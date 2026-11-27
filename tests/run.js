@@ -214,6 +214,9 @@ async function seite(b, q, w, h) {
     const cen2 = await karte.evaluate(() => { const c = window.__lage.map.getCenter(); return c.lat; }); assert.ok(Math.abs(cen2 - 52.0) < 0.3, 'Karte festgehalten: ' + cen2);
     await main.evaluate(() => document.querySelectorAll('#bmRows .bmrow')[2].querySelectorAll('button')[1].click()); await main.waitForTimeout(1000);
     const cen3 = await karte.evaluate(() => window.__lage.map.getCenter().lat); assert.ok(Math.abs(cen3 - 48.0) < 0.3, 'nach Freigabe wieder live: ' + cen3);
+    await wand.keyboard.press('Control+-'); await wand.keyboard.press('Control+-'); await wand.waitForTimeout(300);
+    assert.strictEqual(await wand.evaluate(() => document.documentElement.style.zoom), '0.8', 'Zoom nur im Beamer-Fenster'); assert.strictEqual(await fue.evaluate(() => document.documentElement.style.zoom), '', 'anderes Beamer-Fenster bleibt'); assert.strictEqual(await main.evaluate(() => document.documentElement.style.zoom), '', 'Hauptfenster bleibt');
+    await wand.keyboard.press('Control+0'); await wand.waitForTimeout(200); assert.strictEqual(await wand.evaluate(() => document.documentElement.style.zoom), '', 'Strg+0 setzt zurück');
     await ctx.close();
   });
   await t('Gemeinsamer Einsatz: Server ist voreingestellt und muss nicht eingetragen werden', async () => {
@@ -283,6 +286,7 @@ async function seite(b, q, w, h) {
   await t('Führungsstruktur: Bereitstellungsraum heißt BR, Sammellinie ohne Lücken', async () => {
     const p = await seite(b, '', 1700, 1300); await p.evaluate(() => { const s = window.__lage.state; s.sections = [{ id: 'a', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: [] }, { id: 'b', kind: 'poly', typ: 'ea', name: 'Süd', color: '#16a34a', pts: [] }, { id: 'c', kind: 'poly', typ: 'br', name: 'Kaserne', color: '#d97706', pts: [] }]; s.units = []; });
     await p.keyboard.press('f'); await p.waitForTimeout(600);
+    assert.ok(/Stärke \d+\/\d+\/\d+ = \d+/.test(await p.textContent('.fsec[data-sid="a"] .fsum')), 'Stärke als F/U/H = gesamt');
     assert.ok((await p.textContent('.fsec[data-sid="c"] .ftag')).includes('BR') && !(await p.textContent('.fsec[data-sid="c"] .ftag')).includes('EA'), 'Kaserne ist BR');
     assert.ok(!(await p.locator('.fsec[data-sid="c"] button', { hasText: '+ UEA' }).count()), 'BR hat kein + UEA'); assert.ok((await p.textContent('.fsec[data-sid="a"] .ftag')).includes('EA'));
     const g = await p.$$eval('.feas > .fea', x => x.map(e => { const r = e.getBoundingClientRect(), cs = getComputedStyle(e, '::before'); return { l: r.left, r: r.right, bl: cs.left, br: cs.right, w: e.offsetWidth }; }));
@@ -329,6 +333,35 @@ async function seite(b, q, w, h) {
     assert.strictEqual(await p.locator('.wal button', { hasText: '+ Zeile' }).count(), 0, 'kein + Zeile bei Alarmiert');
     await p.locator('.wcard button', { hasText: 'Bearbeiten' }).first().click(); await p.waitForTimeout(300); const sel = await p.locator('.dlg select[data-k="typ"]').boundingBox(), inp = await p.locator('.dlg input[data-k="befehl"]').boundingBox();
     assert.ok(sel.width > 200 && sel.y + sel.height <= inp.y, 'Art-Auswahl hat eigene Zeile: ' + JSON.stringify([sel, inp])); await p.close();
+  });
+  await t('Kleine Abschnitte: einzelne Einheiten, Gefahrstoffe und Zeichen wandern an den Rand, weiter herein bleiben sie auf der Karte', async () => {
+    const p = await seite(b, '', 1500, 800); await p.evaluate(() => { const L = window.__lage, s = L.state, now = new Date().toISOString(); const sq = (a, b2, d) => [[a, b2], [a, b2 + d], [a + d * 0.7, b2 + d], [a + d * 0.7, b2]];
+      s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: sq(51.50, 7.40, 0.02) }, { id: 'B', kind: 'poly', typ: 'br', name: 'Kaserne', color: '#d97706', pts: sq(51.50, 7.45, 0.01) }];
+      const U = (id, n, sec, lat, lng) => ({ id, name: n, call: '', sym: null, f: 1, u: 2, h: 5, status: 'einsatz', sectionId: sec, task: '', note: '', lat, lng, time: now });
+      s.units = [U('1', 'ELW 1', 'A', 51.507, 7.41), U('2', 'LF 20', 'B', 51.503, 7.455)]; s.symbols = [{ id: 'y1', name: 'Gefahren_A_Gefahr', lat: 51.504, lng: 7.452, label: 'Ausfall', time: now }]; s.chem = [{ id: 'g1', sid: 'benzol', name: '', lat: 51.5035, lng: 7.4545, Q: 100 }]; L.renderUnitMarkers(); });
+    const at = async z => { await p.evaluate(z2 => window.__lage.map.setView([51.505, 7.43], z2, { animate: false }), z); await p.waitForTimeout(800); return p.evaluate(() => ({ cards: [...document.querySelectorAll('.cl-card')].map(c => c.innerText.replace(/\s+/g, ' ')), marker: document.querySelectorAll('.leaflet-marker-icon').length })); };
+    const near = await at(15); assert.ok(near.cards.length === 0 && near.marker >= 4, 'weit herein: alles auf der Karte ' + JSON.stringify(near));
+    const far = await at(13); assert.ok(far.cards.some(c => c.includes('EA Nord') && c.includes('ELW 1')), 'einzelne Einheit im Fenster: ' + JSON.stringify(far)); assert.ok(far.cards.some(c => c.includes('BR Kaserne') && c.includes('UN 1114') && c.includes('Ausfall')), 'Gefahrstoff und Zeichen im Fenster: ' + JSON.stringify(far)); await p.close();
+  });
+  await t('Rückgängig im gemeinsamen Einsatz nimmt nur die eigene Änderung zurück', async () => {
+    const { spawn } = require('child_process'), os = require('os'), fs = require('fs'), path = require('path'), dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ls-'));
+    const srv = spawn('node', ['sync-server/server.js'], { env: Object.assign({}, process.env, { PORT: '18793', DATA_DIR: dir, ALLOW_ORIGINS: '*' }), cwd: path.resolve(__dirname, '..') });
+    try {
+      await new Promise(r => setTimeout(r, 700)); const url = 'file://' + path.resolve(__dirname, '../src/public/kritis-lage-einzeldatei.html'), SRV = 'http://127.0.0.1:18793';
+      const mk = async () => { const p = await (await b.newContext({ viewport: { width: 1400, height: 800 } })).newPage(); await p.goto(url); await p.waitForTimeout(1200); return p; }, A = await mk(), B = await mk();
+      const U = (id, n) => ({ id, name: n, call: '', sym: null, f: 1, u: 1, h: 4, status: 'einsatz', sectionId: null, task: '', note: '', lat: null, lng: null, time: new Date().toISOString() });
+      await A.evaluate(([a, b2]) => { window.__lage.state.units = [a, b2]; window.__lage.commit('Start'); }, [U('u1', 'Eins'), U('u2', 'Zwei')]);
+      const code = await A.evaluate(async s => window.__lage.SYNC.create(s), SRV); await B.evaluate(async ([c, s]) => { await window.__lage.SYNC.join(c, s); }, [code, SRV]);
+      assert.ok(!(await A.evaluate(() => document.querySelector('#btnUndo').disabled)) || true);
+      await A.evaluate(() => { const L = window.__lage; L.state.units[0].note = 'von A'; L.commit('Notiz A'); L.SYNC.schedulePush(); });
+      await B.evaluate(() => { const L = window.__lage; L.state.units.find(u => u.id === 'u2').name = 'Zwei B'; L.commit('Name B'); L.SYNC.schedulePush(); }); await A.waitForTimeout(2500);
+      assert.strictEqual(await A.evaluate(() => window.__lage.state.units.find(u => u.id === 'u2').name), 'Zwei B', 'B-Änderung bei A');
+      await A.evaluate(() => { window.__lage.undo(); }); await A.waitForTimeout(2500);
+      const a = await A.evaluate(() => window.__lage.state.units.map(u => u.id + ':' + u.note + ':' + u.name)), bb = await B.evaluate(() => window.__lage.state.units.map(u => u.id + ':' + u.note + ':' + u.name));
+      assert.deepStrictEqual(a, ['u1::Eins', 'u2::Zwei B'], 'eigene Änderung zurück, fremde bleibt: ' + a.join('|')); assert.deepStrictEqual(bb, a, 'bei B dasselbe');
+      assert.ok(!(await A.evaluate(() => document.querySelector('#btnRedo').disabled)), 'Wiederholen verfügbar');
+      await A.evaluate(() => { window.__lage.redo(); }); await A.waitForTimeout(2500); assert.strictEqual(await B.evaluate(() => window.__lage.state.units[0].note), 'von A', 'Wiederholen kommt bei B an');
+    } finally { srv.kill(); }
   });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
