@@ -19,7 +19,7 @@ async function seite(b, q, w, h) {
   });
   await t('Burger-Menü öffnet und schließt, Lagevortrag und Dunkelmodus liegen in der Kopfzeile', async () => {
     const p = await seite(b, '?rolle=S2'); assert.ok(await p.locator('#btnVortrag').isVisible()); assert.ok(await p.locator('#btnTheme').isVisible());
-    await p.click('#btnMore'); await p.waitForTimeout(500); assert.ok(await p.locator('#btnUnits').isVisible());
+    await p.click('#btnMore'); await p.waitForTimeout(500); assert.ok(await p.locator('#btnUnits').isVisible()); assert.ok(await p.locator('#btnSync').isVisible()); assert.notStrictEqual(await p.$eval('#btnSync', e => getComputedStyle(e).color), 'rgb(255, 255, 255)', 'Menüschrift ist nicht weiß auf hellem Grund');
     await p.keyboard.press('Escape'); await p.waitForTimeout(500); assert.ok(!(await p.locator('#btnUnits').isVisible())); await p.close();
   });
   await t('Lagevortrag starten und beenden', async () => {
