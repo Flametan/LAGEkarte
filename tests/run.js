@@ -187,6 +187,14 @@ async function seite(b, q, w, h) {
     assert.ok(await p.evaluate(() => document.body.classList.contains('dual') && !document.querySelector('#unitOv').hidden && !document.querySelector('#fueOv').hidden));
     await p.click('#tabs [data-act="map"]'); await p.waitForTimeout(400); assert.ok(await on('map') && !(await on('wand'))); await p.close();
   });
+  await t('Stabswand: + Einheit im Abschnitt, Aufforderung zum Einzeichnen auf der Karte', async () => {
+    const p = await seite(b, '', 1700, 1300); await p.evaluate(() => { const s = window.__lage.state; s.areas = []; s.sections = [{ id: 'ea1', kind: 'poly', typ: 'ea', name: 'EA Süd', color: '#2563eb', pts: [] }]; s.units = []; });
+    await p.keyboard.press('u'); await p.waitForTimeout(500); await p.evaluate(() => document.querySelector('#ovStat').dispatchEvent(new Event('change'))); await p.waitForTimeout(300);
+    await p.locator('.wcard button', { hasText: '+ Einheit' }).click(); await p.waitForTimeout(300);
+    await p.locator('.dlg input').first().fill('LF Test'); await p.locator('.dlg button.primary').first().click(); await p.waitForTimeout(400);
+    const u = await p.evaluate(() => window.__lage.state.units[0]); assert.ok(u && u.sectionId === 'ea1' && u.lat != null, 'Einheit im Abschnitt und mit Ort');
+    await p.click('#tabs [data-act="map"]'); await p.waitForSelector('.drawask', { timeout: 4000 }); assert.ok((await p.textContent('.drawask')).includes('EA Süd')); await p.close();
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));

@@ -490,6 +490,7 @@ header .qb button:hover:not(:disabled) { background: #e2e8f0; }
 .clamp.open { display: block; -webkit-line-clamp: unset; cursor: pointer; }
 #panelToggle { z-index: 1700; }
 #unitOv { padding-left: 28px; }
+.wbtns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
 body.dual #unitOv { right: 50%; } body.dual #fueOv { left: 50%; border-left: 2px solid var(--line); }
 .ovunit { touch-action: pan-y; position: relative; }
 .ovunit .grip { cursor: grab; touch-action: none; user-select: none; color: #94a3b8; font-weight: 700; letter-spacing: -2px; padding: 8px 2px; margin: -8px 0 -8px -6px; align-self: stretch; display: flex; align-items: center; }
@@ -1946,13 +1947,36 @@ function inlineRename(node, current, done) {
 /* Zeichnen */
 function stopDraw() {
   if (runtime.drawHandler) { try { runtime.drawHandler.disable(); } catch (e) { /* bereits aus */ } }
-  runtime.drawHandler = null; runtime.drawPurpose = null;
+  runtime.drawHandler = null; runtime.drawPurpose = null; runtime.drawSecId = null;
   runtime.mode = null; runtime.placing = null;
   if (runtime.measure) { map.removeLayer(runtime.measure.line); runtime.measure = null; }
   document.querySelectorAll('.btn.active').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('#symGrid .sel').forEach(b => b.classList.remove('sel'));
   map.getContainer().style.cursor = '';
   say('');
+}
+function einsatzCenter() {
+  let pts = [];
+  state.areas.forEach(a => a.rings.forEach(r => r.forEach(p => pts.push(p))));
+  if (!pts.length) state.units.forEach(u => { if (u.lat != null) pts.push([u.lat, u.lng]); });
+  if (!pts.length) state.sections.forEach(x => (x.pts || []).forEach(p => pts.push(p)));
+  const c = pts.length ? L.latLngBounds(pts).getCenter() : map.getCenter();
+  return map.getBounds().contains(c) ? c : (pts.length ? c : map.getCenter());
+}
+function promptDrawSection() {
+  if (runtime.viewer || ro('sections') || runtime.drawHandler) return;
+  runtime.drawAsked = runtime.drawAsked || new Set();
+  const sx = state.sections.find(x => x.kind !== 'line' && (!x.pts || x.pts.length < 3) && !runtime.drawAsked.has(x.id)); if (!sx) return;
+  const c = einsatzCenter(); if (!map.getBounds().pad(-0.15).contains(c)) map.setView(c, Math.max(map.getZoom(), 14));
+  const kind = { ea: 'EA', br: 'BR', el: 'EL' }[sx.typ] || (sx.parentId ? 'UEA' : 'EA');
+  const pop = L.popup({ closeOnClick: false, autoClose: false, className: 'drawask', minWidth: 240 }).setLatLng(c).setContent(el('div', {},
+    el('b', { text: kind + ' „' + sx.name + '“ ist noch nicht auf der Karte.' }), el('div', { class: 'hint', text: 'Fläche einzeichnen: Ecken anklicken, Doppelklick beendet.' }),
+    el('div', { class: 'row' }, el('button', { class: 'btn small primary', text: 'Jetzt einzeichnen', onclick: () => { map.closePopup(pop); runtime.drawAsked.add(sx.id); drawExistingSection(sx); } }),
+      el('button', { class: 'btn small', text: 'Später', onclick: () => { map.closePopup(pop); runtime.drawAsked.add(sx.id); setTimeout(promptDrawSection, 300); } })))).openOn(map);
+}
+function drawExistingSection(sx) {
+  try { $('#secColor').value = /^#[0-9a-f]{6}$/i.test(sx.color || '') ? sx.color : $('#secColor').value; } catch (e) { /* Farbe egal */ }
+  startDraw('polygon', 'section'); runtime.drawSecId = sx.id; say('„' + sx.name + '“: Ecken anklicken, Doppelklick beendet. Esc bricht ab.', 8000);
 }
 function startDraw(kind, purpose, btn) {
   stopDraw();
@@ -1964,11 +1988,14 @@ function startDraw(kind, purpose, btn) {
   if (btn) btn.classList.add('active');
 }
 map.on(L.Draw.Event.CREATED, e => {
-  const purpose = runtime.drawPurpose; stopDraw();
+  const purpose = runtime.drawPurpose, secId0 = runtime.drawSecId; stopDraw();
   if (purpose === 'area') {
     const ring = e.layer.getLatLngs()[0].map(p => [p.lat, p.lng]);
     const rect = e.layerType === 'rectangle', cnt = state.areas.filter(a => a.kind === (rect ? 'rect' : 'polygon')).length + 1;
     addArea({ kind: rect ? 'rect' : 'polygon', name: (rect ? 'Rechteck ' : 'Polygon ') + cnt, rings: [ring] });
+  } else if (purpose === 'section' && secId0 && state.sections.some(x => x.id === secId0)) {
+    const sx = state.sections.find(x => x.id === secId0); sx.pts = e.layer.getLatLngs()[0].map(p => [p.lat, p.lng]);
+    addJournal('Abschnitt eingezeichnet: ' + sx.name, true); renderSections(); renderUnits(); renderAbschnitte(); save('Abschnitt eingezeichnet: ' + sx.name); setTimeout(promptDrawSection, 600);
   } else if (purpose === 'section') {
     const isLine = e.layerType === 'polyline';
     const ll = isLine ? e.layer.getLatLngs() : e.layer.getLatLngs()[0];
@@ -4660,7 +4687,7 @@ function wandCard(sx, sums) {
   return el('div', { class: 'ea wcard', 'data-kind': wandKind(sx) }, el('div', { class: 'k' }, el('span', { text: kind }), el('b', { text: sx.name })),
     el('div', { class: 'm' }, el('div', {}, el('span', { text: 'Befehlsstelle ' }), el('b', { text: sx.befehl || '' })), el('div', {}, el('span', { text: 'Leiter ' }), el('b', { text: sx.leader || '' })), el('div', {}, el('span', { text: 'Kommunikation ' }), el('b', { text: sx.radio || '' })), el('div', {}, el('span', { text: 'Auftrag ' }), el('b', { text: sx.task || '' }))),
     el('div', { class: 's' }, el('div', {}, el('span', { text: 'Einsatzbeginn ' }), el('b', { text: sx.start || '' })), el('div', {}, el('span', { text: 'Mannschaft ' }), el('b', { text: a.f + '/' + a.u + '/' + a.h + ' = ' + a.m })), el('div', {}, el('span', { text: 'Fahrzeuge ' }), el('b', { text: fz })),
-      vw ? null : el('button', { class: 'btn small wedit', text: 'Bearbeiten', onclick: () => editSectionDialog(sx) })));
+      vw ? null : el('div', { class: 'wbtns' }, el('button', { class: 'btn small wedit', text: 'Bearbeiten', onclick: () => editSectionDialog(sx) }), el('button', { class: 'btn small wedit primary', text: '+ Einheit', title: 'Neue Einheit in diesem Abschnitt anlegen, sie erscheint auf der Karte', onclick: () => addUnitDialog({ sectionId: sx.id }) }))));
 }
 function wandBlock(sx, units) {
   const sums = wandSums(sx ? sx.id : null), ids = new Set(sx ? [sx.id, ...state.sections.filter(x => x.parentId === sx.id).map(x => x.id)] : []);
@@ -4678,9 +4705,9 @@ function kcell(secId, key, val, computed) {
 function wandTable(secs) {
   const rows = secs.map(sx => ({ sx, id: sx.id, name: sx.name, sums: wandSums(sx.id) })).concat([{ sx: null, id: null, name: 'ohne Abschnitt', sums: wandSums(null) }]).filter(r => r.sx || r.sums.alle.n || r.sums.abg.n);
   const val = (r, k) => { const o = (state.kraefte.ovr[r.id == null ? '_' : r.id] || {})[k]; return o != null ? o : r.sums[k].m; };
-  const tot = k => rows.reduce((a, r) => a + val(r, k), 0), stand = wandStand();
+  const tot = k => rows.reduce((a, r) => a + val(r, k), 0);
   const tr = r => el('tr', {}, el('th', { scope: 'row', text: r.name }), ...['anf', 'vor', 'abg'].map(k => el('td', {}, kcell(r.id, k, val(r, k), r.sums[k].m), r.sums[k].n ? el('small', { text: r.sums[k].n + ' Einh.' }) : null)));
-  return el('div', { class: 'kt' }, el('div', { class: 'kt-h' }, el('span', { class: 'lbl', text: 'Kräfteübersicht (S1)' }), el('span', { class: 'kt-stand', text: 'STAND: ' + (stand ? fmtTac(stand) : '–') }), ro('kraefte') ? null : el('button', { class: 'btn small', text: 'Stand jetzt', title: 'Stand der Übersicht auf die aktuelle Zeit setzen', onclick: () => { state.kraefte.standIso = nowIso(); renderUnitOverview(); save('Kräfteübersicht: Stand'); } })),
+  return el('div', { class: 'kt' }, el('div', { class: 'kt-h' }, el('span', { class: 'lbl', text: 'Kräfteübersicht (S1)' }), ),
     el('table', { class: 'kt-t' }, el('thead', {}, el('tr', {}, el('th', { text: 'EA' }), el('th', { text: 'alarmiert, auf Anfahrt' }), el('th', { text: 'vor Ort' }), el('th', { text: 'abgelöst' }))),
       el('tbody', {}, ...rows.map(tr), el('tr', { class: 'sig' }, el('th', { text: 'Σ' }), el('td', { text: String(tot('anf')) }), el('td', { text: String(tot('vor')) }), el('td', { text: String(tot('abg')) })))),
     el('textarea', { class: 'kt-note', rows: '1', placeholder: 'Anmerkung, zum Beispiel: davon 560 „weiße Einheiten“', disabled: ro('kraefte') ? 'disabled' : null, onchange: e => { state.kraefte.note = e.target.value; save('Kräfteübersicht: Anmerkung'); } }));
@@ -5456,6 +5483,7 @@ function syncNav() {
   const on = (a, v) => { const n = document.querySelector('#tabs [data-act="' + a + '"]'); if (n) n.classList.toggle('on', !!v); };
   const open = id => { const n = $(id); return !!n && !n.hidden; };
   on('map', !open('#unitOv') && !open('#fueOv')); on('wand', open('#unitOv')); on('fue', open('#fueOv'));
+  { const mv = !open('#unitOv') && !open('#fueOv'); if (runtime.mapSeen === false && mv) setTimeout(promptDrawSection, 450); runtime.mapSeen = mv; }
   document.body.classList.toggle('dual', open('#unitOv') && open('#fueOv') && !runtime.vortrag);
   document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('dim', $('#app').classList.contains('collapsed')));
 }
