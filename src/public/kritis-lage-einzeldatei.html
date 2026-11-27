@@ -1584,6 +1584,7 @@ body { background: #f2f3f5; }
 .addr-opt { display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: inherit; padding: 8px 6px; font: inherit; cursor: pointer; } .addr-opt:hover { background: rgba(183,28,28,.08); }
 #secPop { position: absolute; top: 56px; right: 14px; z-index: 1200; width: 330px; background: #fff; color: #263340; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.25); padding: 12px; } #secPop[hidden] { display: none; } #secPop .row { margin: 8px 0; } :root[data-theme="dark"] #secPop { background: #17233a; color: var(--ink); } body.vortrag #secPop, body.printing #secPop { display: none; }
 #mapBar .mb { border: 1px solid #cdd4dc; background: #fff; color: #263340; border-radius: 5px; padding: 6px 12px; font-weight: 600; }
+#mapBar .mb-ea { background: var(--red); border-color: var(--red); color: #fff; } #mapBar .mb-ea:hover { background: #8e1515; color: #fff; } :root[data-theme="dark"] #mapBar .mb.mb-ea { background: var(--red); color: #fff; border-color: var(--red); }
 #mapBar .mb:hover { border-color: var(--red); background: #fdecea; }
 :root[data-theme="dark"] #mapBar { background: rgba(17,26,43,.96); } :root[data-theme="dark"] #mapBar .mb-t { color: var(--ink); } :root[data-theme="dark"] #mapBar .mb { background: #17233a; color: var(--ink); border-color: #3a4a63; }
 .leaflet-top { top: 54px; }
@@ -1770,6 +1771,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
         <button class="btn primary" id="btnLoad" disabled>Objekte laden</button>
       </div>
       <h2>Abschnitte und Linien</h2>
+      <div class="row"><button class="btn primary" type="button" id="btnEaGebiet" title="Neuen Einsatzabschnitt (EA) anlegen">+ EA</button></div>
       <div id="secList"></div>
       <div class="notice">Die Objekte stammen aus OpenStreetMap und sind keine amtliche KRITIS-Liste. Die Vollständigkeit schwankt je Sektor, am schwächsten bei Rechenzentren, Funkmasten und Finanzwesen. Betreiberdaten des Krisenstabs sind Voraussetzung für eine belastbare Lage.</div>
     </section>
@@ -2134,10 +2136,10 @@ SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
   </aside>
 
   <div id="mapWrap">
-    <div id="secPop" hidden role="dialog" aria-label="Einsatzabschnitt zeichnen"><b>Einsatzabschnitt auf der Karte</b>
+    <div id="secPop" hidden role="dialog" aria-label="Einsatzabschnitt zeichnen"><b>Neuer Einsatzabschnitt (EA)</b>
       <div class="row"><input type="text" id="secName" placeholder="Bezeichnung, z. B. Abschnitt Nord"><input type="color" id="secColor" value="#e11d48" title="Farbe"></div>
       <div class="row"><button class="btn" id="btnSecPoly">Fläche zeichnen</button><button class="btn" id="btnSecLine">Linie zeichnen</button></div>
-      <div class="hint">Zeichnen, dann Doppelklick zum Beenden. Abschnitte ohne Karte legt man in der Führungsstruktur oder auf der Stabswand an.</div></div><div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button><button type="button" class="mb" data-mb="units" title="Einheiten und Stabswand (U)">Kräfte</button><button type="button" class="mb" data-mb="fue" title="Führungsstruktur (F)">Stab</button><button type="button" class="mb" data-mb="sec" title="Einsatzabschnitt oder Linie auf der Karte zeichnen">Abschnitt</button><button type="button" class="mb" data-mb="print" title="Karte drucken oder als PDF speichern">Drucken</button></div>
+      <div class="hint">Zeichnen, dann Doppelklick zum Beenden. Abschnitte ohne Karte legt man in der Führungsstruktur oder auf der Stabswand an.</div></div><div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span><button type="button" class="mb mb-ea" data-mb="sec" title="Neuen Einsatzabschnitt (EA) anlegen: Name und Farbe wählen, Fläche oder Linie auf der Karte zeichnen">+ EA</button><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button><button type="button" class="mb" data-mb="units" title="Einheiten und Stabswand (U)">Kräfte</button><button type="button" class="mb" data-mb="fue" title="Führungsstruktur (F)">Stab</button><button type="button" class="mb" data-mb="print" title="Karte drucken oder als PDF speichern">Drucken</button></div>
     <div id="map"></div>
     <form id="placeSearch" role="search" autocomplete="off"><button type="button" id="placeToggle" aria-label="Ortssuche ein- oder ausklappen" aria-expanded="true" title="Ortssuche ein- oder ausklappen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 21 21"/></svg></button><input type="search" id="placeQ" placeholder="Ort suchen und hinzoomen" aria-label="Ort suchen"><button type="submit" aria-label="Suchen">Suchen</button><div id="placeRes" role="listbox"></div></form>
     <div id="editBar" role="toolbar" aria-label="Eckpunkte bearbeiten"><span id="editTxt">Eckpunkte bearbeiten</span><button id="editOk">Übernehmen (Enter)</button><button id="editCancel">Verwerfen (Esc)</button></div>
@@ -3279,7 +3281,7 @@ function renameSection(sx, name) {
 function removeSection(sx) { state.sections.forEach(x => { if (x.parentId === sx.id) x.parentId = sx.parentId || null; }); state.sections = state.sections.filter(x => x !== sx); state.units.forEach(u => { if (u.sectionId === sx.id) u.sectionId = null; }); renderSections(); renderUnits(); renderAbschnitte(); save('Abschnitt entfernt: ' + sx.name); }
 function renderSecList() {
   const box = $('#secList'); if (!box) return; box.replaceChildren();
-  if (!state.sections.length) box.append(el('div', { class: 'hint', text: 'Noch keine. Im Reiter Lage zeichnen.' }));
+  if (!state.sections.length) box.append(el('div', { class: 'hint', text: 'Noch keine. Mit „+ EA“ anlegen.' }));
   state.sections.forEach(sx => {
     const nm = el('span', { class: 'nm', title: 'Doppelklick zum Umbenennen', text: sx.name, ondblclick: () => inlineRename(nm, sx.name, v => renameSection(sx, v)) });
     const col = el('input', { type: 'color', value: safeColor(sx.color, '#e11d48'), title: 'Farbe',
@@ -6725,6 +6727,7 @@ $('#btnPoly').onclick = e => startDraw('polygon', 'area', e.currentTarget);
 $('#btnRect').onclick = e => startDraw('rectangle', 'area', e.currentTarget);
 $('#btnCircle').onclick = startCircleMode;
 $('#btnLoad').onclick = () => { Object.keys(runtime.sector).forEach(k => { if (runtime.sector[k].s === 'error') queryAreas().forEach(a => LAYERS.filter(l => l.sector === k).forEach(l => { if (state.loaded[a.id]) delete state.loaded[a.id][l.id]; })); }); loadObjects(); };
+$('#btnEaGebiet').onclick = () => { $('#secPop').hidden = false; $('#secName').focus(); };
 $('#btnSecPoly').onclick = e => { $('#secPop').hidden = true; startDraw('polygon', 'section', e.currentTarget); };
 $('#btnSecLine').onclick = e => { $('#secPop').hidden = true; startDraw('polyline', 'section', e.currentTarget); };
 $('#btnJ').onclick = () => { const t = $('#jText').value.trim(); if (t) { addJournal(t); $('#jText').value = ''; } };
