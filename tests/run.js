@@ -221,6 +221,28 @@ async function seite(b, q, w, h) {
     const cen3 = await karte.evaluate(() => window.__lage.map.getCenter().lat); assert.ok(Math.abs(cen3 - 48.0) < 0.3, 'nach Freigabe wieder live: ' + cen3);
     await ctx.close();
   });
+  await t('Gemeinsamer Einsatz: Server, zwei Geräte, gleichzeitige Änderungen, Löschen, Zeichnen bleibt', async () => {
+    const { spawn } = require('child_process'), os = require('os'), fs = require('fs'), path = require('path'), dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ls-'));
+    const srv = spawn('node', ['sync-server/server.js'], { env: Object.assign({}, process.env, { PORT: '18788', DATA_DIR: dir, ALLOW_ORIGINS: '*' }), cwd: path.resolve(__dirname, '..') });
+    try {
+      await new Promise(r => setTimeout(r, 700)); const url = 'file://' + path.resolve(__dirname, '../src/public/kritis-lage-einzeldatei.html'), SRV = 'http://127.0.0.1:18788';
+      const mk = async () => { const c = await b.newContext({ viewport: { width: 1500, height: 800 }, acceptDownloads: true }); const p = await c.newPage(); await p.goto(url); await p.waitForTimeout(1200); return p; };
+      const A = await mk(), B = await mk(), unit = (id, name) => ({ id, name, call: '', sym: null, f: 0, u: 1, h: 1, status: 'einsatz', sectionId: null, task: '', note: '', lat: null, lng: null, time: new Date().toISOString() });
+      await A.evaluate(u => { window.__lage.state.units = [u]; }, unit('u1', 'LF Eins'));
+      const code = await A.evaluate(async s => window.__lage.SYNC.create(s), SRV); assert.ok(/^([A-Z0-9]{4}-){4}[A-Z0-9]{4}$/.test(code), 'Code: ' + code);
+      await B.evaluate(async ([c, s]) => { await window.__lage.SYNC.join(c, s); }, [code, SRV]);
+      assert.deepStrictEqual(await B.evaluate(() => window.__lage.state.units.map(u => u.name)), ['LF Eins']);
+      await Promise.all([A.evaluate(u => { const L = window.__lage; L.state.units.push(u); L.state.units[0].note = 'von A'; L.SYNC.schedulePush(); }, unit('u2', 'RTW Zwei')), B.evaluate(u => { const L = window.__lage; L.state.units.push(u); L.state.units[0].call = 'von B'; L.SYNC.schedulePush(); }, unit('u3', 'GW Drei'))]);
+      await A.waitForTimeout(2500); const view = p => p.evaluate(() => window.__lage.state.units.map(u => [u.id, u.note, u.call].join(':')).sort());
+      const va = await view(A), vb = await view(B); assert.deepStrictEqual(va, vb); assert.deepStrictEqual(va, ['u1:von A:von B', 'u2::', 'u3::']);
+      await A.evaluate(() => { const L = window.__lage; L.state.units = L.state.units.filter(u => u.id !== 'u2'); L.SYNC.schedulePush(); }); await A.waitForTimeout(2000);
+      assert.deepStrictEqual(await B.evaluate(() => window.__lage.state.units.map(u => u.id).sort()), ['u1', 'u3'], 'Löschen kommt an');
+      await B.evaluate(() => { window.__lage.runtime.drawHandler = { disable() { window.__x = 1; } }; }); await A.evaluate(() => { window.__lage.state.units[0].name = 'LF A-neu'; window.__lage.SYNC.schedulePush(); }); await B.waitForTimeout(1800);
+      assert.ok(await B.evaluate(() => !!window.__lage.runtime.drawHandler && !window.__x), 'Zeichnen wurde nicht abgebrochen'); assert.strictEqual(await B.evaluate(() => window.__lage.state.units.find(u => u.id === 'u1').name), 'LF A-neu');
+      assert.ok((await A.textContent('#syncChip')).includes('online'));
+      await B.evaluate(() => { window.__lage.runtime.drawHandler = null; });
+    } finally { srv.kill(); }
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));
