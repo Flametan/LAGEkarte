@@ -1630,6 +1630,24 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
 #tabs [data-tab='staende']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 5h-2v6l5 3 1-1.700-4-2.300z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 5h-2v6l5 3 1-1.700-4-2.300z'/%3E%3C/svg%3E"); }
 #tabs [data-tab='daten']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5 3h11l5 5v13H5zm3 0v6h7V3zm1 11v7h6v-7z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5 3h11l5 5v13H5zm3 0v6h7V3zm1 11v7h6v-7z'/%3E%3C/svg%3E"); }
 .navhid { display: none !important; }
+
+/* Führungsstruktur: schlichte Kästen wie im Entwurf */
+#fueBody .fbox, #fueBody .fbox.hs { display: block; min-width: 200px; max-width: 240px; text-align: center; border: 1px solid #94a3b8; border-top: 4px solid var(--c, #1e40af); border-radius: 4px; box-shadow: none; padding: 6px 10px; background: var(--panel, #fff); }
+#fueBody .fbox.free { border-style: solid; background: var(--panel, #fff); }
+#fueBody .fbox .fsym { display: none; } #fueBody .fbox b { font-size: 13.5px; } #fueBody .fbox small { font-size: 11.5px; }
+#fueBody .fbox .who { font-size: 12px; margin-top: 3px; } #fueBody .fbox .who.free { display: none; } #fueBody .fbox .funk { display: none; }
+#fueBody .fsec { position: relative; border: 0; border-radius: 0; background: none; padding: 0; width: 210px; min-width: 0; max-width: none; margin: 0; }
+#fueBody .fsec.uea { background: none; margin-top: 0; }
+#fueBody .fsec .ftag { position: absolute; left: 4px; top: 8px; z-index: 1; margin: 0; padding: 0 3px; background: none; color: #64748b; font-size: 12px; opacity: 0; transition: opacity .15s; }
+#fueBody .fsec:hover .ftag, #fueBody .ftag:focus { opacity: 1; } @media (pointer: coarse) { #fueBody .fsec .ftag { opacity: .7; } }
+#fueBody .fsec > .fbox { width: 100%; max-width: none; }
+#fueBody .fact { justify-content: center; margin: 6px 0 4px; } #fueBody .fact .btn { padding: 1px 8px; font-size: 11.5px; }
+#fueBody .fsum { justify-content: center; font-size: 11.5px; margin: 4px 0; }
+#fueBody .ftask { text-align: center; }
+#fueBody .fu { border-left: 4px solid var(--c); border-radius: 0; background: rgba(100, 116, 139, .1); padding: 4px 8px; margin: 4px 0; font-size: 12.5px; } #fueBody .fu img { display: none; }
+#fueBody .fuea { margin-top: 4px; }
+#fueBody .fstaff .fhd { text-align: center; margin: 8px 0 4px; } #fueBody .fgrid { justify-content: center; }
+#fueBody .ftrunk { margin-bottom: -2px; } #fueBody .fea { padding-top: 0; } #fueBody .feas { gap: 30px; }
 </style>
 </head>
 <body>
