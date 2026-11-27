@@ -3864,20 +3864,15 @@ function startMeasure(ll) {
 function mapItems(ll) {
   const ok = d => !runtime.viewer && can(d);
   const items = [
-    ok('manualPois') && { label: 'KRITIS-Objekt hier setzen', sub: () => poiTypeItems(ll) },
-    ok('symbols') && { label: 'Taktisches Zeichen hier setzen', sub: () => symbolItems(ll) },
     ok('areas') && { label: 'Kreis um diesen Punkt als Gebiet', sub: [1, 2, 5, 10].map(km => ({ label: km + ' km', onclick: () => circleArea(ll, km) })) },
     { sep: true },
     ok('chem') && { label: 'Gefahrstoff hier melden', sub: Object.values(SUBSTANCES).filter(x => x.verified).map(x => ({ label: x.name + ' (UN ' + x.un + ')', onclick: () => addChem(x.id, ll) })) },
     ok('plumes') && { label: 'Ausbreitungskeule hier ansetzen', sub: [{ label: 'Gauß-Fahne (Berechnung)', onclick: () => addPlume(ll, 'gauss') }, { label: 'Taktische Keule (Sektor)', onclick: () => addPlume(ll, 'takt') }] },
-    ok('units') && { label: 'Einheit hier einsetzen…', onclick: async () => { const v = await askText('Bezeichnung der Einheit', ''); if (v == null || !v.trim()) return; addUnit({ name: v.trim(), lat: ll.lat, lng: ll.lng }); } },
-    ok('problems') && { label: 'Problem hier melden', onclick: () => reportProblemAt(ll) },
     ok('casualties') && { label: 'Personenzahl hier erfassen', sub: casNew().map(([k, v]) => ({ label: v.label, icon: casIcon(k), swatch: casIcon(k) ? null : v.color, onclick: () => askNumberCas(k, ll) })) },
     ok('bhp') && { label: 'Behandlungsplatz hier einrichten', onclick: () => addBhp(ll) },
     !runtime.viewer && { label: 'Journaleintrag mit Ort', onclick: () => journalAt(ll) },
     { sep: true },
     { label: 'Entfernung messen ab hier', onclick: () => startMeasure(ll) },
-    { label: 'Hier zentrieren', onclick: () => map.panTo(ll) },
     { label: 'Koordinaten kopieren (' + fmtLL(ll) + ')', onclick: () => copyText(fmtLL(ll), 'Koordinaten kopiert: ' + fmtLL(ll)) }
   ].filter(Boolean);
   return items.filter((it, i, arr) => !it.sep || (i > 0 && i < arr.length - 1 && !arr[i - 1].sep));
@@ -3908,7 +3903,6 @@ function sectionItems(sx) {
     { label: 'Farbe', swatch: sx.color, sub: () => colorItems(sx.color, c => { sx.color = c; renderSections(); save('Abschnitt umgefärbt: ' + sx.name); }) },
     { label: 'Deckkraft', sub: (sx.kind === 'line' ? [0.3, 0.6, 1] : [0.05, 0.12, 0.25, 0.4]).map(o => ({ label: Math.round(o * 100) + ' %', check: Math.abs(secOp(sx) - o) < 0.01, onclick: () => { sx.opacity = o; renderSections(); save('Deckkraft geändert: ' + sx.name); } })) },
     { label: 'Eckpunkte bearbeiten', onclick: () => startEdit('section', sx) },
-    { label: 'Duplizieren', onclick: () => { state.sections.push(Object.assign(JSON.parse(JSON.stringify(sx)), { id: uid(), name: sx.name + ' (Kopie)' })); renderSections(); save('Abschnitt dupliziert: ' + sx.name); } },
     { label: 'Zoom', onclick: () => map.fitBounds(L.latLngBounds(sx.pts).pad(0.2)) },
     { sep: true },
     { label: 'Löschen', onclick: () => removeSection(sx) }

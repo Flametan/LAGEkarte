@@ -48,7 +48,7 @@ async function seite(b, q, w, h) {
   await t('Rechtsklick-Menü: alles vorhanden, keine Funktionswahl', async () => {
     const p = await seite(b, '?rolle=S5', 1300, 800); await p.mouse.click(700, 400, { button: 'right' }); await p.waitForTimeout(500);
     const l = await p.evaluate(() => [...document.querySelectorAll('.ctx-item')].map(x => x.textContent.trim()));
-    assert.ok(['Gefahrstoff', 'Einheit hier', 'Problem', 'Behandlungsplatz'].every(k => l.some(x => x.includes(k))), l.join('|')); assert.strictEqual(await p.locator('.rolelay').count(), 0); await p.close();
+    assert.ok(['Gefahrstoff', 'Behandlungsplatz', 'Personenzahl', 'Koordinaten'].every(k => l.some(x => x.includes(k))), l.join('|')); assert.ok(!['Einheit hier', 'Problem hier', 'Hier zentrieren', 'KRITIS-Objekt hier', 'Taktisches Zeichen hier'].some(k => l.some(x => x.includes(k))), 'entfernte Einträge sind weg: ' + l.join('|')); assert.strictEqual(await p.locator('.rolelay').count(), 0); await p.close();
   });
   await t('Tastenkürzel: G, T, Fragezeichen', async () => {
     const p = await seite(b, '?rolle=S2'); await p.keyboard.press('g'); await p.waitForTimeout(200);
