@@ -85,7 +85,7 @@ async function seite(b, q, w, h) {
     assert.ok(/^(tag-stark|tag-mittel|nacht-klar)$/.test(await p.evaluate(() => window.__lage.state.wind.cond))); await p.close();
   });
   await t('Meldungs-Vordruck füllt Zahlen aus der Lage vor', async () => {
-    const p = await seite(b, '?rolle=S2'); await p.click('[data-tab="meldungen"]'); await p.selectOption('#mTpl', 'lage'); await p.waitForTimeout(300);
+    const p = await seite(b, '?rolle=S2'); await p.evaluate(() => document.querySelector('[data-tab="meldungen"]').click()); await p.selectOption('#mTpl', 'lage'); await p.waitForTimeout(300);
     const txt = await p.inputValue('#mText'); assert.ok(/LAGEMELDUNG, Stand/.test(txt) && /SK I 0/.test(txt) && /Kräfte: 0 Einheiten/.test(txt)); assert.strictEqual(await p.inputValue('#mDir'), 'aus');
     await p.selectOption('#mTpl', 'nachf'); assert.strictEqual(await p.inputValue('#mKind'), 'Anfrage'); await p.close();
   });
@@ -159,14 +159,17 @@ async function seite(b, q, w, h) {
       s.sections = [{ id: 'ea1', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [] }, { id: 'ea2', kind: 'poly', typ: 'ea', name: 'EA Süd', color: '#16a34a', pts: [] }];
       s.units = [{ id: 'a', name: 'LF 1', call: '', sym: null, f: 1, u: 3, h: 9, status: 'einsatz', sectionId: 'ea1', task: '', note: '', lat: null, lng: null, time: now }]; });
     const nav = await p.$$eval('#tabs button', x => x.filter(e => e.offsetParent).map(e => e.textContent.trim()));
-    assert.deepStrictEqual(nav.slice(0, 4), ['Übersicht', 'Lagekarte', 'Kräfte', 'Führungsstruktur']); assert.ok(!nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
+    assert.deepStrictEqual(nav.slice(0, 5), ['Übersicht', 'Lagekarte', 'Gebiete', 'Kräfte', 'Führungsstruktur']); assert.ok(nav.includes('KRITIS') && !nav.includes('Meldungen') && !nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
     await p.keyboard.press('f'); await p.waitForTimeout(500);
     await p.click('.fsec[data-sid="ea1"]'.replace('.fsec[data-sid="ea1"]', '.fea:first-child .flab')); await p.fill('.dlg input', 'Kanal 12'); await p.keyboard.press('Enter'); await p.waitForTimeout(500);
     assert.strictEqual(await p.evaluate(() => window.__lage.state.sections[0].radio), 'Kanal 12');
     await p.click('.fsec[data-sid="ea1"] .fold'); await p.waitForTimeout(200); assert.strictEqual(await p.locator('.fsec[data-sid="ea1"] .fu').count(), 0);
     const g = await p.locator('.ftag[data-grip="ea2"]').boundingBox(), r = await p.locator('.fsec[data-sid="ea1"]').boundingBox();
     await p.mouse.move(g.x + 8, g.y + 8); await p.mouse.down(); await p.mouse.move(g.x - 30, g.y, { steps: 3 }); await p.mouse.move(r.x + 6, r.y + 60, { steps: 8 }); await p.mouse.up(); await p.waitForTimeout(400);
-    assert.deepStrictEqual(await p.evaluate(() => window.__lage.state.sections.map(s => s.name)), ['EA Süd', 'EA Nord']); await p.close();
+    assert.deepStrictEqual(await p.evaluate(() => window.__lage.state.sections.map(s => s.name)), ['EA Süd', 'EA Nord']);
+    await p.click('.ftr .flab'); await p.fill('.dlg input', 'Kanal 1'); await p.keyboard.press('Enter'); await p.waitForTimeout(300); assert.strictEqual(await p.evaluate(() => window.__lage.state.fue.lines.ls), 'Kanal 1');
+    const pl = await p.evaluate(() => { window.__lage.state.sections[1].pts = [[51.5, 7.4], [51.5, 7.5], [51.45, 7.5]]; const u = window.__lage.addUnit({ name: 'Neu', sectionId: 'ea1', f: 0, u: 1, h: 1 }); return [u.lat, u.lng]; });
+    assert.ok(pl[0] > 51.4 && pl[0] < 51.6 && pl[1] > 7.3 && pl[1] < 7.6, 'Einheit liegt im Abschnitt'); await p.close();
   });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));

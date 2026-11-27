@@ -1344,6 +1344,11 @@ div.fbox { cursor: default; }
 .fbox .funk { display: inline-block; margin-top: 3px; font-size: 10.5px; background: #e0e7ff; color: #1e3a8a; border-radius: 3px; padding: 0 5px; }
 .fstab { border: 2px solid #1e40af; border-radius: 8px; background: rgba(30, 64, 175, .04); padding: 8px 10px; max-width: 520px; }
 .fgrid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.ftop { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; width: 100%; }
+.ftl { display: flex; justify-content: flex-end; align-items: flex-start; } .ftr { display: flex; justify-content: flex-start; align-items: flex-start; } .fstaff { min-width: 0; }
+.fcol { display: flex; flex-direction: column; align-items: center; align-self: stretch; } .fcol .fv { flex: 1; min-height: 30px; height: auto; }
+.fhl { position: relative; flex: none; width: 110px; height: 2px; background: #94a3b8; margin-top: 38px; }
+.ftl .fhl, .ftr .fhl { align-self: flex-start; }
 .feas { display: flex; flex-wrap: nowrap; justify-content: center; gap: 14px; align-items: flex-start; }
 .fea { position: relative; display: flex; flex-direction: column; align-items: center; }
 .fea::before { content: ''; position: absolute; top: 0; left: -7px; right: -7px; border-top: 2px solid #94a3b8; }
@@ -1365,7 +1370,7 @@ span.flab { cursor: default; } span.flab.empty { display: none; }
 .fu { display: flex; gap: 6px; align-items: center; border-left: 4px solid var(--c); padding: 2px 6px; margin: 3px 0; font-size: 12px; background: rgba(100, 116, 139, .08); }
 .fu img { width: 26px; height: 22px; object-fit: contain; flex: none; }
 .fact { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-.fuea { margin-top: 8px; border-top: 2px solid #94a3b8; padding-top: 2px; }
+.fuea { margin-top: 0; }
 #fueFunk { margin-top: 24px; }
 .fst { border-collapse: collapse; width: 100%; background: var(--panel, #fff); border: 1px solid var(--line); }
 .fst th, .fst td { padding: 4px 6px; border-bottom: 1px solid var(--line); text-align: left; }
@@ -1663,13 +1668,13 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
     <nav id="tabs" role="tablist" aria-label="Bereiche">
       <button role="tab" data-tab="einsatz" aria-selected="true"><span>Übersicht</span></button>
       <button type="button" class="nav-act" data-act="map" title="Nur die Karte zeigen, Seitenleiste einklappen"><span>Lagekarte</span></button>
+      <button role="tab" data-tab="gebiet" aria-selected="false"><span>Gebiete</span></button>
       <button type="button" class="nav-act" data-act="wand" title="Stabswand mit Kräfteübersicht (Taste U)"><span>Kräfte</span></button>
       <button type="button" class="nav-act" data-act="fue" title="Führungsstruktur und Kommunikationsplan (Taste F)"><span>Führungsstruktur</span></button>
-      <button role="tab" data-tab="tagebuch" aria-selected="false"><span>Einsatztagebuch</span></button>
-      <button role="tab" data-tab="meldungen" aria-selected="false"><span>Meldungen</span></button>
+      <button role="tab" data-tab="meldungen" class="navhid" aria-selected="false"><span>Meldungen</span></button>
       <div class="nav-grp">Weitere Bereiche</div>
-      <button role="tab" data-tab="gebiet" aria-selected="false"><span>Gebiete</span></button>
-      <button role="tab" data-tab="ebenen" aria-selected="false"><span>Ebenen</span></button>
+      <button role="tab" data-tab="tagebuch" aria-selected="false"><span>Einsatztagebuch</span></button>
+      <button role="tab" data-tab="ebenen" aria-selected="false"><span>KRITIS</span></button>
       <button role="tab" data-tab="objekte" aria-selected="false"><span>Objekte</span></button>
       <button role="tab" data-tab="kraefte" class="navhid" aria-selected="false"><span>Einheiten (Liste)</span></button>
       <button role="tab" data-tab="probleme" class="navhid" aria-selected="false"><span>Probleme</span></button>
@@ -1705,6 +1710,12 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
     </section>
 
     <section class="tabpane" id="tab-gebiet">
+      <h2>Adresse suchen</h2>
+      <form class="row" id="addrForm" autocomplete="off">
+        <input type="search" id="addrQ" placeholder="Straße, Hausnummer, Ort">
+        <button class="btn primary" type="submit">Zur Adresse</button>
+      </form>
+      <div id="addrRes"></div>
       <h2>Gebiet hinzufügen</h2>
       <div class="row">
         <button class="btn" id="btnPoly">Polygon</button>
@@ -1724,9 +1735,12 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
       </form>
       <div id="nomResults"></div>
 
+      <div hidden>
       <h2>Gebietsdatei</h2>
       <div class="row"><input type="file" id="areaFile" accept=".geojson,.json,.kml"></div>
       <div class="hint">GeoJSON oder KML mit Polygon, z. B. eine Evakuierungszone.</div>
+
+      </div>
 
       <h2>Einsatzgebiete</h2>
       <div id="areaList"></div>
@@ -1750,7 +1764,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
         <button class="btn primary" id="btnPoiPlace">Auf Karte setzen</button>
         <span class="hint">Mehrfach klicken ist möglich. Esc beendet. Gesetzte Objekte lassen sich verschieben und bleiben beim Gebietswechsel erhalten.</span>
       </div>
-      <h2>Ebenen</h2>
+      <h2>KRITIS</h2>
       <div id="sectors"></div>
       <div class="hint">Eine Ebene wird erst abgefragt, wenn sie eingeschaltet ist. Große Ebenen (Funkmasten, Supermärkte, Behörden) sind zunächst aus.</div>
     </section>
@@ -5409,7 +5423,7 @@ function setUnitStatus(u, id) {
   addJournal('Einheit ' + (u.name || '–') + ': Status ' + was + ' zu ' + ustat(id).label, true); renderUnits(); renderAbschnitte(); save('Status Einheit ' + u.name + ': ' + ustat(id).label);
 }
 function assignUnit(u, secId) {
-  if ((u.sectionId || null) === (secId || null)) return; u.sectionId = secId; addJournal('Einheit ' + (u.name || '–') + ' zugeteilt: ' + sectionName(secId), true);
+  if ((u.sectionId || null) === (secId || null)) return; u.sectionId = secId; if (u.lat == null && secId) { const p = secAnchor(secId); u.lat = p[0]; u.lng = p[1]; } addJournal('Einheit ' + (u.name || '–') + ' zugeteilt: ' + sectionName(secId), true);
   renderUnits(); renderAbschnitte(); save('Einheit zugeteilt: ' + u.name);
 }
 function askYesNo(title, text, okLabel) {
@@ -5497,8 +5511,17 @@ function mergeUnit(c) {
   renderUnits(); renderAbschnitte(); save('Einheit zurückgeführt: ' + (c.name || '–'));
 }
 function removeUnit(u) { state.units = state.units.filter(x => x !== u); renderUnits(); renderAbschnitte(); save('Einheit gelöscht: ' + u.name); }
+function secAnchor(secId) {   // Ort für eine neue Einheit im Abschnitt: Mitte der Fläche, sonst Mitte der schon platzierten Einheiten, sonst Kartenmitte
+  const sx = state.sections.find(x => x.id === secId); let c = null;
+  if (sx && sx.pts && sx.pts.length > 1) c = L.latLngBounds(sx.pts).getCenter();
+  else if (sx) { const p = state.units.filter(x => x.sectionId === sx.id && x.lat != null); if (p.length) c = L.latLng(p.reduce((a, x) => a + x.lat, 0) / p.length, p.reduce((a, x) => a + x.lng, 0) / p.length); }
+  if (!c) c = map.getCenter();
+  const n = state.units.filter(x => x.lat != null && Math.abs(x.lat - c.lat) < 0.01 && Math.abs(x.lng - c.lng) < 0.01).length, ang = n * 2.4, rad = n ? 0.00025 * (1 + Math.floor(n / 6)) : 0;
+  return [c.lat + Math.sin(ang) * rad, c.lng + Math.cos(ang) * rad * 1.5];
+}
 function addUnit(data) {
   const u = Object.assign({ id: uid(), name: '', call: '', sym: null, f: 0, u: 0, h: 0, status: state.unitStatus[0].id, sectionId: null, task: '', note: '', lat: null, lng: null, time: nowIso() }, data);
+  if (u.lat == null && u.sectionId) { const p = secAnchor(u.sectionId); u.lat = p[0]; u.lng = p[1]; }
   state.units.push(u); addJournal('Einheit angelegt: ' + (u.name || '–') + ', Stärke ' + fmtStr(u), true); renderUnits(); renderAbschnitte(); save('Einheit angelegt: ' + (u.name || '–')); return u;
 }
 function unitItems(u) {
@@ -5839,6 +5862,11 @@ function fueSecBox(sx, level) {
   return box;
 }
 
+function fueHLine(key, name) {
+  const vw = ro('sections'), L0 = state.fue.lines || (state.fue.lines = {}), t = L0[key] || '';
+  return el('div', { class: 'fhl' }, el(vw ? 'span' : 'button', { class: 'flab' + (t ? '' : ' empty'), title: vw ? null : 'Funkgruppe oder Kanal eintragen', text: t || (vw ? '' : '+ Funk'),
+    onclick: vw ? null : async () => { const v = await askText('Funkgruppe EL – ' + name, t); if (v == null) return; state.fue.lines[key] = v.trim(); renderFue(); save('Funkgruppe EL – ' + name); } }));
+}
 function fueLine(sx) {
   const vw = ro('sections'), t = sx.radio || '';
   return el('div', { class: 'fline' }, el(vw ? 'span' : 'button', { class: 'flab' + (t ? '' : ' empty'), title: vw ? null : 'Funkgruppe oder Kanal für diese Verbindung eintragen', text: t || (vw ? '' : '+ Funk'),
@@ -5896,12 +5924,10 @@ function renderFue() {
   const staff = el('div', { class: 'fstabw' }, stabBox, state.fue.fb.length || !runtime.viewer ? el('div', { class: 'fhd small', text: 'Fachberater und Verbindungspersonen' }) : null, fbList);
   const roots = state.sections.filter(x => x.kind !== 'line' && !x.parentId), free = state.units.filter(u => !u.sectionId || !state.sections.some(x => x.id === u.sectionId));
   body.append(el('div', { class: 'forg' },
-    el('div', { class: 'frow c' }, fBox({ title: 'Einsatzleiter (EL)', sub: 'Leiter der Einsatzleitung', name: el1.name, call: el1.call, color: '#0f2a47', sym: 'tz/Führungsstellen/EL', onclick: () => fueEditPerson('EL', 'Einsatzleiter (EL)') })),
-    el('div', { class: 'fv' }),
-    el('div', { class: 'fmid' }, el('div', { class: 'fl' }, staff), el('div', { class: 'fh' }), el('div', { class: 'fspine' }), el('div', { class: 'fh' }),
-      el('div', { class: 'fr' }, fBox({ title: 'Leitstelle', sub: 'Verbindung zur Leitstelle', name: ls.name, call: ls.call, color: '#475569', sym: 'tz/Einrichtungen/Leitstelle', onclick: () => fueEditPerson('LS', 'Leitstelle') }))),
-    el('div', { class: 'fv' }),
-    el('div', { class: 'fhd', text: 'Einsatzabschnitte (EA) und Untereinsatzabschnitte (UEA)' }),
+    el('div', { class: 'ftop' },
+      el('div', { class: 'ftl' }, el('div', { class: 'fstaff' }, staff), fueHLine('stab', 'Führungsstab')),
+      el('div', { class: 'fcol' }, fBox({ title: 'Einsatzleiter (EL)', sub: 'Leiter der Einsatzleitung', name: el1.name, call: el1.call, color: '#0f2a47', sym: 'tz/Führungsstellen/EL', onclick: () => fueEditPerson('EL', 'Einsatzleiter (EL)') }), el('div', { class: 'fv' })),
+      el('div', { class: 'ftr' }, fueHLine('ls', 'Leitstelle'), fBox({ title: 'Leitstelle', sub: 'Verbindung zur Leitstelle', name: ls.name, call: ls.call, color: '#475569', sym: 'tz/Einrichtungen/Leitstelle', onclick: () => fueEditPerson('LS', 'Leitstelle') }))),
     el('div', { class: 'feas' }, ...roots.map(r => el('div', { class: 'fea' }, fueLine(r), fueSecBox(r, 0))),
       free.length ? el('div', { class: 'fea' }, el('div', { class: 'fsec', style: '--c:#94a3b8' }, el('div', { class: 'ftag', text: 'nicht zugeteilt' }), ...free.map(fueUnit))) : null,
       !roots.length && !vw ? el('div', { class: 'hint', text: 'Noch kein Einsatzabschnitt. Mit „+ EA“ anlegen.' }) : null)));
@@ -6524,12 +6550,27 @@ function setPlaceMin(min, keep) {
   if (!min) { if (!keep) setTimeout(() => $('#placeQ').focus(), 0); } else $('#placeRes').replaceChildren();
   if (!keep) { try { localStorage.setItem('kritis-search', min ? 'min' : 'open'); } catch (e) { /* ohne Speicher */ } }
 }
+let addrPin = null;
 function initPlaceSearch() {
   const box = $('#placeRes');
   let st = null; try { st = localStorage.getItem('kritis-search'); } catch (e) { /* ohne Speicher */ }
   setPlaceMin(st ? st === 'min' : (state.areas.length > 0 || !!savedView()), true);
   $('#placeToggle').addEventListener('click', () => setPlaceMin(!$('#placeSearch').classList.contains('min')));
   $('#placeQ').addEventListener('keydown', ev => { if (ev.key === 'Escape') setPlaceMin(true); });
+  $('#addrForm').addEventListener('submit', async ev => {
+    ev.preventDefault(); const q = $('#addrQ').value.trim(), out = $('#addrRes'); if (!q) return; out.replaceChildren(el('div', { class: 'hint', text: 'Suche läuft…' }));
+    try {
+      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 12000);
+      const r = await fetch(NOMINATIM + '?format=jsonv2&limit=5&countrycodes=de&accept-language=de&addressdetails=0&q=' + encodeURIComponent(q), { signal: ctl.signal }); clearTimeout(to);
+      if (!r.ok) throw new Error('HTTP ' + r.status); const list = await r.json(); out.replaceChildren();
+      if (!list.length) { out.append(el('div', { class: 'hint', text: 'Nichts gefunden. Straße und Ort ausschreiben, zum Beispiel „Hansastraße 5, Dortmund“.' })); return; }
+      const go = x => { const ll = [+x.lat, +x.lon]; if (addrPin) addrPin.remove(); addrPin = L.marker(ll).addTo(map).bindTooltip(x.display_name, { permanent: false }); const b = x.boundingbox.map(Number); map.fitBounds([[b[0], b[2]], [b[1], b[3]]], { maxZoom: 18, padding: [40, 40] }); closeUnitOverview(); closeFue(); setPanel(true); };
+      go(list[0]);
+      out.append(el('div', { class: 'hint', text: list[0].display_name }), el('div', { class: 'row' }, el('button', { class: 'btn small', text: 'Markierung entfernen', onclick: () => { if (addrPin) { addrPin.remove(); addrPin = null; } } }),
+        el('a', { class: 'btn small', target: '_blank', rel: 'noopener', href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(list[0].lat + ',' + list[0].lon), text: 'In Google Maps öffnen' })));
+      list.slice(1).forEach(x => out.append(el('button', { type: 'button', class: 'btn small', style: 'display:block;margin:3px 0;text-align:left', text: x.display_name, onclick: () => go(x) })));
+    } catch (e) { out.replaceChildren(el('div', { class: 'hint', text: 'Suche nicht möglich (' + e.message + '). Ohne Internet gibt es keine Adresssuche.' })); }
+  });
   $('#placeSearch').addEventListener('submit', async ev => {
     ev.preventDefault(); const q = $('#placeQ').value.trim(); if (!q) return;
     box.replaceChildren(el('div', { class: 'none', text: 'Suche läuft…' }));
@@ -6786,7 +6827,7 @@ initPlaceSearch(); initialView();
 tickClock(); setInterval(tickClock, 1000);
 $('#panelToggle').innerHTML = panelGlyph(!$('#app').classList.contains('collapsed'));
 liveInit();
-window.__lage = { TileCache, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
+window.__lage = { TileCache, addUnit, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
 })();
 </script>
 </body>
