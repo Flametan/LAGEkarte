@@ -21,6 +21,11 @@ Die LAGEkarte kennt keine Funktionswahl mehr. Der S2 bedient das Programm und ka
 
 Im Reiter Einheiten (Taste U) liegt die Stabswand: Kräfteübersicht mit Zahlen aus den Kacheln, Bereitstellungsräume, Einsatzabschnitte mit Kopfkarte, Aufträge, Ergänzungen (Wetter, Gefahrstoffraute) und Notizen mit der Betroffenentabelle. Kacheln lassen sich ziehen, Doppelklick oder A setzt „auf Anfahrt“. Die Wandoptik schaltet das Menü ein und aus.
 
+## Gemeinsamer Einsatz und Beamer-Fenster
+
+- **Beamer-Fenster:** Menü, "Beamer-Fenster". Einsatzübersicht, Führungsstruktur und Lagekarte laufen in eigenen Fenstern im selben Browser auf einem Rechner und folgen dem Hauptfenster. "Festhalten" friert Ausschnitt und Inhalte ein, die Taste H schaltet den Karten-Beamer um.
+- **Gemeinsamer Einsatz:** Menü, "Gemeinsamer Einsatz". Mehrere Personen bearbeiten über einen Code denselben Einsatz, jede Änderung kommt nach ein, zwei Sekunden bei den anderen an. Dafür läuft ein eigener Server (`sync-server/`, Anleitung dort), die App liegt weiter auf GitHub Pages.
+
 ## Tests
 
 Die Ende-zu-Ende-Tests liegen in `tests/run.js` und laufen mit Playwright gegen die gebaute Einzeldatei `src/public/kritis-lage-einzeldatei.html`:

@@ -2,6 +2,6 @@
   "name": "lagekarte",
   "private": true,
   "description": "LAGEkarte: Lagekarte für den operativ-taktischen Stab (Einzeldatei, ohne Server)",
-  "scripts": { "build": "python3 tools/build_offline.py", "test": "node tests/run.js" },
+  "scripts": { "build": "python3 tools/build_offline.py", "test": "node --test sync-server/test/*.test.js && node tests/run.js" },
   "devDependencies": { "playwright": "^1.48.0" }
 }

@@ -1695,6 +1695,26 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
 @media (max-width: 1500px) { #mapBar .mb { padding: 5px 7px; font-size: 13px; } #placeSearch { width: 170px !important; } #mapBar .mb-t { font-size: 18px; } }
 #app > header h1 .logo { background: none; padding: 0; margin: 0 10px 0 12px; display: flex; align-items: center; }
 #app > header h1 .logo svg { width: 46px; height: 46px; display: block; }
+
+/* Beamer-Fenster */
+.bmcard { width: min(560px, 94vw); } .bmcard h3 { margin-top: 0; }
+.bmrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; }
+.bmrow .bmn { flex: 1 1 160px; display: flex; flex-direction: column; } .bmst { font-size: 12px; color: var(--muted); } .bmst.on { color: #15803d; font-weight: 700; }
+#bmFrozen { position: fixed; right: 10px; bottom: 8px; z-index: 5000; font-size: 11px; color: rgba(100, 116, 139, .75); background: rgba(255, 255, 255, .6); border-radius: 4px; padding: 1px 6px; pointer-events: none; }
+body.viewer #app > header #btnMore, body.viewer #app > header #btnUndo { }
+body.beamerwin #unitOv .ovtools, body.beamerwin #fueOv .ovtools, body.beamerwin #app > header #btnMore, body.beamerwin #app > header #btnTheme, body.beamerwin #app > header #btnVortrag, body.beamerwin #app > header .qb, body.beamerwin #mapBar, body.beamerwin #placeSearch, body.beamerwin #panelToggle, body.beamerwin #reviewSlider { display: none !important; }
+body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
+
+/* Gemeinsamer Einsatz */
+.synccard { width: min(440px, 94vw); } .synccard h3 { margin: 0 0 2px; font-size: 19px; }
+.tabs2 { display: flex; border: 1px solid #94a3b8; border-radius: 9px; overflow: hidden; margin: 12px 0; } .tabs2 button { flex: 1; border: 0; background: none; padding: 8px; font: 700 14px Inter, system-ui, sans-serif; color: var(--ink); cursor: pointer; } .tabs2 button.on { background: var(--red); color: #fff; }
+.slb2 { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 12px 0 4px; }
+.codebox { font: 700 22px 'Courier New', monospace; letter-spacing: .08em; text-align: center; background: rgba(100, 116, 139, .1); border: 1px dashed #94a3b8; border-radius: 10px; padding: 14px 6px; line-height: 1.6; user-select: all; }
+.synccard .line { display: flex; gap: 8px; margin-top: 12px; } .synccard .line .btn { flex: 1; justify-content: center; }
+.synccard .who { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; margin: 6px 0; } .synccard .dot { width: 10px; height: 10px; border-radius: 50%; background: #15803d; } .synccard .dot.off { background: #94a3b8; }
+.synccard .warn { background: #fff7e6; color: #5b3d00; border: 1px solid #f0c36d; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; margin: 12px 0; } :root[data-theme="dark"] .synccard .warn { background: #3a2c10; color: #f5d68a; }
+.synccard input { width: 100%; } .synccode { font: 700 18px 'Courier New', monospace !important; letter-spacing: .06em; text-align: center; }
+#syncChip { cursor: pointer; font-weight: 700; } #app > header #syncChip.sync-ok { background: #15803d !important; border-color: #15803d !important; } #app > header #syncChip.sync-warn { background: #d97706 !important; border-color: #d97706 !important; } #app > header #syncChip.sync-bad { background: #7f1111 !important; }
 </style>
 </head>
 <body>
@@ -1702,7 +1722,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
   <header>
     <div id="hdrTop">
     <h1><span class="logo" role="img" aria-label="Lagekarte"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#fff"/><path d="M5 17l18-7 18 7 18-7v37l-18 7-18-7-18 7z" fill="#e5b9b9"/><path d="M23 10v37M41 17v37" stroke="#fff" stroke-width="2.500"/><path d="M32 8c-8.500 0-15 6.200-15 14 0 10.500 15 24 15 24s15-13.500 15-24c0-7.800-6.500-14-15-14z" fill="#b71c1c" stroke="#fff" stroke-width="3"/><circle cx="32" cy="22" r="5.500" fill="#fff"/></svg></span><span class="lk">karte</span></h1>
-    <span id="hdrTitle" class="hdr-title"></span>
+    <span id="hdrTitle" class="hdr-title"></span><span id="syncChip" class="chip" hidden role="button" tabindex="0"></span>
     <div id="qat" role="toolbar" aria-label="Schnellzugriff">
       <span class="qb"><button id="btnUndo" disabled aria-label="Rückgängig"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></button><button id="btnUndoMenu" class="caret" disabled aria-label="Rückgängig-Liste"><svg viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path fill="currentColor" d="M0 0h10L5 6z"/></svg></button></span>
       <span class="qb"><button id="btnRedo" disabled aria-label="Wiederholen"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg></button><button id="btnRedoMenu" class="caret" disabled aria-label="Wiederholen-Liste"><svg viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path fill="currentColor" d="M0 0h10L5 6z"/></svg></button></span>
@@ -1721,7 +1741,9 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
     <button id="btnTheme" aria-label="Dunkelmodus" title="Hell oder dunkel umschalten"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.5 0-.9-.1-1.4A5.5 5.5 0 0 1 13.4 3.1C12.9 3 12.5 3 12 3z"/></svg></button>
     <div id="hdrMore"><button id="btnMore" aria-label="Menü" aria-haspopup="menu" aria-expanded="false" title="Weitere Funktionen"><i></i><i></i><i></i></button>
     <div id="hdrMenu" role="menu" aria-hidden="true">
+      <button id="btnSync" title="Einsatz mit anderen gemeinsam bearbeiten (Code)">Gemeinsamer Einsatz</button>
       <button id="btnSetup" title="Name und Uhr der Übung oder des Einsatzes einstellen">Einsatz einrichten</button>
+      <button id="btnBeamer" title="Fenster für Beamer öffnen, festhalten und freigeben">Beamer-Fenster</button>
       <button id="btnUnits" title="Alle Einheiten auf einen Blick, zum Beispiel für den Lagevortrag">Einheiten</button>
       <button id="btnFue" title="Führungsstruktur nach FwDV 100 mit Kommunikationsplan">Führungsstruktur</button>
       <button id="btnAddPoi" title="KRITIS-Objekt per Mausklick auf der Karte setzen">+ Objekt</button>
@@ -2581,9 +2603,11 @@ function freshState() {
 let state = freshState();
 const runtime = { sector: {}, mode: null, placing: null, drawPurpose: null, drawHandler: null, vis: new Set() };
 const qs = new URLSearchParams(location.search);
-runtime.viewer = qs.has('ansicht'); runtime.beamer = qs.has('beamer');
+runtime.beamerView = ['karte', 'wand', 'fue'].includes(qs.get('beamer')) ? qs.get('beamer') : null;   // Beamer-Fenster auf demselben Rechner
+runtime.viewer = qs.has('ansicht') || !!runtime.beamerView; runtime.beamer = qs.has('beamer');
 if (runtime.viewer) document.body.classList.add('viewer');
 if (runtime.beamer) document.body.classList.add('beamer');
+if (runtime.beamerView) document.body.classList.add('beamerwin');
 const PAL = ['#2563eb', '#dc2626', '#16a34a', '#d97706', '#7c3aed', '#0891b2', '#db2777', '#475569'];
 const safeColor = (c, d) => /^#[0-9a-f]{6}$/i.test(c || '') ? c : (d || PAL[0]);
 
@@ -2679,29 +2703,33 @@ function commit(label) {
 }
 function updateUndoButtons() {
   const u = $('#btnUndo'), r = $('#btnRedo'); if (!u) return;
-  $('#btnUndoMenu').disabled = !hist.past.length; $('#btnRedoMenu').disabled = !hist.future.length;
+  $('#btnUndoMenu').disabled = !hist.past.length || SYNC.active; $('#btnRedoMenu').disabled = !hist.future.length || SYNC.active;
   const pu = hist.past[hist.past.length - 1], fr = hist.future[hist.future.length - 1];
-  u.disabled = !pu; r.disabled = !fr;
+  u.disabled = !pu || SYNC.active; r.disabled = !fr || SYNC.active;
   u.title = pu ? 'Rückgängig: ' + pu.label + ' (Strg+Z)' : 'Nichts rückgängig zu machen';
   r.title = fr ? 'Wiederholen: ' + fr.label + ' (Strg+Y)' : 'Nichts zu wiederholen';
 }
 function undo() {
   if (runtime.viewer) return;
+  if (SYNC.active) { say('Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.', 3500); return; }
   commit('Änderung'); const e = hist.past.pop(); if (!e) return;
   hist.future.push(e); restore(e.before); addJournal('Rückgängig: ' + e.label, true); updateUndoButtons();
 }
 function redo() {
   if (runtime.viewer) return;
+  if (SYNC.active) { say('Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.', 3500); return; }
   commit('Änderung'); const e = hist.future.pop(); if (!e) return;
   hist.past.push(e); restore(e.after); addJournal('Wiederholt: ' + e.label, true); updateUndoButtons();
 }
-function undoTo(n) {            // n Schritte auf einmal zurück (Liste wie in Word)
+function undoTo(n) {
+  if (SYNC.active) { say('Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.', 3500); return; }            // n Schritte auf einmal zurück (Liste wie in Word)
   commit('Änderung'); n = Math.min(n, hist.past.length); if (!n) return;
   const taken = []; for (let i = 0; i < n; i++) { const e = hist.past.pop(); hist.future.push(e); taken.push(e); }
   restore(taken[taken.length - 1].before);
   addJournal('Rückgängig: ' + taken[0].label + (n > 1 ? ' und ' + (n - 1) + ' weitere' : ''), true); updateUndoButtons();
 }
 function redoTo(n) {
+  if (SYNC.active) { say('Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.', 3500); return; }
   commit('Änderung'); n = Math.min(n, hist.future.length); if (!n) return;
   const taken = []; for (let i = 0; i < n; i++) { const e = hist.future.pop(); hist.past.push(e); taken.push(e); }
   restore(taken[taken.length - 1].after);
@@ -2738,6 +2766,8 @@ function persist() {
   if (runtime.viewer) return;                 // Ansicht schreibt nie in den Browserspeicher
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveNow, 300);
+  if (typeof scheduleBc === 'function') scheduleBc();
+  if (typeof SYNC !== 'undefined') SYNC.schedulePush();
   if (runtime.live) schedulePush();
 }
 // save('Bezeichnung') legt einen Rückgängig-Schritt an, save() sichert nur im Browser.
@@ -4147,13 +4177,317 @@ function lockViewer(root) {
   root.querySelectorAll('button').forEach(b => { if (/Löschen|Ort setzen|Entfernen|Versorgt|melden/.test(b.textContent)) b.disabled = true; });
 }
 map.on('popupopen', e => { if (runtime.viewer) lockViewer(e.popup.getElement()); });
+
+/* ------------------------------------------------------------------ */
+/* Beamer-Fenster: mehrere Fenster im selben Browser auf einem Rechner */
+/* ------------------------------------------------------------------ */
+const BEAMER_VIEWS = [['wand', 'Einsatzübersicht'], ['fue', 'Führungsstruktur'], ['karte', 'Lagekarte']];
+const bcast = (() => { let ch = null; try { ch = new BroadcastChannel('lagekarte-beamer'); } catch (e) { /* nicht verfügbar */ } return { ok: !!ch, send: m => { try { if (ch) ch.postMessage(m); } catch (e) { /* zu groß o. Ä. */ } }, on: f => { if (ch) ch.onmessage = e => f(e.data); } }; })();
+let bcTimer = 0;
+const viewBox = () => { const b = map.getBounds(); return [[b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]]; };
+function bcSendState() { if (runtime.viewer) return; bcast.send({ t: 'state', state: shareState(), view: viewBox() }); }
+function scheduleBc() { if (runtime.viewer || !bcast.ok) return; clearTimeout(bcTimer); bcTimer = setTimeout(bcSendState, 250); }
+function beamerApply(m) {
+  const bv = runtime.beamerView;
+  if (m.state) applyRemote(m.state);
+  if (bv === 'wand' && $('#unitOv').hidden) { $('#ovGroup').value = 'wand'; openUnitOverview(); }
+  if (bv === 'fue' && $('#fueOv').hidden) openFue();
+  if (bv === 'karte' && m.view) map.fitBounds(L.latLngBounds(m.view), { animate: false });
+  if (bv === 'fue') renderFue(); if (bv === 'wand') renderUnitOverview();
+  runtime.beamerStand = Date.now();
+}
+function beamerShowFrozen() {
+  let b = $('#bmFrozen'); if (!runtime.beamerFrozen) { if (b) b.remove(); return; }
+  if (!b) { b = el('div', { id: 'bmFrozen' }); document.body.append(b); }
+  b.textContent = 'Stand festgehalten ' + fmtHM(runtime.beamerStand || Date.now());
+}
+function beamerStart() {
+  const bv = runtime.beamerView; document.title = 'Beamer: ' + BEAMER_VIEWS.find(x => x[0] === bv)[1];
+  runtime.beamerFrozen = false; runtime.beamerPending = null;
+  bcast.on(m => {
+    if (m.t === 'state') { if (runtime.beamerFrozen) runtime.beamerPending = m; else beamerApply(m); }
+    else if (m.t === 'ctl' && (m.target === bv || m.target === '*')) {
+      if (m.freeze === true) { runtime.beamerFrozen = true; runtime.beamerStand = runtime.beamerStand || Date.now(); }
+      else if (m.freeze === false) { runtime.beamerFrozen = false; if (runtime.beamerPending) { beamerApply(runtime.beamerPending); runtime.beamerPending = null; } }
+      if (m.refresh) { if (runtime.beamerPending) { beamerApply(runtime.beamerPending); runtime.beamerPending = null; } else bcast.send({ t: 'hello', view: bv }); }
+      beamerShowFrozen();
+    }
+  });
+  const beat = () => bcast.send({ t: 'beat', view: bv, frozen: !!runtime.beamerFrozen, pending: !!runtime.beamerPending });
+  bcast.send({ t: 'hello', view: bv }); setInterval(beat, 2000); beat();
+  if (!bcast.ok) say('Dieser Browser kann keine Beamer-Fenster abgleichen.', 8000);
+  else say('Warte auf das Hauptfenster… (muss im selben Browser offen sein)', 4000);
+}
+function beamerMainStart() {
+  runtime.beamers = {};
+  bcast.on(m => {
+    if (m.t === 'hello') bcSendState();
+    else if (m.t === 'beat') { runtime.beamers[m.view] = { time: Date.now(), frozen: m.frozen, pending: m.pending }; if ($('#bmDlg')) renderBeamerDlg(); }
+  });
+  map.on('moveend', () => { clearTimeout(runtime.bcView); runtime.bcView = setTimeout(() => { if (!runtime.viewer) bcast.send({ t: 'view', view: viewBox() }); }, 250); });
+  setInterval(() => { if ($('#bmDlg')) renderBeamerDlg(); }, 2500);
+}
+const beamerAlive = v => runtime.beamers && runtime.beamers[v] && Date.now() - runtime.beamers[v].time < 6000;
+function beamerCtl(target, o) { bcast.send(Object.assign({ t: 'ctl', target }, o)); if (target !== '*' && runtime.beamers[target]) { if (o.freeze !== undefined) runtime.beamers[target].frozen = o.freeze; } renderBeamerDlg(); }
+function beamerToggleKarte() { const v = 'karte'; if (!beamerAlive(v)) { say('Der Karten-Beamer ist nicht geöffnet. Menü, Beamer.', 4000); return; } const fr = !runtime.beamers[v].frozen; beamerCtl(v, { freeze: fr }); say('Karten-Beamer ' + (fr ? 'festgehalten: Ausschnitt und Inhalte bleiben stehen.' : 'freigegeben: folgt wieder dem Hauptfenster.'), 4000); }
+function renderBeamerDlg() {
+  const box = $('#bmRows'); if (!box) return; box.replaceChildren();
+  BEAMER_VIEWS.forEach(([v, name]) => {
+    const st = runtime.beamers[v], alive = beamerAlive(v);
+    box.append(el('div', { class: 'bmrow' }, el('div', { class: 'bmn' }, el('b', { text: name }), el('span', { class: 'bmst' + (alive ? ' on' : ''), text: alive ? (st.frozen ? 'verbunden, festgehalten' : 'verbunden, live') : 'nicht geöffnet' })),
+      el('button', { class: 'btn small', text: alive ? 'Fenster nach vorn' : 'Fenster öffnen', onclick: () => { const u = location.href.split('#')[0].split('?')[0] + '?beamer=' + v; const w = window.open(u, 'lage-beamer-' + v); if (!w) say('Der Browser hat das Fenster blockiert. Pop-ups für diese Seite erlauben.', 5000); else w.focus(); } }),
+      el('button', { class: 'btn small' + (alive && st.frozen ? ' primary' : ''), text: alive && st.frozen ? 'Freigeben' : 'Festhalten', disabled: alive ? null : 'disabled', title: 'Festgehalten: Ausschnitt und Inhalte bleiben auf dem Beamer stehen', onclick: () => beamerCtl(v, { freeze: !st.frozen }) }),
+      el('button', { class: 'btn small', text: 'Jetzt aktualisieren', disabled: alive && st.frozen ? null : 'disabled', title: 'Nur bei festgehaltenem Beamer: einmal den aktuellen Stand zeigen', onclick: () => beamerCtl(v, { refresh: true }) })));
+  });
+}
+function openBeamerDlg() {
+  if ($('#bmDlg')) return;
+  const dlg = el('div', { id: 'bmDlg', class: 'dlg', role: 'dialog', 'aria-modal': 'true' }, el('div', { class: 'bmcard' },
+    el('h3', { text: 'Beamer-Fenster' }), el('div', { class: 'hint', text: 'Jedes Fenster zeigt immer seine Ansicht und folgt diesem Hauptfenster. Fenster auf den jeweiligen Beamer ziehen und dort F11 für Vollbild drücken. Alle Fenster müssen in diesem Browser laufen.' }),
+    el('div', { id: 'bmRows' }), el('div', { class: 'hint', text: 'Festhalten friert Ausschnitt und Inhalte auf dem Beamer ein, während Sie hier weiterarbeiten. Taste H schaltet den Karten-Beamer um.' }),
+    el('div', { class: 'row' }, el('button', { class: 'btn primary', style: 'flex:1;justify-content:center', text: 'Schließen', onclick: () => dlg.remove() }))));
+  dlg.addEventListener('mousedown', e => { if (e.target === dlg) dlg.remove(); }); dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); dlg.remove(); } });
+  document.body.append(dlg); renderBeamerDlg(); bcSendState();
+}
+/* ------------------------------------------------------------------ */
+/* Gemeinsamer Einsatz: Abgleich über den eigenen Sync-Server          */
+/* Ein Code (20 Zeichen) ersetzt das Konto. Daraus entstehen im Browser Kennung, Zugriffsschlüssel und */
+/* Verschlüsselung (HKDF, AES-GCM). Der Server sieht nur unlesbare Blöcke. Zusammengeführt wird je Feld */
+/* auf den Geräten: Die spätere Änderung gewinnt, gelöscht ist gelöscht.                               */
+/* ------------------------------------------------------------------ */
+const SYNC = (() => {
+  const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', K = { code: 'lagekarte_sync_code', url: 'lagekarte_sync_url', pre: 'lagekarte_pre_sync' };
+  const ENC = new TextEncoder(), DEC = new TextDecoder();
+  const ARR = ['areas', 'sections', 'symbols', 'units', 'deps', 'casualties', 'problems', 'plumes', 'chem', 'bhp', 'measure', 'auftraege', 'journal', 'messages', 'stands', 'roles', 'unitStatus', 'fue.fb', 'fue.funk', 'kraefte.alarmiert', 'kraefte.rows', 'manual'];
+  const MAP2 = ['objects', 'logi', 'fue.people', 'kraefte.ovr'], OBJ1 = ['exercise', 'weather', 'meeting', 'wind'], BYTIME = ['journal', 'messages', 'stands'];
+  const AREA_F = ['id', 'name', 'color', 'opacity', 'visible', 'query', 'kind', 'rings', 'areaId', 'circle'];
+  const S = { active: false, code: '', url: '', creds: null, reg: new Map(), base: null, seq: 0, online: 0, status: 'off', msg: '', client: Math.random().toString(16).slice(2, 8).padEnd(6, '0'), lastMs: 0, ctr: 0, ac: null, pushT: 0, pending: new Set(), renderT: 0, loopId: 0, since: 0, snapSeq: 0 };
+  const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* ohne Speicher */ } }, del(k) { try { localStorage.removeItem(k); } catch (e) { /* ohne Speicher */ } } };
+  const norm = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''), valid = s => { s = norm(s); return s.length === 20 && [...s].every(c => ALPHA.includes(c)); };
+  const pretty = s => (norm(s).match(/.{1,4}/g) || []).join('-'), newCode = () => Array.from(crypto.getRandomValues(new Uint8Array(20)), x => ALPHA[x & 31]).join('');
+  const b64 = u => { let s = ''; u.forEach(x => { s += String.fromCharCode(x); }); return btoa(s); }, unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const b64u = u => b64(u).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''), hex = u => Array.from(u, x => x.toString(16).padStart(2, '0')).join('');
+  async function derive(code) {
+    const k0 = await crypto.subtle.importKey('raw', ENC.encode(norm(code)), 'HKDF', false, ['deriveBits', 'deriveKey']);
+    const bits = async (info, n) => new Uint8Array(await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt: ENC.encode('lagekarte-sync-v1'), info: ENC.encode(info) }, k0, n * 8));
+    const key = await crypto.subtle.deriveKey({ name: 'HKDF', hash: 'SHA-256', salt: ENC.encode('lagekarte-sync-v1'), info: ENC.encode('key') }, k0, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+    return { id: hex(await bits('id', 16)), token: b64u(await bits('token', 32)), key };
+  }
+  async function seal(obj) { const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, S.creds.key, ENC.encode(JSON.stringify(obj)))); const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12); return b64(out); }
+  async function open(str) { const raw = unb64(str); return JSON.parse(DEC.decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(0, 12) }, S.creds.key, raw.slice(12)))); }
+  const nextT = () => { const ms = Math.max(Date.now(), S.lastMs); S.ctr = ms === S.lastMs ? S.ctr + 1 : 0; S.lastMs = ms; return String(ms).padStart(13, '0') + String(S.ctr).padStart(4, '0') + S.client; };
+  const seeT = t => { const ms = parseInt(String(t).slice(0, 13), 10); if (ms > S.lastMs) { S.lastMs = ms; S.ctr = 0; } };
+
+  /* ---- Zustand <-> einzelne Felder ---- */
+  const dig = (key, mk) => { const p = key.split('.'); let o = state; for (let i = 0; i < p.length - 1; i++) { o = o[p[i]]; if (!o) return null; } const k = p[p.length - 1]; if (mk && o[k] === undefined) o[k] = mk === 'a' ? [] : {}; return { o, k }; };
+  const items = key => { if (key === 'manual') return Object.values(state.pois).filter(p => p.manual); const d = dig(key); return d && Array.isArray(d.o[d.k]) ? d.o[d.k] : []; };
+  const idOf = (key, x) => { if (!x.id) x.id = key === 'deps' ? (x.from + '>' + x.to) : uid(); return String(x.id).replace(/\//g, '_'); };
+  function flatten() {
+    const leaf = new Map(), ents = new Set(), put = (p, v) => { leaf.set(p, JSON.stringify(v)); };
+    ARR.forEach(key => {
+      const ids = [];
+      items(key).forEach(x => { const id = idOf(key, x); ids.push(id); ents.add(key + '/' + id); (key === 'areas' ? AREA_F : Object.keys(x)).forEach(f => { if (x[f] !== undefined && typeof x[f] !== 'function') put(key + '/' + id + '/' + f, x[f]); }); });
+      if (!BYTIME.includes(key) && key !== 'manual') put(key + '/#o', ids);
+    });
+    MAP2.forEach(key => { const d = dig(key); const m = d && d.o[d.k]; if (m && typeof m === 'object') Object.keys(m).forEach(id => { const sid = id.replace(/\//g, '_'); ents.add(key + '/' + sid); Object.keys(m[id] || {}).forEach(f => put(key + '/' + sid + '/' + f, m[id][f])); if (!Object.keys(m[id] || {}).length) put(key + '/' + sid + '/@e', 1); }); });
+    OBJ1.forEach(key => { Object.keys(state[key] || {}).forEach(f => put(key + '/' + f, state[key][f])); });
+    ['note', 'standIso', 'notiz'].forEach(f => put('kraefte/' + f, state.kraefte[f])); put('chemBand', state.chemBand);
+    return { leaf, ents };
+  }
+  const entOf = p => { const s = p.split('/'); return s.length >= 3 ? s[0] + '/' + s[1] : null; };
+  function diff(cur) {
+    const ops = []; const b = S.base;
+    cur.leaf.forEach((v, p) => { if (b.leaf.get(p) !== v) ops.push({ p, v }); });
+    b.ents.forEach(e => { if (!cur.ents.has(e)) ops.push({ p: e + '/@del', v: 'true' }); });
+    b.leaf.forEach((v, p) => { const e = entOf(p); if (!cur.leaf.has(p) && e && cur.ents.has(e) && !p.endsWith('/@del')) ops.push({ p, x: 1 }); });
+    return ops;
+  }
+  const touched = new Set(), orders = {};
+  function applyOne(st, op) {            // st: Zielzustand, gibt true zurück, wenn etwas geändert wurde
+    const seg = op.p.split('/'); const key = seg[0];
+    if (seg[1] === '#o') { orders[key] = JSON.parse(op.v); touched.add(key); return true; }
+    const isArr = ARR.includes(key), isMap = MAP2.includes(key);
+    if (isArr || isMap) {
+      const id = seg[1], f = seg[2], coll = key === 'manual' ? null : (() => { const d = dig(key, isArr ? 'a' : 'o'); return d ? d.o[d.k] : null; })();
+      if (f === '@del') { if (key === 'manual') delete st.pois[id]; else if (isArr) { const i = coll.findIndex(x => idOf(key, x) === id); if (i > -1) coll.splice(i, 1); } else delete coll[id]; touched.add(key); return true; }
+      let ent;
+      if (key === 'manual') { ent = st.pois[id] || (st.pois[id] = { id, manual: true }); }
+      else if (isArr) { ent = coll.find(x => idOf(key, x) === id); if (!ent) { ent = { id }; coll.push(ent); } }
+      else { ent = coll[id] || (coll[id] = {}); }
+      if (f === '@e') { touched.add(key); return true; }
+      if (op.x) delete ent[f]; else ent[f] = JSON.parse(op.v);
+      touched.add(key); return true;
+    }
+    const f = seg[1];
+    if (key === 'kraefte') { if (op.x) delete state.kraefte[f]; else state.kraefte[f] = JSON.parse(op.v); touched.add('kraefte'); return true; }
+    if (key === 'chemBand') { state.chemBand = JSON.parse(op.v); touched.add(key); return true; }
+    if (OBJ1.includes(key)) { if (op.x) delete state[key][f]; else state[key][f] = JSON.parse(op.v); touched.add(key); return true; }
+    return false;
+  }
+  function reorder() {
+    Object.keys(orders).forEach(key => {
+      if (!ARR.includes(key) || key === 'manual') return; const d = dig(key); if (!d || !Array.isArray(d.o[d.k])) return; const ord = orders[key], arr = d.o[d.k];
+      const rank = x => { const i = ord.indexOf(idOf(key, x)); return i < 0 ? 1e9 : i; }; const idx = new Map(arr.map((x, i) => [x, i]));
+      arr.sort((a, b) => (rank(a) - rank(b)) || (idx.get(a) - idx.get(b)));
+    });
+    BYTIME.forEach(key => { const d = dig(key); if (d && Array.isArray(d.o[d.k]) && touched.has(key)) d.o[d.k].sort((a, b) => String(b.time || '').localeCompare(String(a.time || ''))); });
+  }
+  const tomb = (key, id) => S.reg.has(key + '/' + id + '/@del');
+  function take(p, v, t, x) {              // Feld aus der Ferne übernehmen, wenn es neuer ist
+    const cur = S.reg.get(p); if (cur && cur.t >= t) return false; seeT(t);
+    S.reg.set(p, { v: x ? null : v, t, x: !!x }); const seg = p.split('/'), e = entOf(p);
+    if (e && !p.endsWith('/@del') && tomb(seg[0], seg[1])) return false;           // gelöschte Einträge bleiben gelöscht
+    if (applyOne(state, { p, v, x })) { if (x) S.base.leaf.delete(p); else S.base.leaf.set(p, v); if (p.endsWith('/@del')) { S.base.ents.delete(e); [...S.base.leaf.keys()].forEach(k => { if (k.startsWith(e + '/')) S.base.leaf.delete(k); }); } else if (e) S.base.ents.add(e); return true; }
+    return false;
+  }
+  function renderRemote() {
+    if (S.renderT) return; const go = () => {
+      S.renderT = 0; if (runtime.drawHandler || runtime.mode || runtime.placing || document.querySelector('.dlg:not(.dlgout)') || (document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName) && document.activeElement.closest('#unitOv, #fueOv'))) { S.renderT = setTimeout(go, 900); return; }
+      const k = new Set(touched); touched.clear(); if (!k.size) return; reorder();
+      const has = (...a) => a.some(x => k.has(x)), call = f => { try { f(); } catch (e) { /* Anzeige einzeln absichern */ } };
+      if (has('areas')) { call(() => { state.areas.forEach(prepArea); renderAreas(); renderAreaList(); }); }
+      if (has('sections', 'units', 'fue.people', 'fue.fb', 'fue.funk', 'kraefte.alarmiert', 'kraefte.rows', 'kraefte.ovr', 'kraefte', 'auftraege', 'logi', 'unitStatus', 'roles')) { call(() => { renderSections(); renderUnits(); renderAbschnitte(); renderFue(); }); }
+      if (has('symbols')) call(renderSymbols); if (has('objects', 'manual', 'deps')) call(renderMarkers); if (has('casualties')) call(() => { renderCas(); renderAll(); }); if (has('problems')) call(renderProblems);
+      if (has('wind', 'plumes')) call(renderKeulen); if (has('chem')) call(renderChem); if (has('bhp')) call(renderBhp); if (has('exercise', 'meeting', 'weather')) call(renderEinsatz);
+      if (has('journal')) call(renderJournal); if (has('stands')) call(() => { if (typeof renderStands === 'function') renderStands(); }); if (has('messages')) call(() => { if (typeof renderMessages === 'function') renderMessages(); });
+      call(() => { saveNow(); scheduleBc(); });
+    }; S.renderT = setTimeout(go, 50);
+  }
+
+  /* ---- Netz ---- */
+  const hdr = () => ({ 'X-Sync-Token': S.creds.token, 'Content-Type': 'application/json' });
+  const api = (path, o) => fetch(S.url + '/v1/room/' + S.creds.id + path, Object.assign({ headers: hdr(), cache: 'no-store' }, o || {}));
+  function setStatus(st, msg) { S.status = st; S.msg = msg || ''; updateChip(); }
+  function updateChip() {
+    const c = $('#syncChip'); if (!c) return; if (!S.active) { c.hidden = true; return; } c.hidden = false;
+    const lab = 'Einsatz ' + norm(S.code).slice(0, 4);
+    c.className = 'chip sync-' + (S.status === 'ok' ? 'ok' : S.status === 'denied' ? 'bad' : 'warn');
+    c.textContent = lab + ' · ' + (S.status === 'ok' ? (S.online || 1) + ' online' : S.status === 'denied' ? 'kein Zugriff' : 'getrennt'); c.title = S.msg || 'Gemeinsamer Einsatz: Klicken für Einzelheiten';
+    if (typeof updateUndoButtons === 'function') updateUndoButtons(); const d = $('#syncDlg'); if (d && d.refresh) d.refresh();
+  }
+  async function loadFull(r) {            // Gesamtstand und Blöcke -> Register
+    S.reg = new Map(); if (r.snapshot) { (await open(r.snapshot)).forEach(([p, v, t, x]) => { S.reg.set(p, { v, t, x: !!x }); seeT(t); }); }
+    for (const o of r.ops) { (await open(o.d)).forEach(op => { const cur = S.reg.get(op.p); if (!cur || cur.t < op.t) { S.reg.set(op.p, { v: op.v, t: op.t, x: !!op.x }); seeT(op.t); } }); }
+    S.seq = r.seq; S.snapSeq = r.snapSeq || 0;
+  }
+  function materialize(keepLocalOnly) {   // Register -> Zustand (vollständig ersetzen)
+    const old = state; const fresh = freshState(); ['pois', 'layerOn', 'loaded', 'author', 'msgExtra', 'popRadius', 'version', 'diarySeq', 'msgSeq', 'standSeq', 'sources'].forEach(k => { if (old[k] !== undefined) fresh[k] = old[k]; });
+    fresh.pois = Object.fromEntries(Object.entries(old.pois || {}).filter(([, p]) => !p.manual)); const keepPois = fresh.pois;
+    state = fresh; fresh.pois = keepPois; touched.clear(); Object.keys(orders).forEach(k => delete orders[k]);
+    const dead = new Set(); S.reg.forEach((r, p) => { if (p.endsWith('/@del')) { const s = p.split('/'); dead.add(s[0] + '/' + s[1]); } });
+    [...S.reg.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1)).forEach(([p, r]) => { const e = entOf(p); if (e && dead.has(e) && !p.endsWith('/@del')) return; if (p.endsWith('/@del')) return; applyOne(state, { p, v: r.v, x: r.x }); });
+    BYTIME.forEach(k => touched.add(k)); reorder(); touched.clear();
+    state = migrate(Object.assign(freshState(), state));
+  }
+  async function pushAll() {              // eigenen Zustand als Register aufbauen (beim Teilen)
+    const cur = flatten(); S.reg = new Map(); cur.leaf.forEach((v, p) => S.reg.set(p, { v, t: nextT() })); S.base = cur;
+  }
+  const regEntries = () => { const out = []; S.reg.forEach((r, p) => out.push([p, r.v, r.t, r.x ? 1 : 0])); return out; };
+  async function putSnapshot(seq) { const r = await api('/snapshot', { method: 'PUT', body: JSON.stringify({ seq, data: await seal(regEntries()) }) }); if (!r.ok) throw Object.assign(new Error('Server ' + r.status), { status: r.status }); const j = await r.json(); S.snapSeq = j.snapSeq; return j; }
+  async function push() {
+    S.pushT = 0; if (!S.active || !S.creds || !S.base) return; const cur = flatten(), ops = diff(cur); if (!ops.length) return;
+    ops.forEach(o => { o.t = nextT(); S.reg.set(o.p, { v: o.v, t: o.t, x: !!o.x }); });
+    try {
+      const r = await api('/ops', { method: 'POST', body: JSON.stringify({ ops: [await seal(ops)] }) });
+      if (r.status === 413) { await putSnapshot(S.seq); return schedulePush(); }
+      if (!r.ok) throw Object.assign(new Error('Server ' + r.status), { status: r.status });
+      ops.forEach(o => { if (o.x) S.base.leaf.delete(o.p); else S.base.leaf.set(o.p, o.v); if (o.p.endsWith('/@del')) S.base.ents.delete(entOf(o.p)); else { const e = entOf(o.p); if (e) S.base.ents.add(e); } });
+      if (cur.ents.size !== S.base.ents.size) { cur.ents.forEach(e => S.base.ents.add(e)); }
+      setStatus('ok');
+    } catch (e) { setStatus(e.status === 403 ? 'denied' : 'warn', 'Änderungen werden nachgeholt (' + e.message + ')'); S.pushT = setTimeout(push, 4000); }
+  }
+  function schedulePush() { if (!S.active || !S.base) return; clearTimeout(S.pushT); S.pushT = setTimeout(push, 400); }
+  async function loop(id) {
+    let fail = 0;
+    while (S.active && S.loopId === id) {
+      try {
+        S.ac = new AbortController(); const r = await api('/ops?since=' + S.seq + '&wait=20&c=' + S.client, { signal: S.ac.signal });
+        if (r.status === 404 || r.status === 403) { setStatus('denied', 'Der Einsatz ist nicht mehr erreichbar oder der Code stimmt nicht.'); await sleep(8000); continue; }
+        if (!r.ok) throw new Error('Server ' + r.status); const j = await r.json(); fail = 0;
+        if (j.snapshot && j.snapSeq > S.snapSeq && S.seq < j.snapSeq) { const keep = new Map(S.reg); await loadFull(Object.assign({}, j, { ops: j.ops })); keep.forEach((v, p) => { const c = S.reg.get(p); if (!c || c.t < v.t) S.reg.set(p, v); }); materialize(); rebuildAll(); }
+        else for (const o of j.ops) { const batch = await open(o.d); batch.forEach(op => take(op.p, op.v, op.t, op.x)); }
+        S.seq = Math.max(S.seq, j.seq); S.online = j.online; S.snapSeq = Math.max(S.snapSeq, j.snapSeq || 0); setStatus('ok');
+        if (touched.size) renderRemote();
+        if (j.seq - S.snapSeq > 200 && Math.random() < .3) putSnapshot(S.seq).catch(() => {});
+      } catch (e) { if (!S.active || S.loopId !== id) return; if (e.name !== 'AbortError') { fail++; setStatus('warn', 'Verbindung unterbrochen (' + e.message + ')'); await sleep(Math.min(15000, 1500 * fail)); } }
+    }
+  }
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  function rebuildAll(fit) { applyState(state, !!fit); S.base = flatten(); }
+  function start() { S.active = true; S.status = 'ok'; S.msg = ''; S.loopId++; updateChip(); loop(S.loopId); if (typeof updateUndoButtons === 'function') updateUndoButtons(); }
+  async function creds(code, url) { S.code = norm(code); S.url = String(url || '').trim().replace(/\/+$/, ''); S.creds = await derive(S.code); }
+  const keep = () => { ls.set(K.code, S.code); ls.set(K.url, S.url); };
+
+  async function create(url) {
+    const code = newCode(); await creds(code, url); S.reg = new Map(); await pushAll();
+    const r = await api('/snapshot', { method: 'PUT', body: JSON.stringify({ seq: 0, data: await seal(regEntries()) }) }); if (!r.ok) throw new Error(r.status === 507 ? 'Der Server ist voll.' : 'Der Server hat abgelehnt (' + r.status + ').');
+    S.seq = 0; S.snapSeq = 0; keep(); addJournal('Einsatz geteilt: gemeinsamer Einsatz ' + pretty(code).slice(0, 4), true); start(); return pretty(code);
+  }
+  async function join(code, url, resume) {
+    if (!valid(code)) throw new Error('Der Code muss aus 20 Zeichen bestehen.'); await creds(code, url);
+    const r = await api('/ops?since=0'); if (r.status === 404) throw new Error('Diesen Einsatz gibt es nicht. Code prüfen.'); if (r.status === 403) throw new Error('Zugriff verweigert.'); if (!r.ok) throw new Error('Der Server antwortet nicht richtig (' + r.status + ').');
+    if (!resume) { try { ls.set(K.pre, JSON.stringify(shareState())); } catch (e) { /* zu groß */ } if (!runtime.viewer && (state.units.length || state.sections.length || state.areas.length || state.problems.length)) { try { downloadBackup(); } catch (e) { /* kein Download */ } } }
+    const local = resume ? flatten() : null; await loadFull(await r.json());
+    if (local) { local.leaf.forEach((v, p) => { const e = entOf(p); if (!S.reg.has(p) && !(e && S.reg.has(e + '/@del')) && !p.endsWith('/#o')) S.reg.set(p, { v, t: nextT() }); }); }
+    materialize(); rebuildAll(!resume); keep(); start(); if (local) schedulePush(); if (!resume) addJournal('Gemeinsamem Einsatz beigetreten', true); save();
+  }
+  function leave() { S.active = false; S.loopId++; try { S.ac && S.ac.abort(); } catch (e) { /* weg */ } ls.del(K.code); S.status = 'off'; updateChip(); addJournal('Gemeinsamen Einsatz verlassen', true); save(); }
+  async function resume() { const c = ls.get(K.code), u = ls.get(K.url); if (!c || !u || runtime.viewer || runtime.beamerView) return; try { await join(c, u, true); } catch (e) { S.code = norm(c); S.url = u; S.active = true; try { S.creds = await derive(c); } catch (x) { return; } setStatus('warn', e.message); S.loopId++; const id = S.loopId; (async () => { while (S.active && S.loopId === id) { await sleep(5000); try { await join(c, u, true); return; } catch (x) { setStatus(/verweigert|nicht/.test(x.message) ? 'denied' : 'warn', x.message); } } })(); } }
+  function downloadBackup() {
+    const blob = new Blob([JSON.stringify({ gesichert: new Date().toISOString(), hinweis: 'Stand vor dem Beitritt zu einem gemeinsamen Einsatz', state: shareState() })], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'lagekarte-vor-beitritt-' + new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-') + '.json'; document.body.append(a); a.click(); setTimeout(() => { a.remove(); URL.revokeObjectURL(a.href); }, 500);
+  }
+  return { S, K, ls, pretty, norm, valid, create, join, leave, resume, schedulePush, derive, flatten, get active() { return S.active; }, updateChip };
+})();
+
+function openSyncDlg(tab, pre) {
+  if ($('#syncDlg') || runtime.viewer) return;
+  let mode = SYNC.active && !tab ? 'teilen' : (tab || 'teilen'); const busy = { v: false };
+  const urlIn = el('input', { type: 'url', placeholder: 'https://ihr-server.example', value: (pre && pre.server) || SYNC.ls.get(SYNC.K.url) || '', 'aria-label': 'Adresse des Servers' });
+  const codeIn = el('input', { type: 'text', class: 'synccode', placeholder: 'XXXX-XXXX-XXXX-XXXX-XXXX', value: (pre && pre.code) || '', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Code' });
+  codeIn.addEventListener('input', () => { const p = SYNC.pretty(codeIn.value); codeIn.value = p; });
+  const err = el('div', { class: 'notice', hidden: 'hidden' }), card = el('div', { class: 'rolecard synccard' }), dlg = el('div', { id: 'syncDlg', class: 'dlg', role: 'dialog', 'aria-modal': 'true' }, card);
+  const fail = e => { err.textContent = e.message || String(e); err.hidden = false; };
+  const close = () => dlg.remove();
+  const link = () => location.href.split('#')[0].split('?')[0] + '#einsatz=' + SYNC.norm(SYNC.S.code) + '&server=' + encodeURIComponent(SYNC.S.url);
+  const copy = async (t, what) => { try { await navigator.clipboard.writeText(t); say(what + ' kopiert.', 2500); } catch (e) { say('Kopieren nicht möglich. Bitte von Hand markieren.', 4000); } };
+  const go = async (fn, ok) => { if (busy.v) return; busy.v = true; err.hidden = true; try { await fn(); render(); if (ok) say(ok, 3000); } catch (e) { fail(e); } busy.v = false; };
+  const render = () => {
+    const tabs = el('div', { class: 'tabs2' }, ...[['teilen', 'Teilen'], ['beitreten', 'Beitreten']].map(([k, t]) => el('button', { type: 'button', class: mode === k ? 'on' : '', text: t, onclick: () => { mode = k; err.hidden = true; render(); } })));
+    let body;
+    if (mode === 'teilen' && SYNC.active) {
+      const S = SYNC.S, pc = SYNC.pretty(S.code), parts = pc.split('-');
+      body = el('div', {}, el('div', { class: 'slb2', text: 'Code für alle Beteiligten' }), el('div', { class: 'codebox' }, parts.slice(0, 3).join('-'), el('br'), parts.slice(3).join('-')),
+        el('div', { class: 'line' }, el('button', { class: 'btn', text: 'Code kopieren', onclick: () => copy(pc, 'Code') }), el('button', { class: 'btn', text: 'Link kopieren', onclick: () => copy(link(), 'Link') })),
+        el('div', { class: 'slb2', text: 'Verbunden' }), el('div', { class: 'who' }, el('i', { class: 'dot' + (S.status === 'ok' ? '' : ' off') }), el('b', { text: 'Dieses Fenster' }), el('span', { class: 'hint', style: 'margin-left:auto', text: S.status === 'ok' ? 'verbunden' : (S.msg || 'getrennt') })),
+        el('div', { class: 'who' }, el('i', { class: 'dot' + (S.online > 1 ? '' : ' off') }), el('b', { text: 'Weitere Geräte' }), el('span', { class: 'hint', style: 'margin-left:auto', text: S.online > 1 ? (S.online - 1) + ' online' : 'keines online' })),
+        el('div', { class: 'warn', text: 'Wer den Code kennt, kann den Einsatz lesen und bearbeiten. Die Daten sind auf dem Gerät verschlüsselt, der Server sieht nur unlesbare Daten. Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.' }), err,
+        el('div', { class: 'line' }, el('button', { class: 'btn', style: 'color:#b71c1c', text: 'Einsatz verlassen', onclick: async () => { if (await askYesNo('Gemeinsamen Einsatz verlassen?', 'Sie behalten Ihre Kopie auf diesem Gerät. Änderungen der anderen kommen nicht mehr an.', 'Verlassen')) { SYNC.leave(); render(); } } }), el('button', { class: 'btn primary', text: 'Fertig', onclick: close })));
+    } else if (mode === 'teilen') {
+      body = el('div', {}, el('div', { class: 'hint', text: 'Der aktuelle Einsatz wird verschlüsselt auf Ihren Server gelegt. Danach gibt es einen Code für alle, die mitarbeiten.' }), el('div', { class: 'slb2', text: 'Server' }), urlIn, err,
+        el('div', { class: 'line' }, el('button', { class: 'btn', text: 'Abbrechen', onclick: close }), el('button', { class: 'btn primary', text: 'Einsatz teilen', onclick: () => go(() => { if (!/^https?:\/\//.test(urlIn.value.trim())) throw new Error('Bitte die Adresse des Servers mit https:// eintragen.'); return SYNC.create(urlIn.value); }) })));
+    } else {
+      body = el('div', {}, el('div', { class: 'slb2', text: 'Code eingeben' }), codeIn,
+        el('div', { class: 'warn', text: 'Ihr aktueller Einsatz auf diesem Gerät wird durch den gemeinsamen Einsatz ersetzt. Vorher wird er automatisch als Datei gesichert.' }), el('div', { class: 'slb2', text: 'Server' }), urlIn, err,
+        el('div', { class: 'line' }, el('button', { class: 'btn', text: 'Abbrechen', onclick: close }), el('button', { class: 'btn primary', text: 'Beitreten', onclick: () => go(async () => { if (!/^https?:\/\//.test(urlIn.value.trim())) throw new Error('Bitte die Adresse des Servers mit https:// eintragen.'); await SYNC.join(codeIn.value, urlIn.value); mode = 'teilen'; }, 'Dem gemeinsamen Einsatz beigetreten.') })));
+    }
+    card.replaceChildren(el('h3', { text: 'Gemeinsamer Einsatz' }), el('div', { class: 'hint', text: 'Mehrere Personen bearbeiten denselben Einsatz.' }), tabs, body);
+  };
+  dlg.refresh = () => { if (!busy.v && mode === 'teilen' && SYNC.active) render(); };
+  dlg.addEventListener('mousedown', e => { if (e.target === dlg) close(); }); dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
+  render(); document.body.append(dlg);
+}
+function syncFromHash() { const m = /[#&]einsatz=([A-Z0-9]{20})(?:&server=([^&]+))?/i.exec(location.hash || ''); if (!m || runtime.viewer) return; setTimeout(() => openSyncDlg('beitreten', { code: SYNC.pretty(m[1]), server: m[2] ? decodeURIComponent(m[2]) : '' }), 800); }
 let pushTimer = null;
 function schedulePush() { clearTimeout(pushTimer); pushTimer = setTimeout(pushLive, 700); }
-async function pushLive() {
-  if (!runtime.live) return;
+function shareState() {
   recomputeVisible();
   const vis = {}; visiblePois().forEach(p => { if (p.manual || state.layerOn[p.layer]) vis[p.id] = p; });
-  const share = Object.assign({}, state, { pois: vis, loaded: {}, journal: state.journal.slice(0, 300) });
+  return Object.assign({}, state, { pois: vis, loaded: {}, journal: state.journal.slice(0, 300) });
+}
+async function pushLive() {
+  if (!runtime.live) return;
+  const share = shareState();
   try {
     const r = await fetch('/api/state', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ state: share }) });
     runtime.live.ok = r.ok; if (r.ok) runtime.live.rev = (await r.json()).rev;
@@ -4168,6 +4502,9 @@ function updateBadge() {
   b.textContent = runtime.live.ok === false ? 'Freigabe getrennt' : 'Freigabe aktiv · ' + (runtime.live.viewers || 0) + ' Zuschauer'; b.title = b.textContent;
 }
 async function liveInit() {
+  if (runtime.beamerView) { beamerStart(); return; }
+  SYNC.resume(); syncFromHash();
+  if (!runtime.viewer) beamerMainStart();
   if (!/^https?:$/.test(location.protocol)) { if (runtime.viewer) { runtime.connected = false; updateBadge(); say('Ansicht braucht den Lagekarten-Server (Link aus dem QR-Code).', 8000); } return; }
   try {
     const j = await (await fetch('/api/info', { cache: 'no-store' })).json(); if (!j.server) return;
@@ -6267,7 +6604,7 @@ function openGuidedMeeting() {
 }
 /* ---- Einweisung (Rundgang) und Tastenkürzel ---- */
 const SHORTCUTS = [
-  ['?', 'Diese Übersicht'], ['U', 'Einheiten'], ['F', 'Führungsstruktur'], ['V', 'Lagevortrag starten oder beenden'], ['D', 'Dunkelmodus umschalten'],
+  ['?', 'Diese Übersicht'], ['U', 'Einheiten'], ['F', 'Führungsstruktur'], ['H', 'Karten-Beamer festhalten oder freigeben'], ['V', 'Lagevortrag starten oder beenden'], ['D', 'Dunkelmodus umschalten'],
   ['K', 'Reiter Kräfte'], ['B', 'Reiter Behandlungsplatz'], ['T', 'Reiter Tagebuch'], ['M', 'Reiter Meldungen'], ['P', 'Reiter Probleme'], ['Z', 'Reiter Zahlen'], ['W', 'Reiter Wetter'], ['G', 'Reiter Gefahrstoff'],
   ['N', 'Neue Einheit'], ['J', 'Journaleintrag'], ['/', 'Ortssuche'], ['Strg+Z, Strg+Y', 'Rückgängig, Wiederholen'], ['Umschalt+P', 'Seitenleiste ein- oder ausklappen'], ['Esc', 'Schließen, Abbrechen']
 ];
@@ -6294,6 +6631,7 @@ document.addEventListener('keydown', e => {
   if (k === '?') { e.preventDefault(); showShortcuts(); }
   else if (k === 'u') { e.preventDefault(); $('#btnUnits').click(); }
   else if (k === 'f') { e.preventDefault(); $('#btnFue').click(); }
+  else if (k === 'h' && !runtime.viewer) { e.preventDefault(); beamerToggleKarte(); }
   else if (k === 'v') { e.preventDefault(); runtime.vortrag ? endVortrag() : startVortrag(); }
   else if (k === 'd') { e.preventDefault(); $('#btnTheme').click(); }
   else if (tabs[k] && !runtime.vortrag) { e.preventDefault(); goTab(tabs[k]); }
@@ -6341,7 +6679,7 @@ function maybeTour() {
   runTour();
 }
 function initRoles() {
-  $('#btnExport').onclick = () => exportRole(false); $('#btnHelp').onclick = showShortcuts; $('#btnSetup').onclick = openSetup; { const ht = $('#hdrTitle'); if (ht) { ht.onclick = openSetup; ht.title = 'Name und Uhr einstellen'; ht.style.cursor = 'pointer'; } }
+  $('#btnExport').onclick = () => exportRole(false); $('#btnHelp').onclick = showShortcuts; $('#btnSetup').onclick = openSetup; $('#btnBeamer').onclick = openBeamerDlg; $('#btnSync').onclick = () => openSyncDlg(); { const c = $('#syncChip'); if (c) { c.onclick = () => openSyncDlg(); c.onkeydown = e => { if (e.key === 'Enter') openSyncDlg(); }; } } { const ht = $('#hdrTitle'); if (ht) { ht.onclick = openSetup; ht.title = 'Name und Uhr einstellen'; ht.style.cursor = 'pointer'; } }
   setTimeout(() => { let seen = false; try { seen = !!localStorage.getItem('kritis-setup'); } catch (e) { /* egal */ } if (!seen && !runtime.viewer && !navigator.webdriver && !(state.exercise && state.exercise.name)) { try { localStorage.setItem('kritis-setup', '1'); } catch (e) { /* egal */ } openSetup(); } }, 700);
   setTimeout(maybeTour, 1800);
   $('#mtGuided').onclick = openGuidedMeeting; $('#lvShow').onclick = showLagevortrag; $('#expMine').onclick = () => exportRole(false); $('#expAll').onclick = () => exportRole(true); $('#impOthers').onclick = importDlg;
@@ -6965,7 +7303,7 @@ initPlaceSearch(); initialView();
 tickClock(); setInterval(tickClock, 1000);
 $('#panelToggle').innerHTML = panelGlyph(!$('#app').classList.contains('collapsed'));
 liveInit();
-window.__lage = { TileCache, addUnit, assignUnit, unitMovedOnMap, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
+window.__lage = { SYNC, TileCache, addUnit, assignUnit, unitMovedOnMap, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
 })();
 </script>
 </body>
