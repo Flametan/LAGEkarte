@@ -177,6 +177,16 @@ async function seite(b, q, w, h) {
     const c = await p.evaluate(() => { const m = window.__lage.map.getCenter(); return [m.lat, m.lng, window.__lage.map.getZoom()]; });
     assert.ok(Math.abs(c[0] - 51.5135) < 0.01 && Math.abs(c[1] - 7.4653) < 0.01 && c[2] >= 16, 'Karte zeigt die Adresse: ' + c); assert.ok(await p.locator('.leaflet-marker-icon').count() >= 1); await p.close();
   });
+  await t('Navigation: erneuter Klick klappt zu, mehrere Punkte zugleich aktiv', async () => {
+    const p = await seite(b, '', 1600, 950); const on = k => p.evaluate(k2 => { const n = document.querySelector('#tabs [data-act="' + k2 + '"],#tabs [data-tab="' + k2 + '"]'); return n.classList.contains('on') || (n.getAttribute('aria-selected') === 'true' && !n.classList.contains('dim')); }, k);
+    await p.click('#tabs [data-tab="gebiet"]'); await p.waitForTimeout(300); assert.ok(await on('gebiet') && await on('map'), 'Gebiete und Lagekarte aktiv');
+    await p.click('#tabs [data-tab="gebiet"]'); await p.waitForTimeout(500); assert.ok(await p.evaluate(() => document.querySelector('#app').classList.contains('collapsed')), 'Panel zugeklappt'); assert.ok(!(await on('gebiet')));
+    await p.click('#tabs [data-tab="gebiet"]'); await p.waitForTimeout(400); assert.ok(!(await p.evaluate(() => document.querySelector('#app').classList.contains('collapsed'))));
+    await p.click('#tabs [data-act="wand"]'); await p.click('#tabs [data-act="fue"]'); await p.waitForTimeout(500);
+    assert.ok(await on('wand') && await on('fue') && !(await on('map')), 'Kräfte und Führungsstruktur zugleich');
+    assert.ok(await p.evaluate(() => document.body.classList.contains('dual') && !document.querySelector('#unitOv').hidden && !document.querySelector('#fueOv').hidden));
+    await p.click('#tabs [data-act="map"]'); await p.waitForTimeout(400); assert.ok(await on('map') && !(await on('wand'))); await p.close();
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));

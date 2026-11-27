@@ -1233,6 +1233,7 @@ header .qb button:hover:not(:disabled) { background: #e2e8f0; }
 .clamp.open { display: block; -webkit-line-clamp: unset; cursor: pointer; }
 #panelToggle { z-index: 1700; }
 #unitOv { padding-left: 28px; }
+body.dual #unitOv { right: 50%; } body.dual #fueOv { left: 50%; border-left: 2px solid var(--line); }
 .ovunit { touch-action: pan-y; position: relative; }
 .ovunit .grip { cursor: grab; touch-action: none; user-select: none; color: #94a3b8; font-weight: 700; letter-spacing: -2px; padding: 8px 2px; margin: -8px 0 -8px -6px; align-self: stretch; display: flex; align-items: center; }
 .ovunit.ovdrag { opacity: .3; }
@@ -5815,7 +5816,7 @@ function initOvDrag() {
   window.addEventListener('pointercancel', () => ovDragEnd(false));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && ovDrag && ovDrag.on) { e.stopPropagation(); ovDragEnd(false); } }, true);
 }
-function openUnitOverview() { closeFue(); $('#unitOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderUnitOverview(); $('#ovClose').focus(); }
+function openUnitOverview() { if (runtime.vortrag) closeFue(); $('#unitOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderUnitOverview(); $('#ovClose').focus(); }
 function closeUnitOverview() { $('#unitOv').hidden = true; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); }
 function initUnitOverview() {
   $('#btnUnits').onclick = () => ($('#unitOv').hidden ? openUnitOverview() : closeUnitOverview());
@@ -5979,7 +5980,7 @@ function renderFunk() {
     el('div', { class: 'hint', text: 'Kanäle, Rufnamen und Rufnummern trägt der S6 ein. Es werden keine Werte vorgegeben.' }));
   if (vw) lockViewer(box);
 }
-function openFue() { closeUnitOverview(); $('#fueOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderFue(); $('#fueClose').focus(); }
+function openFue() { if (runtime.vortrag) closeUnitOverview(); $('#fueOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderFue(); $('#fueClose').focus(); }
 function closeFue() { $('#fueOv').hidden = true; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); }
 function initFue() {
   $('#btnFue').onclick = () => ($('#fueOv').hidden ? openFue() : closeFue()); $('#fueClose').onclick = closeFue;
@@ -6435,13 +6436,14 @@ function initTileCacheUi() {
 function syncNav() {
   const on = (a, v) => { const n = document.querySelector('#tabs [data-act="' + a + '"]'); if (n) n.classList.toggle('on', !!v); };
   const open = id => { const n = $(id); return !!n && !n.hidden; };
-  on('map', $('#app').classList.contains('collapsed') && !open('#unitOv') && !open('#fueOv')); on('wand', open('#unitOv')); on('fue', open('#fueOv'));
-  document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('dim', open('#unitOv') || open('#fueOv') || $('#app').classList.contains('collapsed')));
+  on('map', !open('#unitOv') && !open('#fueOv')); on('wand', open('#unitOv')); on('fue', open('#fueOv'));
+  document.body.classList.toggle('dual', open('#unitOv') && open('#fueOv') && !runtime.vortrag);
+  document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('dim', $('#app').classList.contains('collapsed')));
 }
 function initNavActs() {
   document.querySelectorAll('#tabs [data-act]').forEach(b => b.addEventListener('click', () => {
     const a = b.dataset.act;
-    if (a === 'map') { closeUnitOverview(); closeFue(); setPanel(false); }
+    if (a === 'map') { if (!$('#unitOv').hidden || !$('#fueOv').hidden) { closeUnitOverview(); closeFue(); } else setPanel($('#app').classList.contains('collapsed')); }
     else if (a === 'wand') { if (!$('#unitOv').hidden) closeUnitOverview(); else { $('#ovGroup').value = 'wand'; openUnitOverview(); } }
     else if (a === 'fue') { if (!$('#fueOv').hidden) closeFue(); else openFue(); }
     syncNav();
@@ -6722,7 +6724,7 @@ function openTab(name) {
   document.querySelectorAll('#tabs button').forEach(x => x.setAttribute('aria-selected', String(x.dataset.tab === name)));
   document.querySelectorAll('.tabpane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
 }
-document.querySelectorAll('#tabs button[data-tab]').forEach(b => b.addEventListener('click', () => { openTab(b.dataset.tab); if ($('#app').classList.contains('collapsed')) setPanel(true); }));
+document.querySelectorAll('#tabs button[data-tab]').forEach(b => b.addEventListener('click', () => { const app = $('#app'); if (b.getAttribute('aria-selected') === 'true' && !app.classList.contains('collapsed')) { setPanel(false); return; } openTab(b.dataset.tab); if (app.classList.contains('collapsed')) setPanel(true); }));
 $('#btnPoly').onclick = e => startDraw('polygon', 'area', e.currentTarget);
 $('#btnRect').onclick = e => startDraw('rectangle', 'area', e.currentTarget);
 $('#btnCircle').onclick = startCircleMode;
