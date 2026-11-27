@@ -217,6 +217,7 @@ async function seite(b, q, w, h) {
     await wand.keyboard.press('Control+-'); await wand.keyboard.press('Control+-'); await wand.waitForTimeout(300);
     assert.strictEqual(await wand.evaluate(() => document.documentElement.style.zoom), '0.8', 'Zoom nur im Beamer-Fenster'); assert.strictEqual(await fue.evaluate(() => document.documentElement.style.zoom), '', 'anderes Beamer-Fenster bleibt'); assert.strictEqual(await main.evaluate(() => document.documentElement.style.zoom), '', 'Hauptfenster bleibt');
     await wand.keyboard.press('Control+0'); await wand.waitForTimeout(200); assert.strictEqual(await wand.evaluate(() => document.documentElement.style.zoom), '', 'Strg+0 setzt zurück');
+    await wand.mouse.move(300, 300); await wand.waitForTimeout(300); await wand.click('#bmZoom button[data-z="+"]'); await wand.waitForTimeout(200); assert.strictEqual(await wand.evaluate(() => document.documentElement.style.zoom), '1.1', 'Plus-Knopf im Beamer-Fenster'); assert.strictEqual(await fue.evaluate(() => document.documentElement.style.zoom), '', 'anderes Fenster bleibt'); await wand.click('#bmZoom button[data-z="-"]'); await wand.waitForTimeout(200); assert.strictEqual(await wand.evaluate(() => document.documentElement.style.zoom), '', 'Minus-Knopf');
     await ctx.close();
   });
   await t('Gemeinsamer Einsatz: Server ist voreingestellt und muss nicht eingetragen werden', async () => {
