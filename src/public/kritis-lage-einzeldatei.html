@@ -5416,7 +5416,7 @@ function renderUnitMarkers() {
   state.units.filter(u => u.lat != null).forEach(u => {
     const m = L.marker([u.lat, u.lng], { icon: unitMarkerIcon(u), draggable: true });
     m.bindTooltip(el('span', { text: (u.name || 'Einheit') + ' · ' + fmtStr(u) + ' · ' + ustat(u.status).label + ' · ' + sectionName(u.sectionId) + (unitFlags(u).text ? ' · ' + unitFlags(u).text : '') }));
-    m.on('dragend', () => { const ll = m.getLatLng(); u.lat = ll.lat; u.lng = ll.lng; save('Einheit verschoben: ' + u.name); });
+    m.on('dragend', () => { const ll = m.getLatLng(); unitMovedOnMap(u, ll.lat, ll.lng); });
     m.on('click', () => openUnitCard(u, can('logi') && !can('units')));
     m.on('contextmenu', e => ctxOpen(e, unitItems(u), null, 'Einheit: ' + (u.name || '')));
     m.addTo(unitLayer);
@@ -5477,9 +5477,24 @@ function setUnitStatus(u, id) {
   if (u.status === id) return; const was = ustat(u.status).label; u.status = id; u.time = nowIso();
   addJournal('Einheit ' + (u.name || '–') + ': Status ' + was + ' zu ' + ustat(id).label, true); renderUnits(); renderAbschnitte(); save('Status Einheit ' + u.name + ': ' + ustat(id).label);
 }
+function secInside(sx, lat, lng) {   // Punkt in Fläche (Strahlverfahren), pts = [lat, lng]
+  const p = sx && sx.kind !== 'line' && sx.pts; if (!p || p.length < 3) return false; let in_ = false;
+  for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const a = p[i], b = p[j]; if ((a[1] > lng) !== (b[1] > lng) && lat < (b[0] - a[0]) * (lng - a[1]) / (b[1] - a[1]) + a[0]) in_ = !in_; }
+  return in_;
+}
+function sectionAt(lat, lng) {   // kleinste Fläche, die den Punkt enthält (UEA vor EA)
+  const area = x => { const b = L.latLngBounds(x.pts); return (b.getNorth() - b.getSouth()) * (b.getEast() - b.getWest()); };
+  return state.sections.filter(x => secInside(x, lat, lng)).sort((a, b) => area(a) - area(b))[0] || null;
+}
+function unitMovedOnMap(u, lat, lng) {
+  u.lat = lat; u.lng = lng; const sx = sectionAt(lat, lng);
+  if (sx && sx.id !== u.sectionId) { assignUnit(u, sx.id); return; }
+  save('Einheit verschoben: ' + u.name); renderUnitOverview(); renderFue();
+}
 function assignUnit(u, secId) {
-  if ((u.sectionId || null) === (secId || null)) return; u.sectionId = secId; if (u.lat == null && secId) { const p = secAnchor(secId); u.lat = p[0]; u.lng = p[1]; } addJournal('Einheit ' + (u.name || '–') + ' zugeteilt: ' + sectionName(secId), true);
-  renderUnits(); renderAbschnitte(); save('Einheit zugeteilt: ' + u.name);
+  if ((u.sectionId || null) === (secId || null)) return; u.sectionId = secId;
+  { const sx = secId && state.sections.find(x => x.id === secId); if (sx && (u.lat == null || !secInside(sx, u.lat, u.lng)) && ((sx.pts && sx.pts.length > 2) || u.lat == null)) { const p = secAnchor(secId); u.lat = p[0]; u.lng = p[1]; } } addJournal('Einheit ' + (u.name || '–') + ' zugeteilt: ' + sectionName(secId), true);
+  renderUnits(); renderAbschnitte(); renderFue(); save('Einheit zugeteilt: ' + u.name);
 }
 function askYesNo(title, text, okLabel) {
   return new Promise(resolve => {
@@ -5568,7 +5583,8 @@ function mergeUnit(c) {
 function removeUnit(u) { state.units = state.units.filter(x => x !== u); renderUnits(); renderAbschnitte(); save('Einheit gelöscht: ' + u.name); }
 function secAnchor(secId) {   // Ort für eine neue Einheit im Abschnitt: Mitte der Fläche, sonst Mitte der schon platzierten Einheiten, sonst Kartenmitte
   const sx = state.sections.find(x => x.id === secId); let c = null;
-  if (sx && sx.pts && sx.pts.length > 1) c = L.latLngBounds(sx.pts).getCenter();
+  if (sx && sx.pts && sx.pts.length > 2) { c = L.latLngBounds(sx.pts).getCenter(); if (!secInside(sx, c.lat, c.lng)) { const m = L.latLng(sx.pts.reduce((a, q) => a + q[0], 0) / sx.pts.length, sx.pts.reduce((a, q) => a + q[1], 0) / sx.pts.length); if (secInside(sx, m.lat, m.lng)) c = m; } }
+  else if (sx && sx.pts && sx.pts.length > 1) c = L.latLngBounds(sx.pts).getCenter();
   else if (sx) { const p = state.units.filter(x => x.sectionId === sx.id && x.lat != null); if (p.length) c = L.latLng(p.reduce((a, x) => a + x.lat, 0) / p.length, p.reduce((a, x) => a + x.lng, 0) / p.length); }
   if (!c) c = map.getCenter();
   const n = state.units.filter(x => x.lat != null && Math.abs(x.lat - c.lat) < 0.01 && Math.abs(x.lng - c.lng) < 0.01).length, ang = n * 2.4, rad = n ? 0.00025 * (1 + Math.floor(n / 6)) : 0;
@@ -6885,7 +6901,7 @@ initPlaceSearch(); initialView();
 tickClock(); setInterval(tickClock, 1000);
 $('#panelToggle').innerHTML = panelGlyph(!$('#app').classList.contains('collapsed'));
 liveInit();
-window.__lage = { TileCache, addUnit, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
+window.__lage = { TileCache, addUnit, assignUnit, unitMovedOnMap, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
 })();
 </script>
 </body>

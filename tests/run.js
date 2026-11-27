@@ -195,6 +195,15 @@ async function seite(b, q, w, h) {
     const u = await p.evaluate(() => window.__lage.state.units[0]); assert.ok(u && u.sectionId === 'ea1' && u.lat != null, 'Einheit im Abschnitt und mit Ort');
     await p.click('#tabs [data-act="map"]'); await p.waitForSelector('.drawask', { timeout: 4000 }); assert.ok((await p.textContent('.drawask')).includes('EA Süd')); await p.close();
   });
+  await t('Einheit: Ziehen auf der Karte ordnet zu, Verschieben in Kräfte setzt die Einheit in die Fläche', async () => {
+    const p = await seite(b, '', 1700, 1300); const r = await p.evaluate(() => { const L = window.__lage, s = L.state, now = new Date().toISOString();
+      s.areas = []; s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'EA A', color: '#2563eb', pts: [[51.50, 7.40], [51.50, 7.42], [51.52, 7.42], [51.52, 7.40]] }, { id: 'B', kind: 'poly', typ: 'br', name: 'BR B', color: '#16a34a', pts: [[51.50, 7.45], [51.50, 7.47], [51.52, 7.47], [51.52, 7.45]] }];
+      s.units = [{ id: 'u1', name: 'LF 1', call: '', sym: null, f: 1, u: 1, h: 4, status: 'einsatz', sectionId: null, task: '', note: '', lat: 51.51, lng: 7.41, time: now }];
+      L.unitMovedOnMap(s.units[0], 51.51, 7.41); const a = s.units[0].sectionId; L.unitMovedOnMap(s.units[0], 51.51, 7.46); const b2 = s.units[0].sectionId;
+      L.assignUnit(s.units[0], 'A'); const u = s.units[0]; return { a, b2, c: u.sectionId, lat: u.lat, lng: u.lng }; });
+    assert.strictEqual(r.a, 'A'); assert.strictEqual(r.b2, 'B'); assert.strictEqual(r.c, 'A');
+    assert.ok(r.lat > 51.50 && r.lat < 51.52 && r.lng > 7.40 && r.lng < 7.42, 'Einheit liegt wieder in EA A: ' + r.lat + ' ' + r.lng); await p.close();
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));
