@@ -15,7 +15,7 @@ async function seite(b, q, w, h) {
 (async () => {
   const b = await chromium.launch();
   await t('Start ohne Skriptfehler, Name, keine Funktionswahl', async () => {
-    const p = await seite(b, '?rolle=S2'); assert.strictEqual(await p.textContent('h1'), 'LAGEkarte'); assert.strictEqual(await p.locator('#roleChip').count(), 0); await p.close();
+    const p = await seite(b, '?rolle=S2'); assert.strictEqual(await p.getAttribute('h1 .logo', 'aria-label'), 'Lagekarte'); assert.ok(await p.locator('h1 .logo svg').isVisible()); assert.strictEqual(await p.locator('link[rel=icon]').count(), 1); assert.strictEqual(await p.locator('#roleChip').count(), 0); await p.close();
   });
   await t('Burger-Menü öffnet und schließt, Lagevortrag und Dunkelmodus liegen in der Kopfzeile', async () => {
     const p = await seite(b, '?rolle=S2'); assert.ok(await p.locator('#btnVortrag').isVisible()); assert.ok(await p.locator('#btnTheme').isVisible());
@@ -159,7 +159,7 @@ async function seite(b, q, w, h) {
       s.sections = [{ id: 'ea1', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [] }, { id: 'ea2', kind: 'poly', typ: 'ea', name: 'EA Süd', color: '#16a34a', pts: [] }];
       s.units = [{ id: 'a', name: 'LF 1', call: '', sym: null, f: 1, u: 3, h: 9, status: 'einsatz', sectionId: 'ea1', task: '', note: '', lat: null, lng: null, time: now }]; });
     const nav = await p.$$eval('#tabs button', x => x.filter(e => e.offsetParent).map(e => e.textContent.trim()));
-    assert.deepStrictEqual(nav.slice(0, 5), ['Lagekarte', 'Gebiete', 'Kräfte', 'Führungsstruktur', 'Einsatztagebuch']); assert.ok(nav.includes('KRITIS') && !nav.includes('Meldungen') && !nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
+    assert.deepStrictEqual(nav.slice(0, 5), ['Lagekarte', 'Einsatzraum', 'Kräfte', 'Führungsstruktur', 'Einsatztagebuch']); assert.ok(nav.includes('KRITIS') && !nav.includes('Meldungen') && !nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
     await p.keyboard.press('f'); await p.waitForTimeout(500);
     await p.click('.fsec[data-sid="ea1"]'.replace('.fsec[data-sid="ea1"]', '.fea:first-child .flab')); await p.fill('.dlg input', 'Kanal 12'); await p.keyboard.press('Enter'); await p.waitForTimeout(500);
     assert.strictEqual(await p.evaluate(() => window.__lage.state.sections[0].radio), 'Kanal 12');
