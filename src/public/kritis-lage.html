@@ -1070,6 +1070,14 @@ body.printing .clpanel, body.printing #clusterLines { display: none; }
   .wal-r input { font-size: 16px; }
 }
 .rolecard label.hint > select { display: block; width: 100%; margin: 2px 0 8px; }
+
+/* Stabswand: Farbe des Abschnitts wie auf der Karte, nur als Akzent */
+.wblock[style*="--c"] { border-top: 5px solid var(--c); }
+.wblock[style*="--c"] .ea { border-color: color-mix(in srgb, var(--c) 55%, #555); }
+.wblock[style*="--c"] .ea .k { background: color-mix(in srgb, var(--c) 16%, #f1f1f1); border-right-color: color-mix(in srgb, var(--c) 55%, #888); }
+.wblock[style*="--c"] .ea .k b { color: var(--c); }
+.wblock[style*="--c"] .ovunit.wt { border-bottom: 3px solid var(--c); }
+.sdot { width: 10px; height: 10px; margin-right: 7px; border-radius: 50%; }
 </style>
 </head>
 <body>
@@ -5303,7 +5311,7 @@ function wandBlock(sx, units) {
   const list = units.filter(u => sx ? ids.has(u.sectionId) : ((!u.sectionId || !state.sections.some(x => x.id === u.sectionId)) && u.status !== ST_ANF));
   const body = el('div', { class: 'wtiles' }, ...list.slice().sort((p, q) => (p.name || '').localeCompare(q.name || '', 'de')).map(wTile));
   if (!list.length) body.append(el('div', { class: 'ovempty', text: ro('units') ? 'leer' : 'Kacheln hierher ziehen' }));
-  return el('div', { class: 'ovcol wblock', 'data-drop': 'sec:' + (sx ? sx.id : '') }, sx ? wandCard(sx, sums) : el('div', { class: 'wnone' }, el('b', { text: 'Ohne Abschnitt' }), el('span', { text: 'nicht zugeordnete Einheiten' })), body);
+  return el('div', { class: 'ovcol wblock', 'data-drop': 'sec:' + (sx ? sx.id : ''), style: sx ? '--c:' + safeColor(sx.color, '#2563eb') : null }, sx ? wandCard(sx, sums) : el('div', { class: 'wnone' }, el('b', { text: 'Ohne Abschnitt' }), el('span', { text: 'nicht zugeordnete Einheiten' })), body);
 }
 function kcell(secId, key, val, computed) {
   const o = (state.kraefte.ovr[secId == null ? '_' : secId] || {})[key], has = o != null, vw = ro('kraefte');
@@ -5325,7 +5333,7 @@ function wandTable(secs) {
   const rows = secs.map(sx => ({ sx, id: sx.id, name: sx.name, sums: wandSums(sx.id) })).concat([{ sx: null, id: null, name: 'ohne Abschnitt', sums: wandSums(null) }]).filter(r => r.sx || r.sums.alle.n || r.sums.abg.n);
   const val = (r, k) => { const o = (state.kraefte.ovr[r.id == null ? '_' : r.id] || {})[k]; return o != null ? o : r.sums[k].m; };
   const tot = k => rows.reduce((a, r) => a + val(r, k), 0);
-  const tr = r => el('tr', {}, el('th', { scope: 'row', text: r.name }), ...['anf', 'vor', 'abg'].map(k => el('td', {}, kcell(r.id, k, val(r, k), r.sums[k].m), r.sums[k].n ? el('small', { text: r.sums[k].n + ' Einh.' }) : null, wandGroupChips(r.id, k))));
+  const tr = r => el('tr', {}, el('th', { scope: 'row' }, r.sx ? el('i', { class: 'gdot sdot', style: 'background:' + safeColor(r.sx.color, '#2563eb') }) : null, r.name), ...['anf', 'vor', 'abg'].map(k => el('td', {}, kcell(r.id, k, val(r, k), r.sums[k].m), r.sums[k].n ? el('small', { text: r.sums[k].n + ' Einh.' }) : null, wandGroupChips(r.id, k))));
   return el('div', { class: 'kt' }, el('div', { class: 'kt-h' }, el('span', { class: 'lbl', text: 'Kräfteübersicht (S1)' }), ),
     el('table', { class: 'kt-t' }, el('thead', {}, el('tr', {}, el('th', { text: 'EA' }), el('th', { text: 'alarmiert, auf Anfahrt' }), el('th', { text: 'vor Ort' }), el('th', { text: 'abgelöst' }))),
       el('tbody', {}, ...rows.map(tr), ...wandGroupRows(), el('tr', { class: 'sig' }, el('th', { text: 'Σ' }), el('td', { text: String(tot('anf')) }), el('td', { text: String(tot('vor')) }), el('td', { text: String(tot('abg')) })))),
