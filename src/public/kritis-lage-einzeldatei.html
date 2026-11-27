@@ -1344,10 +1344,13 @@ div.fbox { cursor: default; }
 .fbox .funk { display: inline-block; margin-top: 3px; font-size: 10.5px; background: #e0e7ff; color: #1e3a8a; border-radius: 3px; padding: 0 5px; }
 .fstab { border: 2px solid #1e40af; border-radius: 8px; background: rgba(30, 64, 175, .04); padding: 8px 10px; max-width: 520px; }
 .fgrid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.ftop { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; width: 100%; }
+.ftop { display: grid; grid-template-columns: 1fr 2px 1fr; grid-template-rows: auto 1fr; align-items: start; width: 100%; }
+.fel { grid-column: 1 / 4; grid-row: 1; justify-self: center; position: relative; } .fel::after { content: ''; position: absolute; left: 50%; bottom: -18px; width: 2px; height: 18px; background: #94a3b8; margin-left: -1px; }
+.ftrunk { grid-column: 2; grid-row: 2; align-self: stretch; background: #94a3b8; margin-top: 18px; min-height: 90px; }
+.ftl { grid-column: 1; grid-row: 2; margin-top: 18px; } .ftr { grid-column: 3; grid-row: 2; margin-top: 18px; }
 .ftl { display: flex; justify-content: flex-end; align-items: flex-start; } .ftr { display: flex; justify-content: flex-start; align-items: flex-start; } .fstaff { min-width: 0; }
-.fcol { display: flex; flex-direction: column; align-items: center; align-self: stretch; } .fcol .fv { flex: 1; min-height: 30px; height: auto; }
-.fhl { position: relative; flex: none; width: 110px; height: 2px; background: #94a3b8; margin-top: 38px; }
+
+.fhl { position: relative; flex: 1 0 70px; max-width: 160px; height: 2px; background: #94a3b8; margin-top: 38px; }
 .ftl .fhl, .ftr .fhl { align-self: flex-start; }
 .feas { display: flex; flex-wrap: nowrap; justify-content: center; gap: 14px; align-items: flex-start; }
 .fea { position: relative; display: flex; flex-direction: column; align-items: center; }
@@ -5855,10 +5858,10 @@ function fueSecBox(sx, level) {
   const box = el('div', { class: 'fsec' + (level ? ' uea' : ''), 'data-sid': sx.id, style: '--c:' + safeColor(sx.color, '#2563eb') },
     el('div', { class: 'ftag' + (vw ? '' : ' grip'), 'data-grip': vw ? null : sx.id, title: vw ? null : 'Ziehen: verschieben oder unter einen anderen EA hängen', text: (vw ? '' : '⠿ ') + (level ? 'UEA' : 'EA') }),
     fBox({ title: sx.name, sub: 'Leiter' + (sx.deputy ? ', Stv.: ' + sx.deputy : ''), name: sx.leader, color: sx.color, dom: 'sections', sym: level ? 'tz/Führungsstellen/UEAL' : 'tz/Führungsstellen/EAL', onclick: () => fueEditSection(sx) }),
+    vw ? null : el('div', { class: 'fact' }, level ? null : el('button', { class: 'btn small', text: '+ UEA', onclick: () => fueAddSection(sx) }), el('button', { class: 'btn small', text: '+ Einheit', onclick: () => addUnitDialog({ sectionId: sx.id }) }), el('button', { class: 'btn small danger', text: 'Entfernen', onclick: () => fueRemoveSection(sx) })),
     sx.task ? el('div', { class: 'ftask', text: sx.task }) : null,
     el('div', { class: 'fsum' }, el('span', { text: us.length + ' Einheiten, Stärke ' + tot }), us.length ? el('button', { class: 'btn small fold', text: sx.hideU ? 'einblenden' : 'ausblenden', title: 'Einheiten dieses Abschnitts ' + (sx.hideU ? 'einblenden' : 'ausblenden'), onclick: () => { sx.hideU = !sx.hideU; renderFue(); save('Führungsstruktur: Einheiten ' + (sx.hideU ? 'ausgeblendet' : 'eingeblendet')); } }) : null),
     ...(sx.hideU ? [] : us.map(fueUnit)),
-    vw ? null : el('div', { class: 'fact' }, level ? null : el('button', { class: 'btn small', text: '+ UEA', onclick: () => fueAddSection(sx) }), el('button', { class: 'btn small', text: '+ Einheit', onclick: () => addUnitDialog({ sectionId: sx.id }) }), el('button', { class: 'btn small danger', text: 'Entfernen', onclick: () => fueRemoveSection(sx) })),
     ch.length ? el('div', { class: 'fuea' }, ...ch.map(c => el('div', { class: 'fuc' }, fueLine(c), fueSecBox(c, 1)))) : null);
   return box;
 }
@@ -5912,12 +5915,11 @@ function renderFue() {
   const el1 = fuePerson('EL'), ls = fuePerson('LS'), slp = fuePerson('SL'), occ = roles.filter(r => fuePerson(r.id).name).length;
   const editStab = async () => {
     if (runtime.viewer) return;
-    const d = await fieldsDialog('Führungsstab', [{ k: 'SL', l: sl ? sl.label : 'Leiter des Führungsstabs', v: slp.name }, { k: 'call', l: 'Funkrufname des Stabs', v: slp.call }, ...roles.map(r => ({ k: r.id, l: r.label, v: fuePerson(r.id).name }))]); if (!d) return;
-    state.fue.people.SL = { name: d.SL.trim(), call: d.call.trim() }; roles.forEach(r => { state.fue.people[r.id] = { name: d[r.id].trim(), call: '' }; });
-    addJournal('Führungsstab besetzt: Leiter ' + (d.SL.trim() || 'unbesetzt') + ', Sachgebiete ' + roles.filter(r => d[r.id].trim()).length + ' von ' + roles.length, true); renderFue(); save('Führungsstruktur: Führungsstab');
+    const d = await fieldsDialog('Führungsstab', [{ k: 'SL', l: sl ? sl.label : 'Leiter des Führungsstabs', v: slp.name }, { k: 'call', l: 'Funkrufname des Stabs', v: slp.call }]); if (!d) return;
+    state.fue.people.SL = { name: d.SL.trim(), call: d.call.trim() };
+    addJournal('Führungsstab: Leiter ' + (d.SL.trim() || 'unbesetzt'), true); renderFue(); save('Führungsstruktur: Führungsstab');
   };
-  const stabBox = fBox({ title: 'Führungsstab', sub: occ + ' von ' + roles.length + ' Sachgebieten besetzt', name: slp.name, call: slp.call, color: '#1e40af', sym: 'tz/Führungsstellen/Führungsstab', onclick: editStab });
-  stabBox.title = roles.map(r => r.label + ': ' + (fuePerson(r.id).name || 'unbesetzt')).join('\n') + (runtime.viewer ? '' : '\n(Klicken: bearbeiten)');
+  const stabBox = fBox({ title: 'Führungsstab', sub: 'Leiter des Führungsstabs', name: slp.name, call: slp.call, color: '#1e40af', sym: 'tz/Führungsstellen/Führungsstab', onclick: editStab });
   const fbList = el('div', { class: 'fgrid' }, ...state.fue.fb.map(f => fBox({ title: f.title || 'Fachberater', sub: 'Fachberater oder Verbindung', name: f.name, call: f.call, color: '#7c3aed', dom: 'fb', sym: f.sym || null, onclick: async () => {
       let sym = f.sym || null; const d = await fieldsDialog('Fachberater oder Verbindung', [{ k: 'title', l: 'Bezeichnung', v: f.title }, { k: 'name', l: 'Name, Funktion', v: f.name }, { k: 'call', l: 'Funkrufname', v: f.call }], 'OK', async () => { const v = await pickSymbol(sym); if (v !== undefined) sym = v; });
       if (d) { Object.assign(f, { title: d.title.trim(), name: d.name.trim(), call: d.call.trim(), sym }); renderFue(); save('Führungsstruktur: Fachberater'); } } })),
@@ -5926,9 +5928,11 @@ function renderFue() {
   const roots = state.sections.filter(x => x.kind !== 'line' && !x.parentId), free = state.units.filter(u => !u.sectionId || !state.sections.some(x => x.id === u.sectionId));
   body.append(el('div', { class: 'forg' },
     el('div', { class: 'ftop' },
+      el('div', { class: 'fel' }, fBox({ title: 'Einsatzleiter (EL)', sub: 'Leiter der Einsatzleitung', name: el1.name, call: el1.call, color: '#0f2a47', sym: 'tz/Führungsstellen/EL', onclick: () => fueEditPerson('EL', 'Einsatzleiter (EL)') })),
       el('div', { class: 'ftl' }, el('div', { class: 'fstaff' }, staff), fueHLine('stab', 'Führungsstab')),
-      el('div', { class: 'fcol' }, fBox({ title: 'Einsatzleiter (EL)', sub: 'Leiter der Einsatzleitung', name: el1.name, call: el1.call, color: '#0f2a47', sym: 'tz/Führungsstellen/EL', onclick: () => fueEditPerson('EL', 'Einsatzleiter (EL)') }), el('div', { class: 'fv' })),
+      el('div', { class: 'ftrunk' }),
       el('div', { class: 'ftr' }, fueHLine('ls', 'Leitstelle'), fBox({ title: 'Leitstelle', sub: 'Verbindung zur Leitstelle', name: ls.name, call: ls.call, color: '#475569', sym: 'tz/Einrichtungen/Leitstelle', onclick: () => fueEditPerson('LS', 'Leitstelle') }))),
+    el('div', { class: 'fv' }),
     el('div', { class: 'feas' }, ...roots.map(r => el('div', { class: 'fea' }, fueLine(r), fueSecBox(r, 0))),
       free.length ? el('div', { class: 'fea' }, el('div', { class: 'fsec', style: '--c:#94a3b8' }, el('div', { class: 'ftag', text: 'nicht zugeteilt' }), ...free.map(fueUnit))) : null,
       !roots.length && !vw ? el('div', { class: 'hint', text: 'Noch kein Einsatzabschnitt. Mit „+ EA“ anlegen.' }) : null)));
