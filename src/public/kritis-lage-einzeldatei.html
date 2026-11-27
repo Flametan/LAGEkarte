@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20width=%2264%22%20height=%2264%22%20rx=%2214%22%20fill=%22%23fff%22/%3E%3Cpath%20d=%22M5%2017l18-7%2018%207%2018-7v37l-18%207-18-7-18%207z%22%20fill=%22%23e5b9b9%22/%3E%3Cpath%20d=%22M23%2010v37M41%2017v37%22%20stroke=%22%23fff%22%20stroke-width=%222.500%22/%3E%3Cpath%20d=%22M32%208c-8.500%200-15%206.200-15%2014%200%2010.500%2015%2024%2015%2024s15-13.500%2015-24c0-7.800-6.500-14-15-14z%22%20fill=%22%23b71c1c%22%20stroke=%22%23fff%22%20stroke-width=%223%22/%3E%3Ccircle%20cx=%2232%22%20cy=%2222%22%20r=%225.500%22%20fill=%22%23fff%22/%3E%3C/svg%3E">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LAGEkarte</title>
@@ -1692,13 +1693,15 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
 #mapBar { gap: 6px; } #mapBar .mb { padding: 6px 10px; }
 #placeSearch { width: min(230px, 22vw) !important; }
 @media (max-width: 1500px) { #mapBar .mb { padding: 5px 7px; font-size: 13px; } #placeSearch { width: 170px !important; } #mapBar .mb-t { font-size: 18px; } }
+#app > header h1 .logo { background: none; padding: 0; margin: 0 10px 0 12px; display: flex; align-items: center; }
+#app > header h1 .logo svg { width: 46px; height: 46px; display: block; }
 </style>
 </head>
 <body>
 <div id="app">
   <header>
     <div id="hdrTop">
-    <h1><span class="logo">LAGE</span><span class="lk">karte</span></h1>
+    <h1><span class="logo" role="img" aria-label="Lagekarte"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#fff"/><path d="M5 17l18-7 18 7 18-7v37l-18 7-18-7-18 7z" fill="#e5b9b9"/><path d="M23 10v37M41 17v37" stroke="#fff" stroke-width="2.500"/><path d="M32 8c-8.500 0-15 6.200-15 14 0 10.500 15 24 15 24s15-13.500 15-24c0-7.800-6.500-14-15-14z" fill="#b71c1c" stroke="#fff" stroke-width="3"/><circle cx="32" cy="22" r="5.500" fill="#fff"/></svg></span><span class="lk">karte</span></h1>
     <span id="hdrTitle" class="hdr-title"></span>
     <div id="qat" role="toolbar" aria-label="Schnellzugriff">
       <span class="qb"><button id="btnUndo" disabled aria-label="Rückgängig"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></button><button id="btnUndoMenu" class="caret" disabled aria-label="Rückgängig-Liste"><svg viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path fill="currentColor" d="M0 0h10L5 6z"/></svg></button></span>

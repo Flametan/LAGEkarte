@@ -15,7 +15,7 @@ async function seite(b, q, w, h) {
 (async () => {
   const b = await chromium.launch();
   await t('Start ohne Skriptfehler, Name, keine Funktionswahl', async () => {
-    const p = await seite(b, '?rolle=S2'); assert.strictEqual(await p.textContent('h1'), 'LAGEkarte'); assert.strictEqual(await p.locator('#roleChip').count(), 0); await p.close();
+    const p = await seite(b, '?rolle=S2'); assert.strictEqual(await p.getAttribute('h1 .logo', 'aria-label'), 'Lagekarte'); assert.ok(await p.locator('h1 .logo svg').isVisible()); assert.strictEqual(await p.locator('link[rel=icon]').count(), 1); assert.strictEqual(await p.locator('#roleChip').count(), 0); await p.close();
   });
   await t('Burger-Menü öffnet und schließt, Lagevortrag und Dunkelmodus liegen in der Kopfzeile', async () => {
     const p = await seite(b, '?rolle=S2'); assert.ok(await p.locator('#btnVortrag').isVisible()); assert.ok(await p.locator('#btnTheme').isVisible());
