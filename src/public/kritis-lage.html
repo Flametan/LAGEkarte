@@ -1078,6 +1078,9 @@ body.printing .clpanel, body.printing #clusterLines { display: none; }
 .wblock[style*="--c"] .ea .k b { color: var(--c); }
 .wblock[style*="--c"] .ovunit.wt { border-bottom: 3px solid var(--c); }
 .sdot { width: 10px; height: 10px; margin-right: 7px; border-radius: 50%; }
+.cl-un { flex: none; background: #ea580c; color: #fff; font-size: 10.5px; font-weight: 800; border-radius: 4px; padding: 1px 5px; letter-spacing: .02em; }
+#bmZoom { position: fixed; left: 10px; bottom: 44px; z-index: 5000; display: flex; gap: 4px; align-items: center; background: rgba(15, 23, 42, .82); border-radius: 10px; padding: 4px 6px; opacity: 0; pointer-events: none; transition: opacity .25s; } #bmZoom.on { opacity: 1; pointer-events: auto; }
+#bmZoom button { border: 1px solid rgba(255,255,255,.5); background: rgba(255,255,255,.12); color: #fff; font: 700 18px Inter, system-ui, sans-serif; min-width: 38px; height: 34px; border-radius: 7px; cursor: pointer; } #bmZoom .bmz-v { font-size: 13px; min-width: 58px; } #bmZoom button:hover { background: rgba(255,255,255,.28); }
 </style>
 </head>
 <body>
@@ -1827,36 +1830,54 @@ function commit(label) {
 }
 function updateUndoButtons() {
   const u = $('#btnUndo'), r = $('#btnRedo'); if (!u) return;
-  $('#btnUndoMenu').disabled = !hist.past.length || SYNC.active; $('#btnRedoMenu').disabled = !hist.future.length || SYNC.active;
+  $('#btnUndoMenu').disabled = !hist.past.length; $('#btnRedoMenu').disabled = !hist.future.length;
   const pu = hist.past[hist.past.length - 1], fr = hist.future[hist.future.length - 1];
-  u.disabled = !pu || SYNC.active; r.disabled = !fr || SYNC.active;
+  u.disabled = !pu; r.disabled = !fr;
   u.title = pu ? 'Rückgängig: ' + pu.label + ' (Strg+Z)' : 'Nichts rückgängig zu machen';
   r.title = fr ? 'Wiederholen: ' + fr.label + ' (Strg+Y)' : 'Nichts zu wiederholen';
 }
+/* Rückgängig im gemeinsamen Einsatz: Nur was dieser Schritt geändert hat, wird zurückgesetzt, und nur wenn es seither niemand anders geändert hat.
+   Der Rest, auch die Änderungen der anderen, bleibt. */
+function histMerge(curSnap, fromSnap, toSnap) {
+  const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b), isO = v => v && typeof v === 'object' && !Array.isArray(v), hasId = a => Array.isArray(a) && a.every(x => isO(x) && x.id != null);
+  const go = (cur, from, to) => {
+    if (eq(from, to)) return cur;
+    if (hasId(from || []) && hasId(to || []) && hasId(cur || [])) {
+      const res = cur.slice(), fm = new Map((from || []).map(x => [String(x.id), x])), tm = new Map((to || []).map(x => [String(x.id), x]));
+      fm.forEach((f, id) => { if (!tm.has(id)) { const i = res.findIndex(x => String(x.id) === id); if (i > -1) res.splice(i, 1); } });
+      tm.forEach((t, id) => { const i = res.findIndex(x => String(x.id) === id); if (!fm.has(id)) { if (i < 0) res.push(t); } else if (i > -1) res[i] = go(res[i], fm.get(id), t); });
+      return res;
+    }
+    if (isO(from || {}) && isO(to || {}) && isO(cur || {})) {
+      const res = Object.assign({}, cur), keys = new Set([...Object.keys(from || {}), ...Object.keys(to || {})]);
+      keys.forEach(k => { const f = (from || {})[k], t = (to || {})[k]; if (eq(f, t)) return; const c = cur[k]; if (isO(f) && isO(t) && isO(c)) res[k] = go(c, f, t); else if (hasId(f || []) && hasId(t || []) && hasId(c || [])) res[k] = go(c, f, t); else if (eq(c, f)) { if (t === undefined) delete res[k]; else res[k] = t; } });
+      return res;
+    }
+    return eq(cur, from) ? to : cur;
+  };
+  return JSON.stringify(go(JSON.parse(curSnap), JSON.parse(fromSnap), JSON.parse(toSnap)));
+}
+const histTarget = (e, back) => SYNC.active ? histMerge(snapshot(), back ? e.after : e.before, back ? e.before : e.after) : (back ? e.before : e.after);
 function undo() {
   if (runtime.viewer) return;
-  if (SYNC.active) { say('Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.', 3500); return; }
   commit('Änderung'); const e = hist.past.pop(); if (!e) return;
-  hist.future.push(e); restore(e.before); addJournal('Rückgängig: ' + e.label, true); updateUndoButtons();
+  hist.future.push(e); restore(histTarget(e, true)); addJournal('Rückgängig: ' + e.label, true); updateUndoButtons();
 }
 function redo() {
   if (runtime.viewer) return;
-  if (SYNC.active) { say('Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.', 3500); return; }
   commit('Änderung'); const e = hist.future.pop(); if (!e) return;
-  hist.past.push(e); restore(e.after); addJournal('Wiederholt: ' + e.label, true); updateUndoButtons();
+  hist.past.push(e); restore(histTarget(e, false)); addJournal('Wiederholt: ' + e.label, true); updateUndoButtons();
 }
 function undoTo(n) {
-  if (SYNC.active) { say('Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.', 3500); return; }            // n Schritte auf einmal zurück (Liste wie in Word)
-  commit('Änderung'); n = Math.min(n, hist.past.length); if (!n) return;
+  commit('Änderung'); n = Math.min(n, hist.past.length); if (!n) return;            // n Schritte auf einmal zurück (Liste wie in Word)
   const taken = []; for (let i = 0; i < n; i++) { const e = hist.past.pop(); hist.future.push(e); taken.push(e); }
-  restore(taken[taken.length - 1].before);
+  if (SYNC.active) taken.forEach(e => restore(histTarget(e, true))); else restore(taken[taken.length - 1].before);
   addJournal('Rückgängig: ' + taken[0].label + (n > 1 ? ' und ' + (n - 1) + ' weitere' : ''), true); updateUndoButtons();
 }
 function redoTo(n) {
-  if (SYNC.active) { say('Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.', 3500); return; }
   commit('Änderung'); n = Math.min(n, hist.future.length); if (!n) return;
   const taken = []; for (let i = 0; i < n; i++) { const e = hist.future.pop(); hist.past.push(e); taken.push(e); }
-  restore(taken[taken.length - 1].after);
+  if (SYNC.active) taken.slice().reverse().forEach(e => restore(histTarget(e, false))); else restore(taken[taken.length - 1].after);
   addJournal('Wiederholt: ' + taken[0].label + (n > 1 ? ' und ' + (n - 1) + ' weitere' : ''), true); updateUndoButtons();
 }
 function restore(snap) {
@@ -2459,7 +2480,7 @@ function symIcon(name) {
 }
 function renderSymbols() {
   symLayer.clearLayers();
-  state.symbols.forEach(s => {
+  state.symbols.filter(s => !clusterCur.hiddenX.has(s.id)).forEach(s => {
     const m = L.marker([s.lat, s.lng], { icon: symIcon(s.name), draggable: true });
     if (s.label) m.bindTooltip(el('span', { text: s.label }), { permanent: true, direction: 'bottom', className: 'symlabel', offset: [0, 18] });
     m.on('dragend', () => { const ll = m.getLatLng(); s.lat = ll.lat; s.lng = ll.lng; save('Zeichen verschoben'); });
@@ -3318,8 +3339,20 @@ function beamerShowFrozen() {
   if (!b) { b = el('div', { id: 'bmFrozen' }); document.body.append(b); }
   b.textContent = 'Stand festgehalten ' + fmtHM(runtime.beamerStand || Date.now());
 }
+function beamerZoomInit() {   // Strg und Minus, Plus, Null und Strg mit Mausrad gelten nur für dieses Fenster, nicht für die anderen
+  const KEY = 'kritis-bmzoom'; let z = 1; try { z = parseFloat(sessionStorage.getItem(KEY)) || 1; } catch (e) { /* ohne Speicher */ }
+  const apply = () => { z = Math.min(3, Math.max(0.3, Math.round(z * 100) / 100)); document.documentElement.style.zoom = z === 1 ? '' : String(z); const pv = $('.bmz-v'); if (pv) pv.textContent = Math.round(z * 100) + ' %'; try { sessionStorage.setItem(KEY, String(z)); } catch (e) { /* egal */ } setTimeout(() => { try { map.invalidateSize(); renderClusterLines(); } catch (e) { /* Karte noch nicht bereit */ } }, 60); };
+  const pct = el('button', { type: 'button', class: 'bmz-v', title: 'Zurück auf 100 %', onclick: () => step(0) });
+  const bar = el('div', { id: 'bmZoom', role: 'group', 'aria-label': 'Größe dieses Fensters' }, el('button', { type: 'button', 'data-z': '-', title: 'Kleiner (Strg und Minus)', text: '−', onclick: () => step(-0.1) }), pct, el('button', { type: 'button', 'data-z': '+', title: 'Größer (Strg und Plus)', text: '+', onclick: () => step(0.1) }));
+  let hideT = 0; const wake = () => { bar.classList.add('on'); clearTimeout(hideT); hideT = setTimeout(() => bar.classList.remove('on'), 3500); };
+  document.addEventListener('mousemove', wake); document.addEventListener('touchstart', wake, { passive: true }); document.body.append(bar);
+  const step = d => { z = d === 0 ? 1 : z + d; apply(); wake(); };
+  document.addEventListener('keydown', e => { if (!(e.ctrlKey || e.metaKey) || e.altKey) return; const k = e.key; if (k === '-' || k === '_') step(-0.1); else if (k === '+' || k === '=' || k === '>') step(0.1); else if (k === '0') step(0); else return; e.preventDefault(); e.stopPropagation(); }, true);
+  document.addEventListener('wheel', e => { if (!e.ctrlKey && !e.metaKey) return; e.preventDefault(); step(e.deltaY > 0 ? -0.1 : 0.1); }, { passive: false, capture: true });
+  apply(); window.__beamerZoom = () => z;
+}
 function beamerStart() {
-  const bv = runtime.beamerView; document.title = 'Beamer: ' + BEAMER_VIEWS.find(x => x[0] === bv)[1];
+  const bv = runtime.beamerView; beamerZoomInit(); document.title = 'Beamer: ' + BEAMER_VIEWS.find(x => x[0] === bv)[1];
   runtime.beamerFrozen = false; runtime.beamerPending = null;
   bcast.on(m => {
     if (m.t === 'state') { if (runtime.beamerFrozen) runtime.beamerPending = m; else beamerApply(m); }
@@ -3360,7 +3393,7 @@ function renderBeamerDlg() {
 function openBeamerDlg() {
   if ($('#bmDlg')) return;
   const dlg = el('div', { id: 'bmDlg', class: 'dlg', role: 'dialog', 'aria-modal': 'true' }, el('div', { class: 'bmcard' },
-    el('h3', { text: 'Beamer-Fenster' }), el('div', { class: 'hint', text: 'Jedes Fenster zeigt immer seine Ansicht und folgt diesem Hauptfenster. Fenster auf den jeweiligen Beamer ziehen und dort F11 für Vollbild drücken. Alle Fenster müssen in diesem Browser laufen.' }),
+    el('h3', { text: 'Beamer-Fenster' }), el('div', { class: 'hint', text: 'Jedes Fenster zeigt immer seine Ansicht und folgt diesem Hauptfenster. Fenster auf den jeweiligen Beamer ziehen und dort F11 für Vollbild drücken. Strg und Minus, Plus oder Null ändern die Größe nur im jeweiligen Beamer-Fenster. Hatten Sie vorher den Browser-Zoom verstellt, einmal Strg+0 im Hauptfenster drücken. Alle Fenster müssen in diesem Browser laufen.' }),
     el('div', { id: 'bmRows' }), el('div', { class: 'hint', text: 'Festhalten friert Ausschnitt und Inhalte auf dem Beamer ein, während Sie hier weiterarbeiten. Taste H schaltet den Karten-Beamer um.' }),
     el('div', { class: 'row' }, el('button', { class: 'btn primary', style: 'flex:1;justify-content:center', text: 'Schließen', onclick: () => dlg.remove() }))));
   dlg.addEventListener('mousedown', e => { if (e.target === dlg) dlg.remove(); }); dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); dlg.remove(); } });
@@ -3469,7 +3502,7 @@ const SYNC = (() => {
       if (has('symbols')) call(renderSymbols); if (has('objects', 'manual', 'deps')) call(renderMarkers); if (has('casualties')) call(() => { renderCas(); renderAll(); }); if (has('problems')) call(renderProblems);
       if (has('wind', 'plumes')) call(renderKeulen); if (has('chem')) call(renderChem); if (has('bhp')) call(renderBhp); if (has('exercise', 'meeting', 'weather')) call(renderEinsatz);
       if (has('journal')) call(renderJournal); if (has('stands')) call(() => { if (typeof renderStands === 'function') renderStands(); }); if (has('messages')) call(() => { if (typeof renderMessages === 'function') renderMessages(); });
-      call(() => { saveNow(); scheduleBc(); });
+      call(() => { hist.cur = snapshot(); saveNow(); scheduleBc(); });
     }; S.renderT = setTimeout(go, 50);
   }
 
@@ -4581,6 +4614,7 @@ function renderChemMap() {
     CHEM_ZONES.forEach(z => { const ring = R[z.k]; if (!ring) return;
       L.polygon(ring, { pane: 'chemz', color: z.c, weight: 2, dashArray: z.dash || null, fillColor: z.c, fillOpacity: z.fill, interactive: true })
         .on('contextmenu', e => ctxOpen(e, chemItems(inc), e.latlng, 'Gefahrstoff: ' + s.name)).bindTooltip((z.k === 'z2' && !E.tih ? 'Großes Leck, ' : '') + z.n + (z.k === 'z1' ? ', ' + chemM(E.isolate) : z.k === 'z2' ? ', ' + chemM(E.spill) : ', ' + chemM(E.fire)), { sticky: true }).addTo(chemLayer); });
+    if (clusterCur.hiddenG.has(inc.id)) return;
     const plate = chemPlate(s); const m = L.marker([inc.lat, inc.lng], { draggable: !runtime.viewer, zIndexOffset: 900, icon: L.divIcon({ className: '', iconSize: [56, 44], iconAnchor: [28, 22], html: plate }) });
     m.bindTooltip(el('span', { text: s.name + ' (UN ' + s.un + ')' }));
     m.on('dragend', () => { const ll = m.getLatLng(); inc.lat = ll.lat; inc.lng = ll.lng; const pl = state.plumes.find(x => x.id === inc.plumeId); if (pl) { pl.lat = ll.lat; pl.lng = ll.lng; } refreshKeule(); renderChem(); save('Gefahrstoff verschoben: ' + s.name); });
@@ -4948,22 +4982,30 @@ function unitMarkerIcon(u) {
 }
 /* Überlappen sich Zeichen von Einheiten oder verletzten Personen, gehen aus dem Abschnitt Striche zum Kartenrand und die Einheiten stehen dort in einem Fenster.
    Abschnitte links im Bild bekommen es links, Abschnitte rechts im Bild rechts. Das gilt nur, solange der Abschnitt im Bild ist. */
-const CLUSTER_PX = 38;
-let clusterSig = '', clusterCur = { secs: new Map(), hiddenU: new Set(), hiddenC: new Set() };
+const CLUSTER_PX = 38, SMALL_UNITS = 140, SMALL_OTHER = 100;   // Abschnitt kleiner als so viele Pixel: Einheiten (140) bzw. Gefahrstoffe und Zeichen (100) wandern an den Rand
+let clusterSig = '', clusterCur = { secs: new Map(), hiddenU: new Set(), hiddenC: new Set(), hiddenG: new Set(), hiddenX: new Set() };
 function clusterCompute() {
-  const out = { secs: new Map(), hiddenU: new Set(), hiddenC: new Set() }; if (!map._loaded || !map.getSize().x) return out;
-  const size = map.getSize(), view = map.getBounds(), items = [];
-  state.units.forEach(u => { if (u.lat != null) items.push({ k: 'u', ref: u, sec: u.sectionId || null, p: map.latLngToContainerPoint([u.lat, u.lng]) }); });
-  state.casualties.forEach(c => { if (c.lat != null) { const sx = sectionAt(c.lat, c.lng); items.push({ k: 'c', ref: c, sec: sx ? sx.id : null, p: map.latLngToContainerPoint([c.lat, c.lng]) }); } });
-  const over = new Set(); items.forEach((a, i) => { for (let j = i + 1; j < items.length; j++) { const b2 = items[j]; if (Math.abs(a.p.x - b2.p.x) < CLUSTER_PX && Math.abs(a.p.y - b2.p.y) < CLUSTER_PX) { over.add(a); over.add(b2); a.nb = a.nb || []; a.nb.push(b2); b2.nb = b2.nb || []; b2.nb.push(a); } } });
+  const out = { secs: new Map(), hiddenU: new Set(), hiddenC: new Set(), hiddenG: new Set(), hiddenX: new Set() }; if (!map._loaded || !map.getSize().x) return out;
+  const size = map.getSize(), view = map.getBounds(), items = [], pt = (lat, lng) => map.latLngToContainerPoint([lat, lng]);
+  state.units.forEach(u => { if (u.lat != null) items.push({ k: 'u', ref: u, sec: u.sectionId || null, p: pt(u.lat, u.lng) }); });
+  state.casualties.forEach(c => { if (c.lat != null) { const sx = sectionAt(c.lat, c.lng); items.push({ k: 'c', ref: c, sec: sx ? sx.id : null, p: pt(c.lat, c.lng) }); } });
+  state.chem.forEach(g => { if (g.lat != null) { const sx = sectionAt(g.lat, g.lng); items.push({ k: 'g', ref: g, sec: sx ? sx.id : null, p: pt(g.lat, g.lng) }); } });
+  state.symbols.forEach(y => { if (y.lat != null) { const sx = sectionAt(y.lat, y.lng); items.push({ k: 'x', ref: y, sec: sx ? sx.id : null, p: pt(y.lat, y.lng) }); } });
+  const over = new Set(), movers = items.filter(it => it.k === 'u' || it.k === 'c'); movers.forEach((a, i) => { for (let j = i + 1; j < movers.length; j++) { const b2 = movers[j]; if (Math.abs(a.p.x - b2.p.x) < CLUSTER_PX && Math.abs(a.p.y - b2.p.y) < CLUSTER_PX) { over.add(a); over.add(b2); a.nb = a.nb || []; a.nb.push(b2); b2.nb = b2.nb || []; b2.nb.push(a); } } });
   items.forEach(it => { if (it.k === 'c' && !it.sec && over.has(it)) { const u = (it.nb || []).find(n => n.k === 'u' && n.sec); if (u) it.sec = u.sec; } });
-  const ids = new Set(); items.forEach(it => { if (over.has(it) && it.sec && it.k === 'u') ids.add(it.sec); });
-  items.forEach(it => { if (over.has(it) && it.sec && it.k === 'c') ids.add(it.sec); });
-  ids.forEach(id => {
+  const why = new Map(); items.forEach(it => { if (over.has(it) && it.sec) why.set(it.sec, 'over'); });
+  state.sections.forEach(sx => {          // zu kleine Abschnitte: man erkennt EA oder BR sonst nicht mehr
+    if (sx.kind === 'line' || !sx.pts || sx.pts.length < 3) return; const bb = L.latLngBounds(sx.pts), p1 = map.latLngToContainerPoint(bb.getNorthWest()), p2 = map.latLngToContainerPoint(bb.getSouthEast()), px = Math.max(Math.abs(p2.x - p1.x), Math.abs(p2.y - p1.y));
+    const mine = items.filter(it => it.sec === sx.id); if (!mine.length) return; sx._px = px;
+    if (px < SMALL_UNITS && mine.some(it => it.k === 'u' || it.k === 'c')) why.set(sx.id, 'small');
+    if (px < SMALL_OTHER && mine.some(it => it.k === 'g' || it.k === 'x')) why.set(sx.id, 'small');
+  });
+  why.forEach((reason, id) => {
     const sx = state.sections.find(x => x.id === id); if (!sx || sx.kind === 'line') return;
-    const mem = items.filter(it => it.sec === id); if (!mem.length) return;
-    const poly = sx.pts && sx.pts.length > 2, shown = poly ? view.intersects(L.latLngBounds(sx.pts)) : mem.some(it => it.p.x >= 0 && it.p.y >= 0 && it.p.x <= size.x && it.p.y <= size.y); if (!shown) return;
-    out.secs.set(id, mem); mem.forEach(it => (it.k === 'u' ? out.hiddenU : out.hiddenC).add(it.ref.id));
+    const poly = sx.pts && sx.pts.length > 2, small2 = poly && sx._px != null && sx._px < SMALL_OTHER;
+    const mem = items.filter(it => it.sec === id && (it.k === 'u' || it.k === 'c' || small2)); if (!mem.length) return;
+    const shown = poly ? view.intersects(L.latLngBounds(sx.pts)) : mem.some(it => it.p.x >= 0 && it.p.y >= 0 && it.p.x <= size.x && it.p.y <= size.y); if (!shown) return;
+    out.secs.set(id, mem); mem.forEach(it => ({ u: out.hiddenU, c: out.hiddenC, g: out.hiddenG, x: out.hiddenX })[it.k].add(it.ref.id));
   });
   return out;
 }
@@ -4993,7 +5035,10 @@ function clusterDrag(ev, kind, ref, open) {   // Eintrag aus dem Fenster auf die
     const r = map.getContainer().getBoundingClientRect(), hit = document.elementFromPoint(e.clientX, e.clientY);
     if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom || (hit && hit.closest('.clpanel, #mapBar, .leaflet-control'))) return;
     const ll = map.containerPointToLatLng([e.clientX - r.left, e.clientY - r.top]);
-    if (kind === 'u') unitMovedOnMap(ref, ll.lat, ll.lng); else { ref.lat = ll.lat; ref.lng = ll.lng; renderCas(); save('Zahl verschoben'); }
+    if (kind === 'u') unitMovedOnMap(ref, ll.lat, ll.lng);
+    else if (kind === 'g') { ref.lat = ll.lat; ref.lng = ll.lng; const pl = state.plumes.find(x => x.id === ref.plumeId); if (pl) { pl.lat = ll.lat; pl.lng = ll.lng; } refreshKeule(); renderChem(); save('Gefahrstoff verschoben'); }
+    else if (kind === 'x') { ref.lat = ll.lat; ref.lng = ll.lng; renderSymbols(); save('Zeichen verschoben'); }
+    else { ref.lat = ll.lat; ref.lng = ll.lng; renderCas(); save('Zahl verschoben'); }
     clusterSig = ''; updateCluster();
   };
   document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
@@ -5003,13 +5048,17 @@ function renderClusterPanel(cl) {
   if (!L1) { const w = $('#mapWrap'), sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.id = 'clusterLines'; L1 = el('div', { id: 'clusterPanelL', class: 'clpanel', hidden: 'hidden' }); R1 = el('div', { id: 'clusterPanelR', class: 'clpanel', hidden: 'hidden' }); w.append(sv, L1, R1); [L1, R1].forEach(p => p.addEventListener('scroll', renderClusterLines)); }
   L1.replaceChildren(); R1.replaceChildren(); const sz = map.getSize();
   [...cl.secs.entries()].map(([id, mem]) => { const sx = state.sections.find(x => x.id === id); return sx ? [sx, mem, clusterAnchor(sx, mem)] : null; }).filter(Boolean).sort((a, b) => a[2].y - b[2].y).forEach(([sx, mem, anc]) => {
-    const us = mem.filter(m => m.k === 'u').map(m => m.ref).sort((a, b) => (a.name || '').localeCompare(b.name || '', 'de')), cs = mem.filter(m => m.k === 'c').map(m => m.ref);
+    const us = mem.filter(m => m.k === 'u').map(m => m.ref).sort((a, b) => (a.name || '').localeCompare(b.name || '', 'de')), cs = mem.filter(m => m.k === 'c').map(m => m.ref), gs = mem.filter(m => m.k === 'g').map(m => m.ref), xs = mem.filter(m => m.k === 'x').map(m => m.ref);
     const card = el('div', { class: 'cl-card', 'data-sid': sx.id, style: '--c:' + safeColor(sx.color, '#2563eb') },
-      el('button', { class: 'cl-h', title: 'Zum Abschnitt zoomen', onclick: () => { if (sx.pts && sx.pts.length > 2) map.fitBounds(L.latLngBounds(sx.pts).pad(0.3)); } }, el('b', { text: secLabel(sx) }), el('span', { text: us.length + ' Einh.' + (cs.length ? ', ' + cs.reduce((a, c) => a + (c.n || 0), 0) + ' Pers.' : '') })),
+      el('button', { class: 'cl-h', title: 'Zum Abschnitt zoomen', onclick: () => { if (sx.pts && sx.pts.length > 2) map.fitBounds(L.latLngBounds(sx.pts).pad(0.3)); } }, el('b', { text: secLabel(sx) }), el('span', { text: (us.length ? us.length + ' Einh.' : '') + (cs.length ? (us.length ? ', ' : '') + cs.reduce((a, c) => a + (c.n || 0), 0) + ' Pers.' : '') + (gs.length + xs.length ? (us.length + cs.length ? ', ' : '') + (gs.length + xs.length) + ' Zeichen' : '') })),
       ...us.map(u => el('div', { class: 'cl-u', role: 'button', tabindex: '0', title: (u.name || 'Einheit') + ' · ' + ustat(u.status).label + ' · auf die Karte ziehen, um sie zu verschieben', style: '--sc:' + safeColor(ustat(u.status).color), onpointerdown: e => clusterDrag(e, 'u', u, () => openUnitCard(u, can('logi') && !can('units'))) },
         el('img', { src: unitSym(u).url, alt: '', draggable: 'false' }), el('span', { class: 'cl-n', text: u.name || 'Einheit' }), el('small', { text: fmtStr(u) }))),
       ...cs.map(c => el('div', { class: 'cl-u cl-c', role: 'button', tabindex: '0', title: CAS[c.cat].label + ' · auf die Karte ziehen, um sie zu verschieben', style: '--sc:' + CAS[c.cat].color, onpointerdown: e => clusterDrag(e, 'c', c, () => map.setView([c.lat, c.lng], Math.max(map.getZoom(), 17))) },
-        casMark(c.cat, 24), el('span', { class: 'cl-n', text: CAS[c.cat].label }), el('small', { text: String(c.n || 0) }))));
+        casMark(c.cat, 24), el('span', { class: 'cl-n', text: CAS[c.cat].label }), el('small', { text: String(c.n || 0) }))),
+      ...gs.map(g => { const sub = chemSub(g.sid); return el('div', { class: 'cl-u cl-g', role: 'button', tabindex: '0', title: (sub ? sub.name : 'Gefahrstoff') + ' · auf die Karte ziehen, um ihn zu verschieben', style: '--sc:#ea580c', onpointerdown: e => clusterDrag(e, 'g', g, () => map.setView([g.lat, g.lng], Math.max(map.getZoom(), 17))) },
+        el('span', { class: 'cl-un', text: sub ? 'UN ' + sub.un : 'UN' }), el('span', { class: 'cl-n', text: sub ? sub.name : 'Gefahrstoff' })); }),
+      ...xs.map(y => el('div', { class: 'cl-u cl-x', role: 'button', tabindex: '0', title: (y.label || y.title || y.name) + ' · auf die Karte ziehen, um es zu verschieben', style: '--sc:#64748b', onpointerdown: e => clusterDrag(e, 'x', y, () => map.setView([y.lat, y.lng], Math.max(map.getZoom(), 17))) },
+        el('img', { src: symUrl(y.name), alt: '', draggable: 'false' }), el('span', { class: 'cl-n', text: y.label || y.title || y.name }))));
     (anc.x < sz.x / 2 ? L1 : R1).append(card);
   });
   L1.hidden = !L1.children.length; R1.hidden = !R1.children.length; renderClusterLines();
@@ -5020,7 +5069,7 @@ function clusterSigOf(cl) {   // welche Abschnitte, welche Einträge und auf wel
 }
 function updateCluster() {
   const cl = clusterCompute(), sig = clusterSigOf(cl);
-  if (sig !== clusterSig) { const idsOld = clusterSig.replace(/:[LR]:/g, ':'), idsNew = sig.replace(/:[LR]:/g, ':'); clusterSig = sig; clusterCur = cl; if (idsOld !== idsNew) { renderUnitMarkers(); renderCas(); } else renderClusterPanel(cl); } else { clusterCur = cl; renderClusterLines(); }
+  if (sig !== clusterSig) { const idsOld = clusterSig.replace(/:[LR]:/g, ':'), idsNew = sig.replace(/:[LR]:/g, ':'); clusterSig = sig; clusterCur = cl; if (idsOld !== idsNew) { renderUnitMarkers(); renderCas(); renderChemMap(); renderSymbols(); } else renderClusterPanel(cl); } else { clusterCur = cl; renderClusterLines(); }
 }
 let clusterFrame = 0;
 map.on('zoomend moveend', updateCluster); map.on('move zoom', () => { if (clusterFrame) return; clusterFrame = requestAnimationFrame(() => { clusterFrame = 0; if (clusterSig || clusterCur.secs.size) updateCluster(); }); });
@@ -5571,7 +5620,7 @@ function fueSecBox(sx, level) {
     fBox({ title: sx.name, sub: 'Leiter' + (sx.deputy ? ', Stv.: ' + sx.deputy : ''), name: sx.leader, color: sx.color, dom: 'sections', sym: level ? 'tz/Führungsstellen/UEAL' : 'tz/Führungsstellen/EAL', onclick: () => fueEditSection(sx) }),
     vw ? null : el('div', { class: 'fact' }, (level || sx.typ === 'br') ? null : el('button', { class: 'btn small', text: '+ UEA', onclick: () => fueAddSection(sx) }), el('button', { class: 'btn small', text: '+ Einheit', onclick: () => addUnitDialog({ sectionId: sx.id }) }), el('button', { class: 'btn small danger', text: 'Entfernen', onclick: () => fueRemoveSection(sx) })),
     sx.task ? el('div', { class: 'ftask', text: sx.task }) : null,
-    el('div', { class: 'fsum' }, el('span', { text: us.length + ' Einheiten, Stärke ' + tot }), us.length ? el('button', { class: 'btn small fold', text: sx.hideU ? 'einblenden' : 'ausblenden', title: 'Einheiten dieses Abschnitts ' + (sx.hideU ? 'einblenden' : 'ausblenden'), onclick: () => { sx.hideU = !sx.hideU; renderFue(); save('Führungsstruktur: Einheiten ' + (sx.hideU ? 'ausgeblendet' : 'eingeblendet')); } }) : null),
+    el('div', { class: 'fsum' }, el('span', { text: us.length + ' Einheiten, Stärke ' + us.reduce((x, u) => x + (u.f || 0), 0) + '/' + us.reduce((x, u) => x + (u.u || 0), 0) + '/' + us.reduce((x, u) => x + (u.h || 0), 0) + ' = ' + tot }), us.length ? el('button', { class: 'btn small fold', text: sx.hideU ? 'einblenden' : 'ausblenden', title: 'Einheiten dieses Abschnitts ' + (sx.hideU ? 'einblenden' : 'ausblenden'), onclick: () => { sx.hideU = !sx.hideU; renderFue(); save('Führungsstruktur: Einheiten ' + (sx.hideU ? 'ausgeblendet' : 'eingeblendet')); } }) : null),
     ...(sx.hideU ? [] : us.map(fueUnit)),
     ch.length ? el('div', { class: 'fuea' }, ...ch.map(c => el('div', { class: 'fuc' }, fueLine(c), fueSecBox(c, 1)))) : null);
   return box;
