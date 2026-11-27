@@ -2320,17 +2320,20 @@ function renderSectionsKeepList() {   // während der Farbwahl nur die Karte neu
     lyr.bindTooltip(el('span', { text: sx.name }), { permanent: true, direction: 'center', className: 'seclabel' }); lyr.addTo(secLayer);
   });
 }
+const SYM_ORD = { 1: 0, 3: 1, 4: 2, 2: 3, 5: 4 };   // Feuerwehr, Rettungsdienst, THW, dann Führung, dann Gefahren
+const symCats = () => symbolProperties.categories.slice().sort((a, b) => (SYM_ORD[a.id] ?? 9) - (SYM_ORD[b.id] ?? 9));
+const symSort = list => list.map((x, i) => [x, i]).sort((a, b) => ((SYM_ORD[a[0].category] ?? 9) - (SYM_ORD[b[0].category] ?? 9)) || a[1] - b[1]).map(p => p[0]);
 function buildPalette() {
   const sel = $('#symCat');
   if (window.symbolsMissing || typeof symbolProperties === 'undefined') {
     $('#symHint').textContent = 'Zeichenvorrat nicht gefunden. Die Datei muss im Ordner src/public liegen (images/symbols).'; sel.hidden = $('#symQ').hidden = true; return;
   }
   sel.append(el('option', { value: '', text: 'alle Kategorien' }));
-  symbolProperties.categories.forEach(c => sel.append(el('option', { value: c.id, text: c.name })));
-  sel.value = String(symbolProperties.categories[0].id);
+  symCats().forEach(c => sel.append(el('option', { value: c.id, text: c.name })));
+  sel.value = String(symCats()[0].id);
   const draw = () => {
     const q = $('#symQ').value.trim().toLowerCase(), cat = sel.value, grid = $('#symGrid'); grid.replaceChildren();
-    symbolProperties.symbols.filter(s => (!cat || String(s.category) === cat) && (!q || (s.title + ' ' + s.name).toLowerCase().includes(q))).forEach(s => {
+    symSort(symbolProperties.symbols.filter(s => (!cat || String(s.category) === cat) && (!q || (s.title + ' ' + s.name).toLowerCase().includes(q)))).forEach(s => {
       const b = el('button', { title: s.title, onclick: () => { stopDraw(); runtime.placing = s; b.classList.add('sel'); map.getContainer().style.cursor = 'crosshair'; say('Zeichen „' + s.title + '“: Ort auf der Karte anklicken. Esc bricht ab.'); } },
         el('img', { src: symUrl(s.name), alt: '', loading: 'lazy' }), s.title);
       grid.append(b);
@@ -2696,7 +2699,7 @@ function symbolItems(ll) {
   const mk = sy => ({ label: sy.title, icon: symUrl(sy.name), onclick: () => placeSymbolAt(ll, sy) });
   const rec = recent('kritis-recent-sym').map(n => byName[n]).filter(Boolean);
   const out = rec.map(mk); if (rec.length) out.push({ sep: true });
-  symbolProperties.categories.forEach(c => out.push({ label: c.name, sub: () => symbolProperties.symbols.filter(x => x.category === c.id).map(mk) }));
+  symCats().forEach(c => out.push({ label: c.name, sub: () => symbolProperties.symbols.filter(x => x.category === c.id).map(mk) }));
   return out;
 }
 function reportProblemAt(ll) {
@@ -4351,10 +4354,10 @@ function pickSymbol(cur) {
     const buildLib = () => {
       body.replaceChildren(); const cat = el('select', { 'aria-label': 'Kategorie' }), q = el('input', { type: 'search', placeholder: 'Suchen, z. B. Löschgruppe' }), grid = el('div', { class: 'sgrid' });
       if (typeof symbolProperties === 'undefined') { body.append(el('div', { class: 'hint', text: 'Zeichenvorrat nicht gefunden.' })); return; }
-      cat.append(el('option', { value: '', text: 'alle Kategorien' })); symbolProperties.categories.forEach(c => cat.append(el('option', { value: c.id, text: c.name })));
+      cat.append(el('option', { value: '', text: 'alle Kategorien' })); symCats().forEach(c => cat.append(el('option', { value: c.id, text: c.name })));
       const draw = () => {
         grid.replaceChildren(); const t = q.value.trim().toLowerCase(), c = cat.value;
-        const list = symbolProperties.symbols.filter(x => (!c || String(x.category) === c) && (!t || (x.title + ' ' + x.name + ' ' + (x.keywords || '')).toLowerCase().includes(t)));
+        const list = symSort(symbolProperties.symbols.filter(x => (!c || String(x.category) === c) && (!t || (x.title + ' ' + x.name + ' ' + (x.keywords || '')).toLowerCase().includes(t))));
         list.slice(0, 150).forEach(x => { const b = el('button', { title: x.title, class: sel && sel.name === x.name ? 'sel' : '', onclick: () => { sel = { k: 'lib', name: x.name }; showPrev(); draw(); } }, el('img', { src: symUrl(x.name), alt: '', loading: 'lazy' }), x.title); grid.append(b); });
         if (list.length > 150) grid.append(el('div', { class: 'hint', text: (list.length - 150) + ' weitere Treffer, bitte Suche verfeinern.' }));
       };
@@ -4644,10 +4647,9 @@ function editSectionDialog(sx) {
     row('Bezeichnung', inp('name', 'z. B. EA ICE', sx.name)), row('Art', typ), row('Befehlsstelle (Adresse, Koordinaten)', inp('befehl', '', sx.befehl)), row('Leiter (Name, Dienstgrad)', inp('leader', '', sx.leader)),
     row('Kommunikation (Funk)', inp('radio', '', sx.radio)), row('Auftrag', inp('task', '', sx.task)), row('Einsatzbeginn (TTHHMM)', inp('start', 'z. B. 260915', sx.start)),
     el('div', { class: 'hint', text: 'Mannschaft und Fahrzeuge rechnet das Programm aus den Kacheln des Abschnitts.' }),
-    el('div', { class: 'row', style: 'margin-top:12px' }, el('button', { class: 'btn primary', text: 'Speichern', onclick: () => { const v = {}; dlg.querySelectorAll('[data-k]').forEach(n => { v[n.dataset.k] = n.value.trim(); }); if (!v.name) { say('Bitte eine Bezeichnung eintragen.', 3000); return; }
+    el('div', { class: 'row', style: 'margin-top:12px' }, isNew ? null : el('button', { class: 'btn danger', text: 'Löschen', onclick: () => { dlg.remove(); fueRemoveSection(sx); } }), el('button', { class: 'btn', style: 'margin-left:auto', text: 'Abbrechen', onclick: () => dlg.remove() }), el('button', { class: 'btn primary', text: 'Speichern', onclick: () => { const v = {}; dlg.querySelectorAll('[data-k]').forEach(n => { v[n.dataset.k] = n.value.trim(); }); if (!v.name) { say('Bitte eine Bezeichnung eintragen.', 3000); return; }
       if (isNew) { const n = Object.assign({ id: uid(), kind: 'poly', color: PAL[state.sections.length % PAL.length], pts: [], parentId: null }, v); state.sections.push(n); addJournal('Abschnitt angelegt: ' + v.name, true); } else { Object.assign(sx, v); addJournal('Abschnitt geändert: ' + v.name, true); }
-      dlg.remove(); renderSections(); renderUnits(); renderAbschnitte(); save('Abschnitt ' + (isNew ? 'angelegt' : 'geändert') + ': ' + v.name); } }), el('button', { class: 'btn', text: 'Abbrechen', onclick: () => dlg.remove() }),
-      isNew ? null : el('button', { class: 'btn danger', style: 'margin-left:auto', text: 'Löschen', onclick: () => { dlg.remove(); fueRemoveSection(sx); } }))));
+      dlg.remove(); renderSections(); renderUnits(); renderAbschnitte(); save('Abschnitt ' + (isNew ? 'angelegt' : 'geändert') + ': ' + v.name); } }))));
   dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); dlg.remove(); } });
   document.body.append(dlg); dlg.querySelector('input').focus();
 }
