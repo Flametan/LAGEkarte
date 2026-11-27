@@ -977,6 +977,68 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
 #app > header #hdrMenu button:hover:not(:disabled) { background: rgba(30, 64, 175, .12) !important; }
 #app > header #hdrMenu button:disabled { opacity: .45; }
 .advsrv { margin: 10px 0 0; font-size: 12.5px; color: var(--muted); } .advsrv summary { cursor: pointer; } .advsrv input { margin-top: 6px; }
+
+/* Handy (bis 700 px): Navigation unten, Seitenleiste als Blatt darüber, Karte bleibt Hauptsache. Der Rechner bleibt unverändert. */
+@media (max-width: 700px) {
+  #app { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: auto minmax(0, 1fr) !important; height: 100dvh; padding-bottom: 58px; box-sizing: border-box; }
+  #app.collapsed { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: auto minmax(0, 1fr) !important; }
+  #app > header { flex-wrap: nowrap !important; min-height: 50px !important; padding: 4px 8px 4px 0 !important; gap: 6px !important; overflow: visible !important; }
+  #app > header h1 { margin: 0 !important; } #app > header h1 .logo { margin: 0 6px 0 8px !important; } #app > header h1 .logo svg { width: 36px; height: 36px; }
+  #app > header #hdrTitle { max-width: 34vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+  #app > header #qat, #app > header #btnVortrag, #app > header #btnShare, #app > header #hdrSub, #app > header #tacTime, #app > header #mtLine, #app > header #hdrArea { display: none !important; }
+  #app > header #clock { display: inline !important; font-size: 15px; letter-spacing: 0; margin-left: auto; } #app > header .sp { display: none; }
+  #app > header #syncChip { font-size: 11px; padding: 1px 6px; } #app > header #btnMore, #app > header #btnTheme { min-width: 40px; min-height: 40px; }
+  #panelToggle { display: none !important; }
+  #panel { position: fixed !important; left: 0; right: 0; bottom: 0; z-index: 1600; display: flex !important; flex-direction: column-reverse; max-height: 64vh; visibility: visible !important; border: 0 !important; border-top: 1px solid var(--line) !important; box-shadow: 0 -4px 18px rgba(0, 0, 0, .28); background: var(--panel); overflow: hidden !important; }
+  #panel .tabpane { overflow: auto; max-height: calc(64vh - 58px); padding: 12px 14px 18px; -webkit-overflow-scrolling: touch; }
+  #app.collapsed .tabpane { display: none !important; }
+  #app #tabs { flex: none; flex-direction: row !important; min-height: 58px; height: 58px; padding: 0 !important; overflow-x: auto !important; overflow-y: hidden !important; background: var(--nav); border: 0 !important; scrollbar-width: none; }
+  #app #tabs::-webkit-scrollbar { display: none; }
+  #app #tabs button { flex: 0 0 auto !important; width: auto !important; min-width: 68px; height: 58px; display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 4px 8px !important; font-size: 11px !important; font-weight: 600 !important; color: #d6dee6 !important; background: none; border: 0 !important; border-radius: 0 !important; white-space: nowrap; }
+  #app #tabs button span { line-height: 1.1; }
+  #app #tabs button.navhid { display: none !important; }
+  #app #tabs button::before { content: ''; flex: none; width: 22px; height: 22px; background: currentColor; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-position: center; mask-position: center; }
+  #app #tabs button[aria-selected="true"], #app #tabs button.on { background: var(--red2) !important; color: #fff !important; }
+  #app #tabs button.dim[aria-selected="true"] { background: none !important; color: #d6dee6 !important; }
+  .nav-grp, .nav-saved { display: none !important; }
+  /* Kartenleiste: eine scrollbare Zeile, Suche als Symbol */
+  #mapBar { height: 50px; flex-wrap: nowrap; overflow-x: auto; padding: 0 8px 0 52px; gap: 6px; scrollbar-width: none; } #mapBar .mb-t, #mapBar .sp { display: none; } #mapBar .mb { flex: none; white-space: nowrap; min-height: 38px; }
+  #placeSearch { left: 8px !important; top: 6px !important; width: auto !important; }
+  #placeSearch:not(.min) { right: 8px !important; top: 56px !important; z-index: 1300 !important; }
+  .leaflet-top { top: 54px; }
+  #secPop { right: 8px; left: 8px; width: auto; top: 54px; } #mtPop { width: min(320px, 94vw); }
+  /* Ansichten über der Karte */
+  #unitOv, #fueOv { background: var(--bg, #f4f6fa) !important; padding: 10px 10px 70px !important; } #unitOv .ovhead { gap: 6px; } .ovtools { flex-wrap: wrap; } #ovCols { grid-template-columns: 1fr; }
+  #fueOv .fuehd { top: -10px; } #fueBody .feas { padding-bottom: 20px; }
+  /* Fenster und Eingaben */
+  .dlg > div, .rolecard { max-width: 96vw; max-height: 92dvh; overflow: auto; } input, select, textarea { font-size: 16px; } .btn { min-height: 42px; }
+  .bmcard, .synccard, .setupcard { width: 94vw; }
+  #chemBand { bottom: 62px; }
+  #hdrMenu { right: 6px; max-width: 92vw; }
+}
+.walblock { margin-bottom: 8px; min-height: 70px; } .wal-add { padding: 6px 8px 0; }
+
+#app > header #mapActs { display: inline-flex; gap: 6px; margin-left: auto; margin-right: 10px; }
+#app > header #mapActs .mb { padding: 5px 10px; font-weight: 600; white-space: nowrap; }
+#app > header #mapActs .mb-ea { background: #fff !important; color: var(--red) !important; border-color: #fff !important; }
+body.viewer #mapActs, body.beamerwin #mapActs, body.vortrag #mapActs, body.printing #mapActs { display: none !important; }
+@media (max-width: 1500px) { #app > header #mapActs .mb { padding: 4px 7px; font-size: 13px; } #app > header #hdrTitle { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+@media (max-width: 700px) { #mapBar #mapActs { display: contents; } #mapBar #mapActs .mb { background: #fff !important; color: #263340 !important; border: 1px solid #cdd4dc !important; } #mapBar #mapActs .mb-ea { background: var(--red) !important; color: #fff !important; border-color: var(--red) !important; } #mapBar #mapActs .mb-ek { color: var(--red) !important; border-color: var(--red) !important; } }
+.kt-t tr.grp th, .kt-t tr.grp td { font-size: .86em; font-weight: 500; color: var(--muted); border-bottom: 1px dotted var(--line); padding-top: 3px; padding-bottom: 3px; } .gdot { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 7px; border: 1px solid rgba(0,0,0,.25); vertical-align: -1px; }
+#fueBody .fea::before { left: -15px; right: -15px; } #fueBody .fea:first-child::before { left: 50%; } #fueBody .fea:last-child::before { right: 50%; } #fueBody .fea:only-child::before { display: none; }
+#hdrMenu #btnUnits, #hdrMenu #btnFue, #hdrMenu #btnAddPoi { display: none !important; }   /* stehen in Navigation und Kartenleiste, die Tasten U und F nutzen sie weiter */
+#app > header #hdrSub #mapActs { margin-left: auto; margin-right: 6px; }
+.kgrp { display: flex; gap: 8px; margin-top: 3px; font-size: 11.5px; color: var(--muted); font-weight: 600; } .kgrp .gdot { margin-right: 3px; }
+.vt th.bk { width: 54px; padding: 3px 4px; font-size: 11.5px; white-space: nowrap; }
+
+#clusterLines { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 850; pointer-events: none; }
+#clusterPanel { position: absolute; right: 10px; top: 130px; bottom: 36px; width: 200px; z-index: 860; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; } #clusterPanel[hidden] { display: none; }
+.cl-card { background: var(--panel, #fff); border: 1px solid var(--line); border-left: 6px solid var(--c); border-radius: 8px; box-shadow: 0 2px 8px rgba(15, 23, 42, .25); padding: 4px 6px 6px; flex: none; }
+.cl-h { display: flex; justify-content: space-between; align-items: baseline; width: 100%; border: 0; background: none; font: inherit; color: var(--ink); cursor: pointer; padding: 2px 2px 4px; text-align: left; } .cl-h b { font-size: 13px; } .cl-h span { font-size: 11px; color: var(--muted); }
+.cl-u { display: flex; align-items: center; gap: 6px; width: 100%; border: 0; border-top: 1px solid var(--line); background: none; padding: 3px 2px; font: inherit; color: var(--ink); cursor: pointer; text-align: left; border-left: 3px solid var(--sc, transparent); padding-left: 5px; } .cl-u:hover { background: rgba(30, 64, 175, .1); }
+.cl-u img { width: 30px; height: 24px; object-fit: contain; flex: none; } .cl-n { flex: 1; min-width: 0; font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .cl-u small { font-size: 10.5px; color: var(--muted); }
+body.printing #clusterPanel, body.printing #clusterLines { display: none; }
+@media (max-width: 700px) { #clusterPanel { width: 150px; top: 110px; bottom: 70px; } .cl-u small { display: none; } }
 </style>
 </head>
 <body>
@@ -993,7 +1055,7 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
     <span id="hdrArea"></span>
     <div id="mtLine" hidden></div>
     <span class="sp"></span>
-    <span id="clock" role="button" tabindex="0" title="Klicken: nächste Lagebesprechung festlegen"></span>
+    <span id="mapActs"><button type="button" class="mb mb-ea" data-mb="sec" title="Neuen Einsatzabschnitt (EA) anlegen: Name und Farbe wählen, Fläche oder Linie auf der Karte zeichnen">+ EA</button><button type="button" class="mb mb-ek" data-mb="ek" title="Einsatzkräfte anlegen und direkt auf der Karte setzen">+ Einsatzkräfte</button><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button></span><span id="clock" role="button" tabindex="0" title="Klicken: nächste Lagebesprechung festlegen"></span>
     <span id="tacTime" class="chip" role="button" tabindex="0" title="Taktische Zeit (TTHHMM). Klicken: nächste Lagebesprechung festlegen" aria-label="Taktische Zeit"></span>
     <button id="fristChip" class="chip" hidden title="Fristen: Probleme mit Frist und Nachforderungen mit Lieferzeit"></button>
     <span id="storeChip" class="chip due" hidden></span>
@@ -1006,9 +1068,9 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
       <button id="btnSync" title="Einsatz mit anderen gemeinsam bearbeiten (Code)">Gemeinsamer Einsatz</button>
       <button id="btnSetup" title="Name und Uhr der Übung oder des Einsatzes einstellen">Einsatz einrichten</button>
       <button id="btnBeamer" title="Fenster für Beamer öffnen, festhalten und freigeben">Beamer-Fenster</button>
-      <button id="btnUnits" title="Alle Einheiten auf einen Blick, zum Beispiel für den Lagevortrag">Einheiten</button>
-      <button id="btnFue" title="Führungsstruktur nach FwDV 100 mit Kommunikationsplan">Führungsstruktur</button>
-      <button id="btnAddPoi" title="KRITIS-Objekt per Mausklick auf der Karte setzen">+ Objekt</button>
+      <button id="btnUnits" hidden title="Alle Einheiten auf einen Blick, zum Beispiel für den Lagevortrag">Einheiten</button>
+      <button id="btnFue" hidden title="Führungsstruktur nach FwDV 100 mit Kommunikationsplan">Führungsstruktur</button>
+      <button id="btnAddPoi" hidden title="KRITIS-Objekt per Mausklick auf der Karte setzen">+ Objekt</button>
       <button id="btnPrint" title="Karte drucken oder als PDF speichern">Drucken</button>
       <button id="btnExport" title="Ihre Daten als JSON-Datei speichern" hidden>Export</button>
       <button id="btnLook" title="Darstellung wie an der Stabswand: weißer Grund, schwarze Etiketten">Wandoptik: aus</button>
@@ -1028,15 +1090,15 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
       <button role="tab" data-tab="meldungen" class="navhid" aria-selected="false"><span>Meldungen</span></button>
       <div class="nav-grp">Weitere Bereiche</div>
       <button role="tab" data-tab="tagebuch" aria-selected="false"><span>Einsatztagebuch</span></button>
+      <button role="tab" data-tab="probleme" class="navhid" aria-selected="false"><span>Probleme</span></button>
       <button role="tab" data-tab="ebenen" aria-selected="false"><span>KRITIS</span></button>
       <button role="tab" data-tab="objekte" aria-selected="false"><span>Objekte</span></button>
       <button role="tab" data-tab="kraefte" class="navhid" aria-selected="false"><span>Einheiten (Liste)</span></button>
-      <button role="tab" data-tab="probleme" class="navhid" aria-selected="false"><span>Probleme</span></button>
       <button role="tab" data-tab="zahlen" aria-selected="false"><span>Zahlen</span></button>
       <button role="tab" data-tab="bhp" aria-selected="false" title="Behandlungsplatz: Sichtungskategorien, Transport, Kliniken"><span>Behandlungsplatz</span></button>
       <button role="tab" data-tab="keule" aria-selected="false" title="Wetter, Wind und Keule"><span>Wetter und Keule</span></button>
       <button role="tab" data-tab="chem" aria-selected="false" title="Gefahrstoffe: Datenblatt, Absperrzonen, Betroffene, Keule"><span>Gefahrstoff</span></button>
-      <button role="tab" data-tab="lage" aria-selected="false"><span>Lage</span></button>
+      <button role="tab" data-tab="lage" aria-selected="false"><span>Schadenslage</span></button>
       <button role="tab" data-tab="staende" class="navhid" aria-selected="false"><span>Lagestände</span></button>
       <button role="tab" data-tab="daten" aria-selected="false"><span>Daten</span></button>
       <div id="navSaved" class="nav-saved">Noch nicht gespeichert</div>
@@ -1302,12 +1364,12 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
     </section>
 
     <section class="tabpane" id="tab-lage">
-      <h2>Taktische Zeichen</h2>
+      <h2>Schadensereignisse</h2>
       <div class="row">
         <select id="symCat"></select>
         <input type="search" id="symQ" placeholder="Suchen">
       </div>
-      <div class="hint" id="symHint">Zeichen wählen, dann auf die Karte klicken. Esc bricht ab.</div>
+      <div class="hint" id="symHint">Schadensereignisse und Gefahren auf der Karte markieren: Zeichen wählen, dann auf die Karte klicken. Esc bricht ab. Einheiten legen Sie über „+ Einsatzkräfte“ an, Personenzahlen im Reiter Zahlen.</div>
       <div id="symGrid"></div>
 
       <h2>Abhängigkeiten</h2>
@@ -1360,7 +1422,7 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
         <ul class="hint">
           <li>GHS-Piktogramme (Flamme, Flamme über Kreis, Gasflasche, Ätzwirkung, Totenkopf, Gesundheitsgefahr, Ausrufezeichen, Umwelt): UNECE, Dateien von Wikimedia Commons, gemeinfrei (PD-ineligible)</li>
           <li>Stoffdaten: GESTIS-Stoffdatenbank (DGUV, Benzol), Emergency Response Guidebook (PHMSA/Transport Canada), CAMEO Chemicals (NOAA), Datenbank GEFAHRGUT (BAM), ECHA, AEGL (US EPA) und ERPG (AIHA). Quellen mit Adresse im Reiter Gefahrstoff</li>
-          <li>Zeichen für Personen (Betroffene, Sichtungskategorien, Tote, Vermisste, Gerettete): eigene Zeichnung für diese Anwendung, MIT-Lizenz wie das Repository</li>
+          <li>Zeichen für Personen (Betroffene, Sichtungskategorien, Schwarz, Vermisste, Gerettete): eigene Zeichnung für diese Anwendung, MIT-Lizenz wie das Repository</li>
           <li>Zensus 2022, Gitterzellen (Bevölkerung, Alter): © Statistische Ämter des Bundes und der Länder, 2025, Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0). Für diese Anwendung als Auszug aufbereitet, Altersklassen zusammengefasst</li>
           <li>Leaflet 1.9.4: BSD-2-Clause, (c) 2010-2023 Vladimir Agafonkin, (c) 2010-2011 CloudMade</li>
           <li>Leaflet.draw 1.0.4: MIT, (c) 2012-2017 Jacob Toye, Jon West, Smartrak, Leaflet</li>
@@ -1474,7 +1536,7 @@ SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
     <div id="secPop" hidden role="dialog" aria-label="Einsatzabschnitt zeichnen"><b>Neuer Einsatzabschnitt (EA)</b>
       <div class="row"><input type="text" id="secName" placeholder="Bezeichnung, z. B. Abschnitt Nord"><input type="color" id="secColor" value="#e11d48" title="Farbe"></div>
       <div class="row"><button class="btn" id="btnSecPoly">Fläche zeichnen</button><button class="btn" id="btnSecLine">Linie zeichnen</button></div>
-      <div class="hint">Zeichnen, dann Doppelklick zum Beenden. Abschnitte ohne Karte legt man in der Führungsstruktur oder auf der Stabswand an.</div></div><div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span><button type="button" class="mb mb-ea" data-mb="sec" title="Neuen Einsatzabschnitt (EA) anlegen: Name und Farbe wählen, Fläche oder Linie auf der Karte zeichnen">+ EA</button><button type="button" class="mb mb-ek" data-mb="ek" title="Einsatzkräfte anlegen und direkt auf der Karte setzen">+ Einsatzkräfte</button><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button><button type="button" class="mb" data-mb="units" title="Einheiten und Stabswand (U)">Kräfte</button><button type="button" class="mb" data-mb="fue" title="Führungsstruktur (F)">Stab</button><button type="button" class="mb" data-mb="print" title="Karte drucken oder als PDF speichern">Drucken</button></div>
+      <div class="hint">Zeichnen, dann Doppelklick zum Beenden. Abschnitte ohne Karte legt man in der Führungsstruktur oder auf der Stabswand an.</div></div><div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span></div>
     <div id="map"></div>
     <form id="placeSearch" role="search" autocomplete="off"><button type="button" id="placeToggle" aria-label="Ortssuche ein- oder ausklappen" aria-expanded="true" title="Ortssuche ein- oder ausklappen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 21 21"/></svg></button><input type="search" id="placeQ" placeholder="Ort suchen und hinzoomen" aria-label="Ort suchen"><button type="submit" aria-label="Suchen">Suchen</button><div id="placeRes" role="listbox"></div></form>
     <div id="editBar" role="toolbar" aria-label="Eckpunkte bearbeiten"><span id="editTxt">Eckpunkte bearbeiten</span><button id="editOk">Übernehmen (Enter)</button><button id="editCancel">Verwerfen (Esc)</button></div>
@@ -2052,7 +2114,7 @@ function promptDrawSection() {
   runtime.drawAsked = runtime.drawAsked || new Set();
   const sx = state.sections.find(x => x.kind !== 'line' && (!x.pts || x.pts.length < 3) && !runtime.drawAsked.has(x.id)); if (!sx) return;
   const c = einsatzCenter(); if (!map.getBounds().pad(-0.15).contains(c)) map.setView(c, Math.max(map.getZoom(), 14));
-  const kind = { ea: 'EA', br: 'BR', el: 'EL' }[sx.typ] || (sx.parentId ? 'UEA' : 'EA');
+  const kind = { ea: 'EA', br: 'BR', el: 'EL' }[sx.typ] || (sx.parentId ? 'UEA' : sx.typ === 'br' ? 'BR' : 'EA');
   const pop = L.popup({ closeOnClick: false, autoClose: false, className: 'drawask', minWidth: 240 }).setLatLng(c).setContent(el('div', {},
     el('b', { text: kind + ' „' + sx.name + '“ ist noch nicht auf der Karte.' }), el('div', { class: 'hint', text: 'Fläche einzeichnen: Ecken anklicken, Doppelklick beendet.' }),
     el('div', { class: 'row' }, el('button', { class: 'btn small primary', text: 'Jetzt einzeichnen', onclick: () => { map.closePopup(pop); runtime.drawAsked.add(sx.id); drawExistingSection(sx); } }),
@@ -2440,8 +2502,8 @@ function buildPalette() {
     $('#symHint').textContent = 'Zeichenvorrat nicht gefunden. Die Datei muss im Ordner src/public liegen (images/symbols).'; sel.hidden = $('#symQ').hidden = true; return;
   }
   sel.append(el('option', { value: '', text: 'alle Kategorien' }));
-  symCats().forEach(c => sel.append(el('option', { value: c.id, text: c.name })));
-  sel.value = String(symCats()[0].id);
+  symCats().filter(c => c.id === 5).forEach(c => sel.append(el('option', { value: c.id, text: c.name })));
+  sel.value = '5'; sel.hidden = true;   // Schadenslage: nur Gefahren und Maßnahmen, Einheiten legt man über + Einsatzkräfte an
   const draw = () => {
     const q = $('#symQ').value.trim().toLowerCase(), cat = sel.value, grid = $('#symGrid'); grid.replaceChildren();
     symSort(symbolProperties.symbols.filter(s => (!cat || String(s.category) === cat) && (!q || (s.title + ' ' + s.name).toLowerCase().includes(q)))).forEach(s => {
@@ -2482,7 +2544,7 @@ const CAS = {
   sk1:       { tag: 'SK I', label: 'SK I (rot), akut lebensbedrohlich', short: 'SK I',   color: '#dc2626', sym: 'sk1' },
   sk2:       { tag: 'SK II', label: 'SK II (gelb), schwer verletzt',     short: 'SK II',  color: '#ca8a04', sym: 'sk2' },
   sk3:       { tag: 'SK III', label: 'SK III (grün), leicht verletzt',    short: 'SK III', color: '#16a34a', sym: 'sk3' },
-  tot:       { label: 'Tote',        short: 'T',     color: '#111827', sym: 'tot' },
+  tot:       { label: 'Schwarz',        short: 'T',     color: '#111827', sym: 'tot' },
   vermisst:  { label: 'Vermisste',   short: 'Vm',    color: '#7c3aed', sym: 'vermisst' },
   evakuiert: { label: 'Evakuierte',  short: 'E',     color: '#0369a1' },                 // kein Zeichen im Vorrat
   gerettet:  { label: 'Gerettete',   short: 'G',     color: '#0d9488', sym: 'gerettet' },
@@ -2842,20 +2904,15 @@ function startMeasure(ll) {
 function mapItems(ll) {
   const ok = d => !runtime.viewer && can(d);
   const items = [
-    ok('manualPois') && { label: 'KRITIS-Objekt hier setzen', sub: () => poiTypeItems(ll) },
-    ok('symbols') && { label: 'Taktisches Zeichen hier setzen', sub: () => symbolItems(ll) },
     ok('areas') && { label: 'Kreis um diesen Punkt als Gebiet', sub: [1, 2, 5, 10].map(km => ({ label: km + ' km', onclick: () => circleArea(ll, km) })) },
     { sep: true },
     ok('chem') && { label: 'Gefahrstoff hier melden', sub: Object.values(SUBSTANCES).filter(x => x.verified).map(x => ({ label: x.name + ' (UN ' + x.un + ')', onclick: () => addChem(x.id, ll) })) },
     ok('plumes') && { label: 'Ausbreitungskeule hier ansetzen', sub: [{ label: 'Gauß-Fahne (Berechnung)', onclick: () => addPlume(ll, 'gauss') }, { label: 'Taktische Keule (Sektor)', onclick: () => addPlume(ll, 'takt') }] },
-    ok('units') && { label: 'Einheit hier einsetzen…', onclick: async () => { const v = await askText('Bezeichnung der Einheit', ''); if (v == null || !v.trim()) return; addUnit({ name: v.trim(), lat: ll.lat, lng: ll.lng }); } },
-    ok('problems') && { label: 'Problem hier melden', onclick: () => reportProblemAt(ll) },
     ok('casualties') && { label: 'Personenzahl hier erfassen', sub: casNew().map(([k, v]) => ({ label: v.label, icon: casIcon(k), swatch: casIcon(k) ? null : v.color, onclick: () => askNumberCas(k, ll) })) },
     ok('bhp') && { label: 'Behandlungsplatz hier einrichten', onclick: () => addBhp(ll) },
     !runtime.viewer && { label: 'Journaleintrag mit Ort', onclick: () => journalAt(ll) },
     { sep: true },
     { label: 'Entfernung messen ab hier', onclick: () => startMeasure(ll) },
-    { label: 'Hier zentrieren', onclick: () => map.panTo(ll) },
     { label: 'Koordinaten kopieren (' + fmtLL(ll) + ')', onclick: () => copyText(fmtLL(ll), 'Koordinaten kopiert: ' + fmtLL(ll)) }
   ].filter(Boolean);
   return items.filter((it, i, arr) => !it.sep || (i > 0 && i < arr.length - 1 && !arr[i - 1].sep));
@@ -2886,7 +2943,6 @@ function sectionItems(sx) {
     { label: 'Farbe', swatch: sx.color, sub: () => colorItems(sx.color, c => { sx.color = c; renderSections(); save('Abschnitt umgefärbt: ' + sx.name); }) },
     { label: 'Deckkraft', sub: (sx.kind === 'line' ? [0.3, 0.6, 1] : [0.05, 0.12, 0.25, 0.4]).map(o => ({ label: Math.round(o * 100) + ' %', check: Math.abs(secOp(sx) - o) < 0.01, onclick: () => { sx.opacity = o; renderSections(); save('Deckkraft geändert: ' + sx.name); } })) },
     { label: 'Eckpunkte bearbeiten', onclick: () => startEdit('section', sx) },
-    { label: 'Duplizieren', onclick: () => { state.sections.push(Object.assign(JSON.parse(JSON.stringify(sx)), { id: uid(), name: sx.name + ' (Kopie)' })); renderSections(); save('Abschnitt dupliziert: ' + sx.name); } },
     { label: 'Zoom', onclick: () => map.fitBounds(L.latLngBounds(sx.pts).pad(0.2)) },
     { sep: true },
     { label: 'Löschen', onclick: () => removeSection(sx) }
@@ -2943,7 +2999,6 @@ function problemItems(x) {
   return [
     { label: 'Titel ändern…', onclick: async () => { const v = await askText('Titel', x.title); if (v == null || !v.trim()) return; x.title = v.trim(); renderProblems(); save('Problem bearbeitet: ' + x.title); } },
     { label: 'Status setzen', sub: Object.entries(PSTAT).map(([k, v]) => ({ label: v, check: x.status === k, onclick: () => { x.status = k; addJournal('Problem „' + x.title + '“: ' + v, true); renderProblems(); renderCounts(); save('Problemstatus: ' + x.title + ' ' + v); } })) },
-    { label: 'In der Liste zeigen', onclick: () => { setPanel(true); openTab('probleme'); $('#pfStatus').value = ''; renderProblems(); const c = document.querySelector('[data-pid="' + x.id + '"]'); if (c) c.scrollIntoView({ block: 'center' }); } },
     { label: 'Duplizieren', onclick: () => { state.problems.unshift(Object.assign({}, x, { id: uid(), title: x.title + ' (Kopie)', lat: x.lat + 0.0004, lng: x.lng + 0.0004, time: nowIso() })); renderProblems(); renderCounts(); save('Problem dupliziert: ' + x.title); } },
     { label: 'Zoom', onclick: () => map.setView([x.lat, x.lng], Math.max(map.getZoom(), 16)) },
     { sep: true },
@@ -3612,7 +3667,6 @@ const fmtClock = ms => new Date(ms).toLocaleString('de-DE', { weekday: 'short', 
 /* Fristen: Probleme mit Frist, Nachforderungen mit Lieferzeit */
 function fristItems() {
   const out = [];
-  state.problems.forEach(p => { if (p.due && p.status !== 'erledigt') out.push({ key: 'p' + p.id, t: Date.parse(p.due), text: p.title || 'Problem', tab: 'probleme' }); });
   state.units.forEach(u => { const l = state.logi[u.id]; if (l && l.req && l.eta) out.push({ key: 'l' + u.id + l.eta, t: Date.parse(l.eta), text: 'Nachforderung ' + (u.name || 'Einheit') + ': ' + l.req, tab: 'kraefte' }); });
   (state.auftraege || []).forEach(a => { if (a.due && !a.done) out.push({ key: 'u' + a.id + a.due, t: Date.parse(a.due), text: 'Auftrag: ' + (a.title || '') + (a.by ? ' (' + a.by + ')' : ''), tab: 'wand' }); });
   return out.filter(x => isFinite(x.t)).sort((a, b) => a.t - b.t);
@@ -4726,7 +4780,7 @@ function renderVortrag() {
   if (!runtime.vortrag) return; const ex = state.exercise, t = casTotals().t, probs = state.problems.filter(p => p.status !== 'erledigt').length;
   $('#vtTop').replaceChildren(el('span', { class: 'nm', text: 'LAGEkarte' }), ex && ex.active ? el('span', { class: 'ex', text: 'ÜBUNG' }) : '', ex && ex.name ? el('span', { class: 'en', text: ex.name }) : '', el('span', { class: 't', text: fmtClock(nowMs()) }), el('span', { class: 'tz', text: fmtTac(nowMs()) }), el('span', { class: 'mt', text: vtMeetingText() }));
   const k = (c, n, l, id) => el('div', { class: 'vtk', style: '--c:' + c }, el('b', { text: n, id: id || null }), el('span', { text: l })), zone = vtZone(), meas = (state.measure || []);
-  $('#vtKpi').replaceChildren(k('#dc2626', String(t.sk1 || 0), 'SK I (rot)'), k('#ca8a04', String(t.sk2 || 0), 'SK II (gelb)'), k('#16a34a', String(t.sk3 || 0), 'SK III (grün)'), k('#111827', String(t.vermisst || 0), 'Vermisste, ' + (t.tot || 0) + ' Tote'), ...(bhpTotals().n ? [k('#b91c1c', String(bhpTotals().w.sk1), 'SK I im Behandlungsplatz wartend')] : []),
+  $('#vtKpi').replaceChildren(k('#dc2626', String(t.sk1 || 0), 'SK I (rot)'), k('#ca8a04', String(t.sk2 || 0), 'SK II (gelb)'), k('#16a34a', String(t.sk3 || 0), 'SK III (grün)'), k('#111827', String(t.vermisst || 0), 'Vermisste, ' + (t.tot || 0) + ' Schwarz'), ...(bhpTotals().n ? [k('#b91c1c', String(bhpTotals().w.sk1), 'SK I im Behandlungsplatz wartend')] : []),
     k('#0e7490', zone ? '…' : POP.total != null ? '≈ ' + popFmtN(POP.total) : '–', zone ? 'Einwohner im ' + zone.label : 'Einwohner im Abfragegebiet', 'vtPop'), k(probs ? '#b91c1c' : '#15803d', String(probs), 'Probleme offen'),
     meas.length ? k('#0e7490', Math.max(...meas.map(m => m.ppm)) + ' ppm', 'höchster Messwert') : '');
   if (zone && zone.ring) popFor([zone.ring]).then(r => { const e = $('#vtPop'); if (e) e.textContent = r.noData || r.missing.length ? '–' : '≈ ' + popFmtN(r.pop); });
@@ -4831,9 +4885,58 @@ function unitMarkerIcon(u) {
   const node = el('div', { class: 'umk ring' + (fl.out ? ' out' : fl.due ? ' due' : ''), style: '--sc:' + safeColor(st.color) }, img, fl.out ? el('span', { class: 'ustrike' }) : null, el('span', { class: 'usb', style: 'background:' + safeColor(st.color), text: st.short || (st.label || '?').charAt(0).toUpperCase() }), el('span', { class: 'ulb', text: u.name || 'Einheit' }));
   return L.divIcon({ className: '', html: node, iconSize: [Math.max(w, 60), 52], iconAnchor: [Math.max(w, 60) / 2, 22] });
 }
+/* Viele Einheiten übereinander: Aus dem Abschnitt geht ein Strich zum Kartenrand, dort stehen die Einheiten als Liste.
+   Das gilt nur, solange der Abschnitt im Bild ist und die Einheiten sich überdecken. */
+const CLUSTER_MIN = 3, CLUSTER_PX = 34;
+let clusterSig = '', clusterCur = new Map();
+function clusterSections() {
+  const out = new Map(), taken = new Set(); if (!map._loaded || !map.getSize().x) return out; const view = map.getBounds();
+  const secs = state.sections.filter(x => x.kind !== 'line' && x.pts && x.pts.length > 2).sort((a, b) => (a.parentId ? 1 : 0) - (b.parentId ? 1 : 0));
+  secs.forEach(sx => {
+    if (!view.intersects(L.latLngBounds(sx.pts))) return;
+    const ids = new Set([sx.id, ...state.sections.filter(c => c.parentId === sx.id).map(c => c.id)]);
+    const us = state.units.filter(u => u.lat != null && ids.has(u.sectionId) && !taken.has(u.id)); if (us.length < CLUSTER_MIN) return;
+    const pts = us.map(u => map.latLngToContainerPoint([u.lat, u.lng]));
+    const near = us.filter((u, i) => pts.some((p, j) => j !== i && Math.abs(p.x - pts[i].x) < CLUSTER_PX && Math.abs(p.y - pts[i].y) < CLUSTER_PX));
+    if (near.length >= CLUSTER_MIN) { out.set(sx.id, us); us.forEach(u => taken.add(u.id)); }
+  });
+  return out;
+}
+function clusterAnchor(sx) {
+  let c = L.latLngBounds(sx.pts).getCenter(); if (!secInside(sx, c.lat, c.lng)) { const m = L.latLng(sx.pts.reduce((a, q) => a + q[0], 0) / sx.pts.length, sx.pts.reduce((a, q) => a + q[1], 0) / sx.pts.length); if (secInside(sx, m.lat, m.lng)) c = m; }
+  const p = map.latLngToContainerPoint(c), sz = map.getSize(); return L.point(Math.min(Math.max(p.x, 10), sz.x - 10), Math.min(Math.max(p.y, 10), sz.y - 10));
+}
+function renderClusterLines() {
+  const panel = $('#clusterPanel'), svg = $('#clusterLines'); if (!panel || !svg) return; svg.replaceChildren(); if (panel.hidden) return;
+  const base = $('#mapWrap').getBoundingClientRect(), pr = panel.getBoundingClientRect(), NS = 'http://www.w3.org/2000/svg';
+  panel.querySelectorAll('.cl-card').forEach(card => {
+    const sx = state.sections.find(x => x.id === card.dataset.sid); if (!sx) return; const r = card.getBoundingClientRect(), a = clusterAnchor(sx);
+    const ey = Math.min(Math.max(r.top + 18, pr.top + 6), pr.bottom - 6) - base.top, ex = r.left - base.left, col = safeColor(sx.color, '#2563eb');
+    const line = document.createElementNS(NS, 'path'); line.setAttribute('d', 'M' + a.x + ' ' + a.y + ' L' + (ex - 14) + ' ' + ey + ' L' + ex + ' ' + ey); line.setAttribute('stroke', col); line.setAttribute('stroke-width', '3'); line.setAttribute('fill', 'none'); line.setAttribute('stroke-linejoin', 'round');
+    const dot = document.createElementNS(NS, 'circle'); dot.setAttribute('cx', a.x); dot.setAttribute('cy', a.y); dot.setAttribute('r', '6'); dot.setAttribute('fill', col); dot.setAttribute('stroke', '#fff'); dot.setAttribute('stroke-width', '2');
+    svg.append(line, dot);
+  });
+}
+function renderClusterPanel(cl) {
+  let panel = $('#clusterPanel'); if (!panel) { const w = $('#mapWrap'); panel = el('div', { id: 'clusterPanel', hidden: 'hidden' }); const sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.id = 'clusterLines'; w.append(sv, panel); panel.addEventListener('scroll', renderClusterLines); }
+  panel.replaceChildren(); panel.hidden = !cl.size; if (!cl.size) { renderClusterLines(); return; }
+  [...cl.entries()].map(([id, us]) => [state.sections.find(x => x.id === id), us]).filter(p => p[0]).sort((a, b) => clusterAnchor(a[0]).y - clusterAnchor(b[0]).y).forEach(([sx, us]) => {
+    panel.append(el('div', { class: 'cl-card', 'data-sid': sx.id, style: '--c:' + safeColor(sx.color, '#2563eb') },
+      el('button', { class: 'cl-h', title: 'Zum Abschnitt zoomen', onclick: () => map.fitBounds(L.latLngBounds(sx.pts).pad(0.3)) }, el('b', { text: sx.name }), el('span', { text: us.length + ' Einh.' })),
+      ...us.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', 'de')).map(u => el('button', { class: 'cl-u', title: (u.name || 'Einheit') + ' · ' + ustat(u.status).label, style: '--sc:' + safeColor(ustat(u.status).color), onclick: () => openUnitCard(u, can('logi') && !can('units')) },
+        el('img', { src: unitSym(u).url, alt: '' }), el('span', { class: 'cl-n', text: u.name || 'Einheit' }), el('small', { text: fmtStr(u) })))));
+  });
+  renderClusterLines();
+}
+function updateCluster() {
+  const cl = clusterSections(), sig = [...cl.keys()].sort().join('|') + '#' + [...cl.values()].map(u => u.length).join(',');
+  if (sig !== clusterSig) { clusterSig = sig; renderUnitMarkers(); } else renderClusterLines();
+}
+map.on('zoomend moveend', updateCluster); map.on('move', () => { if (clusterSig && clusterSig !== '#') requestAnimationFrame(renderClusterLines); });
 function renderUnitMarkers() {
-  unitLayer.clearLayers();
-  state.units.filter(u => u.lat != null).forEach(u => {
+  unitLayer.clearLayers(); clusterCur = clusterSections(); clusterSig = [...clusterCur.keys()].sort().join('|') + '#' + [...clusterCur.values()].map(u => u.length).join(',');
+  const hidden = new Set(); clusterCur.forEach(us => us.forEach(u => hidden.add(u.id))); renderClusterPanel(clusterCur);
+  state.units.filter(u => u.lat != null && !hidden.has(u.id)).forEach(u => {
     const m = L.marker([u.lat, u.lng], { icon: unitMarkerIcon(u), draggable: true });
     m.bindTooltip(el('span', { text: (u.name || 'Einheit') + ' · ' + fmtStr(u) + ' · ' + ustat(u.status).label + ' · ' + sectionName(u.sectionId) + (unitFlags(u).text ? ' · ' + unitFlags(u).text : '') }));
     m.on('dragend', () => { const ll = m.getLatLng(); unitMovedOnMap(u, ll.lat, ll.lng); });
@@ -5110,10 +5213,10 @@ function wandCard(sx, sums) {
 }
 function wandBlock(sx, units) {
   const sums = wandSums(sx ? sx.id : null), ids = new Set(sx ? [sx.id, ...state.sections.filter(x => x.parentId === sx.id).map(x => x.id)] : []);
-  const list = units.filter(u => sx ? ids.has(u.sectionId) : (!u.sectionId || !state.sections.some(x => x.id === u.sectionId)));
+  const list = units.filter(u => sx ? ids.has(u.sectionId) : ((!u.sectionId || !state.sections.some(x => x.id === u.sectionId)) && u.status !== ST_ANF));
   const body = el('div', { class: 'wtiles' }, ...list.slice().sort((p, q) => (p.name || '').localeCompare(q.name || '', 'de')).map(wTile));
   if (!list.length) body.append(el('div', { class: 'ovempty', text: ro('units') ? 'leer' : 'Kacheln hierher ziehen' }));
-  return el('div', { class: 'ovcol wblock', 'data-drop': 'sec:' + (sx ? sx.id : '') }, sx ? wandCard(sx, sums) : el('div', { class: 'wnone' }, el('b', { text: 'Ohne Abschnitt' }), el('span', { text: 'nicht zugeordnete Einheiten („weiße Einheiten“)' })), body);
+  return el('div', { class: 'ovcol wblock', 'data-drop': 'sec:' + (sx ? sx.id : '') }, sx ? wandCard(sx, sums) : el('div', { class: 'wnone' }, el('b', { text: 'Ohne Abschnitt' }), el('span', { text: 'nicht zugeordnete Einheiten' })), body);
 }
 function kcell(secId, key, val, computed) {
   const o = (state.kraefte.ovr[secId == null ? '_' : secId] || {})[key], has = o != null, vw = ro('kraefte');
@@ -5121,21 +5224,49 @@ function kcell(secId, key, val, computed) {
   const inp = el('input', { type: 'number', min: '0', class: 'kc' + (has ? ' ovr' : ''), value: has ? o : computed, disabled: vw ? 'disabled' : null, title: has ? 'Von Hand eingetragen, gerechnet wären ' + computed + '. Leeren setzt zurück.' : 'Aus den Kacheln gerechnet. Zahl eintragen überschreibt.', 'aria-label': key, onchange: e => { const v = e.target.value.trim(); set(v === '' ? null : Math.max(0, Math.round(+v || 0))); } });
   return inp;
 }
+function unitGroup(u) {   // rot: Feuerwehr, weiß: Rettungsdienst und Hilfsorganisationen, blau: THW, sonst null. Aus dem Zeichen, sonst aus dem Namen
+  const sy = u.sym;
+  if (sy && sy.k === 'dv' && sy.o) { const o = sy.o.organisation; return o === 'feuerwehr' ? 'rot' : o === 'thw' ? 'blau' : o === 'hilfsorganisation' ? 'weiss' : null; }
+  if (sy && sy.k === 'lib' && typeof symbolProperties !== 'undefined') { const x = symbolProperties.symbols.find(y => y.name === sy.name); if (x) return { 1: 'rot', 3: 'weiss', 4: 'blau' }[x.category] || null; }
+  const n = String(u.name || '');
+  if (/\b(THW|GKW|MLW|MzKW|FGr|BRmG|Fachgruppe|Ortsverband)\b/i.test(n)) return 'blau';
+  if (/\b(RTW|KTW|NEF|NAW|ITW|MTW-?RD|SEG|SAN|Rettungs|Sanit|Notarzt|BHP|KatS-?San)/i.test(n)) return 'weiss';
+  if (/\b(LF|HLF|TLF|DLK|DLA|ELW|RW|GW|FF|BF|Löschzug|Löschgruppe|MTF|KdoW|WLF|LZ)\b/i.test(n)) return 'rot';
+  return null;
+}
 function wandTable(secs) {
   const rows = secs.map(sx => ({ sx, id: sx.id, name: sx.name, sums: wandSums(sx.id) })).concat([{ sx: null, id: null, name: 'ohne Abschnitt', sums: wandSums(null) }]).filter(r => r.sx || r.sums.alle.n || r.sums.abg.n);
   const val = (r, k) => { const o = (state.kraefte.ovr[r.id == null ? '_' : r.id] || {})[k]; return o != null ? o : r.sums[k].m; };
   const tot = k => rows.reduce((a, r) => a + val(r, k), 0);
-  const tr = r => el('tr', {}, el('th', { scope: 'row', text: r.name }), ...['anf', 'vor', 'abg'].map(k => el('td', {}, kcell(r.id, k, val(r, k), r.sums[k].m), r.sums[k].n ? el('small', { text: r.sums[k].n + ' Einh.' }) : null)));
+  const tr = r => el('tr', {}, el('th', { scope: 'row', text: r.name }), ...['anf', 'vor', 'abg'].map(k => el('td', {}, kcell(r.id, k, val(r, k), r.sums[k].m), r.sums[k].n ? el('small', { text: r.sums[k].n + ' Einh.' }) : null, wandGroupChips(r.id, k))));
   return el('div', { class: 'kt' }, el('div', { class: 'kt-h' }, el('span', { class: 'lbl', text: 'Kräfteübersicht (S1)' }), ),
     el('table', { class: 'kt-t' }, el('thead', {}, el('tr', {}, el('th', { text: 'EA' }), el('th', { text: 'alarmiert, auf Anfahrt' }), el('th', { text: 'vor Ort' }), el('th', { text: 'abgelöst' }))),
-      el('tbody', {}, ...rows.map(tr), el('tr', { class: 'sig' }, el('th', { text: 'Σ' }), el('td', { text: String(tot('anf')) }), el('td', { text: String(tot('vor')) }), el('td', { text: String(tot('abg')) })))),
-    el('textarea', { class: 'kt-note', rows: '1', placeholder: 'Anmerkung, zum Beispiel: davon 560 „weiße Einheiten“', disabled: ro('kraefte') ? 'disabled' : null, onchange: e => { state.kraefte.note = e.target.value; save('Kräfteübersicht: Anmerkung'); } }));
+      el('tbody', {}, ...rows.map(tr), ...wandGroupRows(), el('tr', { class: 'sig' }, el('th', { text: 'Σ' }), el('td', { text: String(tot('anf')) }), el('td', { text: String(tot('vor')) }), el('td', { text: String(tot('abg')) })))),
+    el('textarea', { class: 'kt-note', rows: '1', disabled: ro('kraefte') ? 'disabled' : null, onchange: e => { state.kraefte.note = e.target.value; save('Kräfteübersicht: Anmerkung'); } }));
 }
-function wandAlarm() {
+function wandGroupChips(secId, k) {   // rot, weiß, blau in diesem Abschnitt, unter der Zahl
+  const ids = secId == null ? null : new Set([secId, ...state.sections.filter(x => x.parentId === secId).map(x => x.id)]);
+  const st = { anf: u => u.status === ST_ANF, vor: u => u.status !== ST_ANF && u.status !== ST_ABG && u.status !== 'nicht', abg: u => u.status === ST_ABG }[k];
+  const us = state.units.filter(u => (ids ? ids.has(u.sectionId) : (!u.sectionId || !state.sections.some(x => x.id === u.sectionId))) && st(u));
+  const col = { rot: '#dc2626', weiss: '#cbd5e1', blau: '#2563eb' }, lab = { rot: 'Feuerwehr (rot)', weiss: 'Rettungsdienst (weiß)', blau: 'THW (blau)' };
+  const parts = ['rot', 'weiss', 'blau'].map(g => [g, us.filter(u => unitGroup(u) === g).reduce((a, u) => a + uTotal(u), 0)]).filter(p => p[1]);
+  return parts.length ? el('div', { class: 'kgrp' }, ...parts.map(([g, n]) => el('span', { title: lab[g] + ': ' + n }, el('i', { class: 'gdot', style: 'background:' + col[g] }), String(n)))) : null;
+}
+function wandGroupRows() {   // davon rot, weiß, blau: automatisch aus den Einsatzkräften
+  const defs = [['rot', 'davon Feuerwehr (rot)', '#dc2626'], ['weiss', 'davon Rettungsdienst (weiß)', '#cbd5e1'], ['blau', 'davon THW (blau)', '#2563eb']];
+  const st = { anf: u => u.status === ST_ANF, vor: u => u.status !== ST_ANF && u.status !== ST_ABG && u.status !== 'nicht', abg: u => u.status === ST_ABG };
+  const rows = defs.map(([g, label, col]) => { const us = state.units.filter(u => unitGroup(u) === g); return { g, label, col, us, n: us.length }; }).filter(r => r.n);
+  return rows.map(r => el('tr', { class: 'grp' }, el('th', { scope: 'row' }, el('i', { class: 'gdot', style: 'background:' + r.col }), r.label), ...['anf', 'vor', 'abg'].map(k => el('td', { text: String(r.us.filter(st[k]).reduce((a, u) => a + uTotal(u), 0)) }))));
+}
+function wandAlarm(units) {
   const vw = ro('kraefte'), box = el('div', { class: 'wal' });
+  const list = (units || []).filter(u => u.status === ST_ANF && (!u.sectionId || !state.sections.some(x => x.id === u.sectionId)));
+  const tiles = el('div', { class: 'wtiles' }, ...list.slice().sort((p, q) => (p.name || '').localeCompare(q.name || '', 'de')).map(wTile));
+  if (!list.length) tiles.append(el('div', { class: 'ovempty', text: ro('units') ? 'leer' : 'Kacheln hierher ziehen' }));
+  const block = el('div', { class: 'ovcol wblock walblock', 'data-drop': 'alarm' }, ro('units') ? null : el('div', { class: 'wal-add' }, el('button', { class: 'btn small wedit primary', text: '+ Einheit', title: 'Alarmierte Einheit anlegen, sie steht auf Anfahrt und wird einem Abschnitt zugeteilt, wenn sie ankommt', onclick: () => addUnitDialog({ status: ST_ANF }) })), tiles);
   state.kraefte.alarmiert.forEach(a => box.append(el('div', { class: 'wal-r' }, el('input', { type: 'text', value: a.text, disabled: vw ? 'disabled' : null, 'aria-label': 'Alarmiert oder auf Marsch', onchange: e => { a.text = e.target.value.trim(); state.kraefte.standIso = nowIso(); save('Alarmiert: ' + a.text); } }), vw ? null : el('button', { class: 'btn small danger', text: '×', 'aria-label': 'Zeile entfernen', onclick: () => { state.kraefte.alarmiert = state.kraefte.alarmiert.filter(x => x !== a); renderUnitOverview(); save('Alarmiert entfernt'); } }))));
   if (!vw) box.append(el('button', { class: 'btn small', text: '+ Zeile', onclick: () => { state.kraefte.alarmiert.push({ id: uid(), text: '' }); renderUnitOverview(); const i = $('#ovCols .wal-r:last-of-type input'); if (i) i.focus(); } }));
-  return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Alarmiert, auf Marsch' }), box);
+  return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Alarmiert, auf Marsch' }), block, box);
 }
 /* Aufträge, Ergänzungen und Notizen der Stabswand */
 function addAuftrag(d) {
@@ -5187,10 +5318,10 @@ function wandNotizen() {
   const sum = r => (r.sk1 || 0) + (r.sk2 || 0) + (r.sk3 || 0) + (r.tot || 0) + (r.vm || 0);
   const tr = (r, isLive) => el('tr', { class: isLive ? 'live' : '' }, el('td', { text: isLive ? 'jetzt' : fmtTac(Date.parse(r.iso)).slice(2) }), ...['sk1', 'sk2', 'sk3', 'tot', 'vm'].map(k => el('td', { text: String(r[k] || 0) })), el('td', { text: String(sum(r)) }),
     isLive || vw ? el('td') : el('td', {}, el('button', { class: 'btn small danger', 'aria-label': 'Zeile löschen', text: '×', onclick: () => { state.kraefte.rows = rows.filter(x => x !== r); renderUnitOverview(); save('Betroffenenzeile gelöscht'); } })));
-  const tbl = el('table', { class: 'vt' }, el('thead', {}, el('tr', {}, el('th', { text: 'Zeit' }), el('th', { class: 'r', text: 'SK I' }), el('th', { class: 'g', text: 'SK II' }), el('th', { class: 'gr', text: 'SK III' }), el('th', { text: 'Tot' }), el('th', { text: 'Vm' }), el('th', { class: 'bl', text: 'Σ' }), el('th'))),
+  const tbl = el('table', { class: 'vt' }, el('thead', {}, el('tr', {}, el('th', { text: 'Zeit' }), el('th', { class: 'r', text: 'SK I' }), el('th', { class: 'g', text: 'SK II' }), el('th', { class: 'gr', text: 'SK III' }), el('th', { class: 'bk', text: 'Schwarz' }), el('th', { text: 'Vm' }), el('th', { class: 'bl', text: 'Σ' }), el('th'))),
     el('tbody', {}, ...rows.map(r => tr(r, false)), tr(live, true)));
   return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Notizen' }), el('div', { class: 'card wc' }, el('h4', { text: 'Betroffene nach Zeit' }), tbl,
-    vw ? null : el('button', { class: 'btn small', text: 'Stand festhalten', title: 'Die aktuellen Zahlen aus dem Reiter Zahlen als neue Zeile speichern', onclick: () => { state.kraefte.rows.push(Object.assign({ id: uid(), iso: nowIso() }, live)); addJournal('Betroffene festgehalten: SK I ' + live.sk1 + ', SK II ' + live.sk2 + ', SK III ' + live.sk3 + ', Tote ' + live.tot + ', Vermisste ' + live.vm, true); renderUnitOverview(); save('Betroffene festgehalten'); } }),
+    vw ? null : el('button', { class: 'btn small', text: 'Stand festhalten', title: 'Die aktuellen Zahlen aus dem Reiter Zahlen als neue Zeile speichern', onclick: () => { state.kraefte.rows.push(Object.assign({ id: uid(), iso: nowIso() }, live)); addJournal('Betroffene festgehalten: SK I ' + live.sk1 + ', SK II ' + live.sk2 + ', SK III ' + live.sk3 + ', Schwarz ' + live.tot + ', Vermisste ' + live.vm, true); renderUnitOverview(); save('Betroffene festgehalten'); } }),
     el('div', { class: 'hint', text: 'Die Zahlen kommen aus dem Reiter Zahlen. „Stand festhalten“ speichert sie mit Uhrzeit.' })),
     el('div', { class: 'card wc' }, el('h4', { text: 'Notiz' }), el('textarea', { rows: '4', class: 'kt-note2', placeholder: 'Freie Notizen, zum Beispiel Wind, Absprachen', disabled: vw ? 'disabled' : null, onchange: e => { state.kraefte.notiz = e.target.value; save('Notiz'); } })));
 }
@@ -5198,7 +5329,7 @@ function renderWand(cols, units) {
   const secs = state.sections.filter(x => x.kind !== 'line' && !x.parentId), brs = secs.filter(x => wandKind(x) === 'br'), eas = secs.filter(x => wandKind(x) !== 'br');
   const addBtn = (typ, txt) => ro('sections') ? null : el('button', { class: 'btn small', text: txt, onclick: () => editSectionDialog({ typ }) });
   const wall = el('div', { class: 'wall' },
-    el('div', { class: 'wcol' }, wandAlarm(), el('span', { class: 'lbl', text: 'Bereitstellungsräume' }), ...brs.map(x => wandBlock(x, units)), addBtn('br', '+ Bereitstellungsraum')),
+    el('div', { class: 'wcol' }, wandAlarm(units), el('span', { class: 'lbl', text: 'Bereitstellungsräume' }), ...brs.map(x => wandBlock(x, units)), addBtn('br', '+ Bereitstellungsraum')),
     el('div', { class: 'wcol wide' }, el('span', { class: 'lbl', text: 'Einsatzabschnitte' }), ...eas.map(x => wandBlock(x, units)), wandBlock(null, units), addBtn('ea', '+ Einsatzabschnitt')));
   cols.append(wandTable(secs), wall, el('div', { class: 'wall2' }, wandAuftraege(), wandErgaenzung(), wandNotizen()));
   const ta = cols.querySelector('.kt-note'); if (ta) ta.value = state.kraefte.note || ''; const tb = cols.querySelector('.kt-note2'); if (tb) tb.value = state.kraefte.notiz || '';
@@ -5254,7 +5385,7 @@ function ovDragEnd(apply) {
   document.querySelectorAll('#ovCols .ovcol.over').forEach(c => c.classList.remove('over'));
   if (d.on && apply && d.target) {
     const u = state.units.find(x => x.id === d.id), key = d.target.dataset.drop; if (!u) return;
-    if (key.startsWith('sec:')) assignUnit(u, key.slice(4) || null); else setUnitStatus(u, key.slice(3));
+    if (key === 'alarm') { assignUnit(u, null); setUnitStatus(u, ST_ANF); } else if (key.startsWith('sec:')) assignUnit(u, key.slice(4) || null); else setUnitStatus(u, key.slice(3));
   } else if (d.on) renderUnitOverview();
 }
 function initOvDrag() {
@@ -5281,7 +5412,7 @@ function initOvDrag() {
   window.addEventListener('pointercancel', () => ovDragEnd(false));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && ovDrag && ovDrag.on) { e.stopPropagation(); ovDragEnd(false); } }, true);
 }
-function openUnitOverview() { if (runtime.vortrag) closeFue(); $('#unitOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderUnitOverview(); $('#ovClose').focus(); }
+function openUnitOverview() { if (runtime.vortrag || isPhone()) closeFue(); if (isPhone()) setPanel(false, false); $('#unitOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderUnitOverview(); $('#ovClose').focus(); }
 function closeUnitOverview() { $('#unitOv').hidden = true; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); }
 function initUnitOverview() {
   $('#btnUnits').onclick = () => ($('#unitOv').hidden ? openUnitOverview() : closeUnitOverview());
@@ -5319,7 +5450,7 @@ async function fueEditPerson(key, title) {
 }
 async function fueEditSection(sx) {
   if (ro('sections')) return;
-  const d = await fieldsDialog((sx.parentId ? 'UEA ' : 'EA ') + sx.name, [{ k: 'name', l: 'Bezeichnung', v: sx.name }, { k: 'leader', l: 'Abschnittsleiter', v: sx.leader || '' }, { k: 'deputy', l: 'Stellvertreter', v: sx.deputy || '' }, { k: 'radio', l: 'Funk (Kanal, Rufname)', v: sx.radio || '' }, { k: 'task', l: 'Auftrag', v: sx.task || '', area: true }]); if (!d) return;
+  const d = await fieldsDialog((sx.parentId ? 'UEA ' : sx.typ === 'br' ? 'BR ' : 'EA ') + sx.name, [{ k: 'name', l: 'Bezeichnung', v: sx.name }, { k: 'leader', l: 'Abschnittsleiter', v: sx.leader || '' }, { k: 'deputy', l: 'Stellvertreter', v: sx.deputy || '' }, { k: 'radio', l: 'Funk (Kanal, Rufname)', v: sx.radio || '' }, { k: 'task', l: 'Auftrag', v: sx.task || '', area: true }]); if (!d) return;
   Object.assign(sx, { name: d.name.trim() || sx.name, leader: d.leader.trim(), deputy: d.deputy.trim(), radio: d.radio.trim(), task: d.task }); renderSections(); renderUnits(); renderAbschnitte(); save('Führung Abschnitt ' + sx.name);
 }
 async function fueAddSection(parent) {
@@ -5329,7 +5460,7 @@ async function fueAddSection(parent) {
 }
 async function fueRemoveSection(sx) {
   const kids = state.sections.filter(x => x.parentId === sx.id).length, un = state.units.filter(u => u.sectionId === sx.id).length;
-  if (await askYesNo((sx.parentId ? 'UEA' : 'EA') + ' „' + sx.name + '“ entfernen?', un + ' Einheiten werden „ohne Abschnitt“.' + (kids ? ' Die ' + kids + ' UEA rücken eine Ebene hoch.' : '') + ' Rückgängig ist möglich.', 'Entfernen')) { state.sections.forEach(x => { if (x.parentId === sx.id) x.parentId = sx.parentId || null; }); removeSection(sx); }
+  if (await askYesNo((sx.parentId ? 'UEA' : sx.typ === 'br' ? 'BR' : 'EA') + ' „' + sx.name + '“ entfernen?', un + ' Einheiten werden „ohne Abschnitt“.' + (kids ? ' Die ' + kids + ' UEA rücken eine Ebene hoch.' : '') + ' Rückgängig ist möglich.', 'Entfernen')) { state.sections.forEach(x => { if (x.parentId === sx.id) x.parentId = sx.parentId || null; }); removeSection(sx); }
 }
 function fBox(o) {
   const who = o.name, vw = ro(o.dom || 'people'), sy = !o.sym ? null : typeof o.sym === 'string' ? symUrl(o.sym) : symOf(o.sym).url;
@@ -5342,9 +5473,9 @@ function fueSecBox(sx, level) {
   const ch = state.sections.filter(x => x.parentId === sx.id && x.kind !== 'line'), us = state.units.filter(u => u.sectionId === sx.id), vw = ro('sections');
   const tot = us.reduce((a, u) => a + uTotal(u), 0);
   const box = el('div', { class: 'fsec' + (level ? ' uea' : ''), 'data-sid': sx.id, style: '--c:' + safeColor(sx.color, '#2563eb') },
-    el('div', { class: 'ftag' + (vw ? '' : ' grip'), 'data-grip': vw ? null : sx.id, title: vw ? null : 'Ziehen: verschieben oder unter einen anderen EA hängen', text: (vw ? '' : '⠿ ') + (level ? 'UEA' : 'EA') }),
+    el('div', { class: 'ftag' + (vw ? '' : ' grip'), 'data-grip': vw ? null : sx.id, title: vw ? null : (sx.typ === 'br' ? 'Ziehen: verschieben' : 'Ziehen: verschieben oder unter einen anderen EA hängen'), text: (vw ? '' : '⠿ ') + (level ? 'UEA' : sx.typ === 'br' ? 'BR' : sx.typ === 'el' ? 'EL' : 'EA') }),
     fBox({ title: sx.name, sub: 'Leiter' + (sx.deputy ? ', Stv.: ' + sx.deputy : ''), name: sx.leader, color: sx.color, dom: 'sections', sym: level ? 'tz/Führungsstellen/UEAL' : 'tz/Führungsstellen/EAL', onclick: () => fueEditSection(sx) }),
-    vw ? null : el('div', { class: 'fact' }, level ? null : el('button', { class: 'btn small', text: '+ UEA', onclick: () => fueAddSection(sx) }), el('button', { class: 'btn small', text: '+ Einheit', onclick: () => addUnitDialog({ sectionId: sx.id }) }), el('button', { class: 'btn small danger', text: 'Entfernen', onclick: () => fueRemoveSection(sx) })),
+    vw ? null : el('div', { class: 'fact' }, (level || sx.typ === 'br') ? null : el('button', { class: 'btn small', text: '+ UEA', onclick: () => fueAddSection(sx) }), el('button', { class: 'btn small', text: '+ Einheit', onclick: () => addUnitDialog({ sectionId: sx.id }) }), el('button', { class: 'btn small danger', text: 'Entfernen', onclick: () => fueRemoveSection(sx) })),
     sx.task ? el('div', { class: 'ftask', text: sx.task }) : null,
     el('div', { class: 'fsum' }, el('span', { text: us.length + ' Einheiten, Stärke ' + tot }), us.length ? el('button', { class: 'btn small fold', text: sx.hideU ? 'einblenden' : 'ausblenden', title: 'Einheiten dieses Abschnitts ' + (sx.hideU ? 'einblenden' : 'ausblenden'), onclick: () => { sx.hideU = !sx.hideU; renderFue(); save('Führungsstruktur: Einheiten ' + (sx.hideU ? 'ausgeblendet' : 'eingeblendet')); } }) : null),
     ...(sx.hideU ? [] : us.map(fueUnit)),
@@ -5445,7 +5576,7 @@ function renderFunk() {
     el('div', { class: 'hint', text: 'Kanäle, Rufnamen und Rufnummern trägt der S6 ein. Es werden keine Werte vorgegeben.' }));
   if (vw) lockViewer(box);
 }
-function openFue() { if (runtime.vortrag) closeUnitOverview(); $('#fueOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderFue(); $('#fueClose').focus(); }
+function openFue() { if (runtime.vortrag || isPhone()) closeUnitOverview(); if (isPhone()) setPanel(false, false); $('#fueOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderFue(); $('#fueClose').focus(); }
 function closeFue() { $('#fueOv').hidden = true; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); }
 function initFue() {
   $('#btnFue').onclick = () => ($('#fueOv').hidden ? openFue() : closeFue()); $('#fueClose').onclick = closeFue;
@@ -5457,7 +5588,7 @@ function initFue() {
 /* Rollen: Auswahl am Anfang, nur eigene Aufgaben, Export, Einlesen    */
 /* ------------------------------------------------------------------ */
 const ROLLEN = [
-  { id: 'EL', name: 'Einsatzleiter', d: 'Gesamtlage, Führungsstruktur, Entscheidungen' }, { id: 'S1', name: 'S1 Personal', d: 'Personen erfassen (Sichtung, Tote, Vermisste)' },
+  { id: 'EL', name: 'Einsatzleiter', d: 'Gesamtlage, Führungsstruktur, Entscheidungen' }, { id: 'S1', name: 'S1 Personal', d: 'Personen erfassen (Sichtung, Schwarz, Vermisste)' },
   { id: 'S2', name: 'S2 Lage', d: 'Lagevortrag, alles bearbeiten, Daten der anderen einlesen' }, { id: 'S3', name: 'S3 Einsatz', d: 'Einheiten und Abschnitte' },
   { id: 'S4', name: 'S4 Versorgung', d: 'Ablösung, Atemschutz, Nachforderung, Ausfälle' }, { id: 'S5', name: 'S5 Presse', d: 'Meldungen' }, { id: 'S6', name: 'S6 Kommunikation', d: 'Kommunikationsplan' }];
 const ROLE_DOM = { EL: ['people', 'fb', 'auftraege'], S1: ['casualties', 'bhp', 'kraefte'], S2: ['areas', 'objects', 'deps', 'symbols', 'manualPois', 'wind', 'weather', 'plumes', 'chem', 'measure', 'problems', 'exercise', 'meeting'], S3: ['units', 'sections'], S4: ['logi'], S5: [], S6: ['funk'] };
@@ -5607,7 +5738,7 @@ function openGuidedMeeting() {
   const render = () => {
     const us = state.units, inE = us.filter(u => u.status === 'einsatz'), bound = us.filter(u => u.status !== 'bereit').reduce((a, u) => a + uTotal(u), 0), res = us.filter(u => u.status === 'bereit').reduce((a, u) => a + uTotal(u), 0);
     const lgOf = u => state.logi[u.id] || {}, soon = us.filter(u => { const l = lgOf(u); return l.relief && Date.parse(l.relief) - nowMs() < 30 * 60000; }), out = us.filter(u => lgOf(u).ausfall), t = casTotals().t, ca = chemActive(), cs = ca ? chemSub(ca.sid) : null; let body;
-    if (step === 1) body = el('div', {}, el('h2', { text: 'Lage' }), el('p', { class: 'hint', text: 'Das Wichtigste zuerst.' }), el('div', { class: 'kpi' }, kpi(t.sk1 || 0, 'SK I (rot)', '#dc2626'), kpi(t.sk2 || 0, 'SK II (gelb)', '#ca8a04'), kpi(t.sk3 || 0, 'SK III (grün)', '#16a34a'), kpi((t.tot || 0) + (t.vermisst || 0), 'Tote und Vermisste', '#111827')),
+    if (step === 1) body = el('div', {}, el('h2', { text: 'Lage' }), el('p', { class: 'hint', text: 'Das Wichtigste zuerst.' }), el('div', { class: 'kpi' }, kpi(t.sk1 || 0, 'SK I (rot)', '#dc2626'), kpi(t.sk2 || 0, 'SK II (gelb)', '#ca8a04'), kpi(t.sk3 || 0, 'SK III (grün)', '#16a34a'), kpi((t.tot || 0) + (t.vermisst || 0), 'Schwarz und Vermisste', '#111827')),
       el('p', { text: (state.wind.dir != null ? 'Wind aus ' + state.wind.dir + ' Grad, ' + (state.wind.speed != null ? state.wind.speed + ' m/s. ' : '') : 'Wind nicht gesetzt. ') + (cs ? 'Gefahrstoff ' + cs.name + ' (UN ' + cs.un + ') gemeldet.' : 'Kein Gefahrstoff gemeldet.') }), el('p', { text: state.problems.filter(p => p.status !== 'erledigt').length + ' Probleme offen.' }));
     if (step === 2) body = el('div', {}, el('h2', { text: 'Kräfte' }), el('p', { class: 'hint', text: 'Rot braucht eine Entscheidung.' }), el('div', { class: 'kpi' }, kpi(inE.length, 'Einheiten im Einsatz', '#15803d'), kpi(bound, 'Kräfte gebunden, ' + res + ' einsatzbereit', '#15803d'), kpi(soon.length, 'Ablösungen in 30 Minuten', '#c2410c'), kpi(out.length, 'Ausfälle', '#b91c1c')),
       el('div', { class: 'tblwrap' }, el('table', { class: 'fst' }, el('thead', {}, el('tr', {}, ...['Einheit', 'Abschnitt', 'Auftrag', 'Seit', 'Atemschutz', 'Ablösung'].map(h => el('th', { text: h })))),
@@ -5629,7 +5760,7 @@ function openGuidedMeeting() {
 /* ---- Einweisung (Rundgang) und Tastenkürzel ---- */
 const SHORTCUTS = [
   ['?', 'Diese Übersicht'], ['U', 'Einheiten'], ['F', 'Führungsstruktur'], ['H', 'Karten-Beamer festhalten oder freigeben'], ['V', 'Lagevortrag starten oder beenden'], ['D', 'Dunkelmodus umschalten'],
-  ['K', 'Reiter Kräfte'], ['B', 'Reiter Behandlungsplatz'], ['T', 'Reiter Tagebuch'], ['M', 'Reiter Meldungen'], ['P', 'Reiter Probleme'], ['Z', 'Reiter Zahlen'], ['W', 'Reiter Wetter'], ['G', 'Reiter Gefahrstoff'],
+  ['K', 'Reiter Kräfte'], ['B', 'Reiter Behandlungsplatz'], ['T', 'Reiter Tagebuch'], ['M', 'Reiter Meldungen'], ['Z', 'Reiter Zahlen'], ['W', 'Reiter Wetter'], ['G', 'Reiter Gefahrstoff'],
   ['N', 'Neue Einheit'], ['J', 'Journaleintrag'], ['/', 'Ortssuche'], ['Strg+Z, Strg+Y', 'Rückgängig, Wiederholen'], ['Umschalt+P', 'Seitenleiste ein- oder ausklappen'], ['Esc', 'Schließen, Abbrechen']
 ];
 function infoDialog(title, ...body) {
@@ -5650,7 +5781,7 @@ function goTab(name) {
 document.addEventListener('keydown', e => {
   if (typing(e.target) || e.ctrlKey || e.metaKey || e.altKey || document.querySelector('.dlg:not(.dlgout)') || menuStack.length) return;
   if (e.target && /^(SELECT|BUTTON)$/.test(e.target.tagName) && e.key === ' ') return;
-  const k = e.key.toLowerCase(), tabs = { b: 'bhp', k: 'kraefte', t: 'tagebuch', m: 'meldungen', p: 'probleme', z: 'zahlen', w: 'keule', g: 'chem' };
+  const k = e.key.toLowerCase(), tabs = { b: 'bhp', k: 'kraefte', t: 'tagebuch', m: 'meldungen', z: 'zahlen', w: 'keule', g: 'chem' };
   if (e.shiftKey && k !== '?') return;
   if (k === '?') { e.preventDefault(); showShortcuts(); }
   else if (k === 'u') { e.preventDefault(); $('#btnUnits').click(); }
@@ -5865,7 +5996,7 @@ function lageFacts() {
   const st = id => us.filter(u => u.status === id).length, due = typeof meetingDue === 'function' ? meetingDue() : null;
   return {
     zeit: fmtTac(nowMs()) + ' (' + fmtHM2(nowMs()) + ' Uhr)', name: (e.active && e.name) ? e.name : 'Einsatz',
-    personen: 'SK I ' + (t.sk1 || 0) + ', SK II ' + (t.sk2 || 0) + ', SK III ' + (t.sk3 || 0) + ', Tote ' + (t.tot || 0) + ', Vermisste ' + (t.vermisst || 0),
+    personen: 'SK I ' + (t.sk1 || 0) + ', SK II ' + (t.sk2 || 0) + ', SK III ' + (t.sk3 || 0) + ', Schwarz ' + (t.tot || 0) + ', Vermisste ' + (t.vermisst || 0),
     kraefte: us.length + ' Einheiten, Stärke ' + sum('f') + '/' + sum('u') + '/' + sum('h') + '/' + (sum('f') + sum('u') + sum('h')) + ', im Einsatz ' + st('einsatz') + ', Reserve ' + st('reserve') + ', einsatzbereit ' + st('bereit'),
     gefahr: cs ? cs.name + ' (UN ' + cs.un + ', Kemler ' + cs.kemler + '), Absperrung ' + chemM(chemErg(cs, ca).isolate) + (ca.fire ? ', Brand ' + chemM(chemErg(cs, ca).fire) : '') : 'kein Gefahrstoff gemeldet',
     wetter: w && w.dir != null ? 'Wind aus ' + Math.round(w.dir) + ' Grad' + (w.speed != null ? ', ' + w.speed + ' m/s' : '') : 'Wind nicht gesetzt',
@@ -5914,12 +6045,12 @@ function syncNav() {
 function initNavActs() {
   document.querySelectorAll('#tabs [data-act]').forEach(b => b.addEventListener('click', () => {
     const a = b.dataset.act;
-    if (a === 'map') { if (!$('#unitOv').hidden || !$('#fueOv').hidden) { closeUnitOverview(); closeFue(); } else setPanel($('#app').classList.contains('collapsed')); }
+    if (a === 'map') { if (!$('#unitOv').hidden || !$('#fueOv').hidden) { closeUnitOverview(); closeFue(); } else if (isPhone()) setPanel(false, false); else setPanel($('#app').classList.contains('collapsed')); }
     else if (a === 'wand') { if (!$('#unitOv').hidden) closeUnitOverview(); else { $('#ovGroup').value = 'wand'; openUnitOverview(); } }
     else if (a === 'fue') { if (!$('#fueOv').hidden) closeFue(); else openFue(); }
     syncNav();
   }));
-  document.querySelectorAll('#mapBar [data-mb]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mb; if (k === 'poi') $('#btnAddPoi').click(); else if (k === 'units') $('#btnUnits').click(); else if (k === 'fue') $('#btnFue').click(); else if (k === 'ek') openUnitWizard({}); else if (k === 'sec') { const p = $('#secPop'); p.hidden = !p.hidden; if (!p.hidden) $('#secName').focus(); } else if (k === 'print') $('#btnPrint').click(); syncNav(); }));
+  document.querySelectorAll('#mapActs [data-mb]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mb; if (k === 'poi') $('#btnAddPoi').click(); else if (k === 'units') $('#btnUnits').click(); else if (k === 'fue') $('#btnFue').click(); else if (k === 'ek') openUnitWizard({}); else if (k === 'sec') { const p = $('#secPop'); p.hidden = !p.hidden; if (!p.hidden) $('#secName').focus(); } else if (k === 'print') $('#btnPrint').click(); syncNav(); }));
   syncNav();
 }
 function initLook() {
@@ -5979,7 +6110,7 @@ function renderStands() {
     box.append(el('div', { class: 'card', style: '--c:#1e40af' },
       el('div', {}, el('b', { text: 'Nr. ' + st.nr + ' · ' + st.title }), el('span', { class: 'hint', text: ' · ' + fmtTime(st.time) + (st.by ? ' · ' + st.by : '') })),
       st.note ? el('div', { text: st.note, style: 'white-space:pre-wrap' }) : null,
-      el('div', { class: 'hint', text: 'Objekte: ' + o.ausgefallen + ' ausgefallen, ' + o.eingeschraenkt + ' eingeschränkt, ' + o.intakt + ' intakt · Verletzte ' + (c.verletzt + c.schwer) + ', Tote ' + c.tot + ', Betroffene ' + c.betroffen + ' · Probleme offen ' + st.sum.probOpen + ' · Einheiten ' + st.sum.units + ' (Stärke ' + st.sum.strength + ')' }),
+      el('div', { class: 'hint', text: 'Objekte: ' + o.ausgefallen + ' ausgefallen, ' + o.eingeschraenkt + ' eingeschränkt, ' + o.intakt + ' intakt · Verletzte ' + (c.verletzt + c.schwer) + ', Schwarz ' + c.tot + ', Betroffene ' + c.betroffen + ' · Probleme offen ' + st.sum.probOpen + ' · Einheiten ' + st.sum.units + ' (Stärke ' + st.sum.strength + ')' }),
       el('div', { class: 'row' }, el('button', { class: 'btn small', text: 'Anzeigen', onclick: () => enterReview(st) }), el('button', { class: 'btn small', text: 'Mit jetzt vergleichen', onclick: () => compareStand(st) }),
         !runtime.viewer ? el('button', { class: 'btn small danger', text: 'Löschen', onclick: () => { if (confirm('Lagestand Nr. ' + st.nr + ' endgültig löschen?')) { state.stands = state.stands.filter(x => x !== st); addJournal('Lagestand Nr. ' + st.nr + ' gelöscht', true); renderStands(); persist(); } } }) : null)));
   });
@@ -6251,6 +6382,10 @@ document.addEventListener('keydown', e => {
 });
 /* Seitenleiste einklappen */
 const panelGlyph = open => window.matchMedia('(max-width: 860px)').matches ? (open ? '&#9662;' : '&#9652;') : (open ? '&lsaquo;' : '&rsaquo;');
+const isPhone = () => window.matchMedia('(max-width: 700px)').matches;
+function placeMapActs() {   // Rechner: Knöpfe in der Kopfzeile, Handy: in der Kartenleiste
+  const a = $('#mapActs'), apply = () => { if (isPhone()) $('#mapBar').append(a); else $('#hdrSub').append(a); }; apply(); window.matchMedia('(max-width: 700px)').addEventListener('change', apply);
+}
 function setPanel(open, remember) {
   const app = $('#app'); app.classList.toggle('collapsed', !open); setTimeout(() => { if (typeof syncNav === 'function') syncNav(); }, 0);
   const t = $('#panelToggle'); t.setAttribute('aria-expanded', String(open));
@@ -6260,7 +6395,7 @@ function setPanel(open, remember) {
 }
 function togglePanel() { setPanel($('#app').classList.contains('collapsed')); }
 $('#panelToggle').onclick = togglePanel;
-$('#fristChip').onclick = () => { const t = $('#fristChip').dataset.tab || 'probleme'; if (t === 'wand') { openUnitOverview(); return; } setPanel(true); openTab(t); };
+$('#fristChip').onclick = () => { const t = $('#fristChip').dataset.tab || 'wand'; if (t === 'wand') { openUnitOverview(); return; } setPanel(true); openTab(t); };
 $('#btnTheme').onclick = () => { const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); try { localStorage.setItem('kritis-theme', t); } catch (e) { /* ohne Speicher */ } };
 try { if (localStorage.getItem('kritis-panel') === '0') { $('#app').classList.add('collapsed'); $('#panelToggle').innerHTML = panelGlyph(false); $('#panelToggle').setAttribute('aria-expanded', 'false'); setTimeout(() => map.invalidateSize(), 0); } } catch (e) { /* egal */ }
 
@@ -6323,11 +6458,11 @@ initKeule(); initEinsatz(); initKraefte(); initAbschnitte(); initUnitOverview();
 setInterval(() => { if (!document.hidden && !runtime.viewer) renderUnitMarkers(); }, 30000);   // überfällige Ablösungen erscheinen von selbst
 initMeldungen(); initStaende(); $('#roleAdd').onclick = () => { state.roles.push({ id: 'R' + uid(), label: 'neue Rolle' }); renderRoles(); renderJournal(); fillMsgRefs(); persist(); };
 renderAreas(); renderAreaList(); renderMarkers(); renderSymbols(); renderSections(); renderJournal(); renderAll(); renderCas(); renderProblems(); renderKeulen(); renderChem(); renderBhp(); renderEinsatz(); renderUnits(); renderAbschnitte(); renderMessages(); fillMsgRefs(); renderRoles(); renderStands(); $('#mExtraOn').checked = !!state.msgExtra; $('#mExtra').hidden = !state.msgExtra;
-initPlaceSearch(); initialView();
+placeMapActs(); initPlaceSearch(); initialView(); if (isPhone()) { setPanel(false, false); setPlaceMin(true, true); }
 tickClock(); setInterval(tickClock, 1000);
 $('#panelToggle').innerHTML = panelGlyph(!$('#app').classList.contains('collapsed'));
 liveInit();
-window.__lage = { SYNC, TileCache, addUnit, assignUnit, unitMovedOnMap, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
+window.__lage = { renderUnitMarkers, SYNC, TileCache, addUnit, assignUnit, unitMovedOnMap, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
 })();
 </script>
 </body>

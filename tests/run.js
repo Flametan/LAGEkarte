@@ -19,8 +19,8 @@ async function seite(b, q, w, h) {
   });
   await t('Burger-Menü öffnet und schließt, Lagevortrag und Dunkelmodus liegen in der Kopfzeile', async () => {
     const p = await seite(b, '?rolle=S2'); assert.ok(await p.locator('#btnVortrag').isVisible()); assert.ok(await p.locator('#btnTheme').isVisible());
-    await p.click('#btnMore'); await p.waitForTimeout(500); assert.ok(await p.locator('#btnUnits').isVisible()); assert.ok(await p.locator('#btnSync').isVisible()); assert.notStrictEqual(await p.$eval('#btnSync', e => getComputedStyle(e).color), 'rgb(255, 255, 255)', 'Menüschrift ist nicht weiß auf hellem Grund');
-    await p.keyboard.press('Escape'); await p.waitForTimeout(500); assert.ok(!(await p.locator('#btnUnits').isVisible())); await p.close();
+    await p.click('#btnMore'); await p.waitForTimeout(500); assert.ok(await p.locator('#btnSetup').isVisible()); assert.ok(!(await p.locator('#btnUnits').isVisible()) && !(await p.locator('#btnFue').isVisible()) && !(await p.locator('#btnAddPoi').isVisible()), 'Einheiten, Führungsstruktur, + Objekt nicht im Menü'); assert.ok(await p.locator('#btnSync').isVisible()); assert.notStrictEqual(await p.$eval('#btnSync', e => getComputedStyle(e).color), 'rgb(255, 255, 255)', 'Menüschrift ist nicht weiß auf hellem Grund');
+    await p.keyboard.press('Escape'); await p.waitForTimeout(500); assert.ok(!(await p.locator('#btnSetup').isVisible())); await p.close();
   });
   await t('Lagevortrag starten und beenden', async () => {
     const p = await seite(b, '?rolle=S2'); await p.click('#btnVortrag'); await p.waitForTimeout(700);
@@ -48,7 +48,7 @@ async function seite(b, q, w, h) {
   await t('Rechtsklick-Menü: alles vorhanden, keine Funktionswahl', async () => {
     const p = await seite(b, '?rolle=S5', 1300, 800); await p.mouse.click(700, 400, { button: 'right' }); await p.waitForTimeout(500);
     const l = await p.evaluate(() => [...document.querySelectorAll('.ctx-item')].map(x => x.textContent.trim()));
-    assert.ok(['Gefahrstoff', 'Einheit hier', 'Problem', 'Behandlungsplatz'].every(k => l.some(x => x.includes(k))), l.join('|')); assert.strictEqual(await p.locator('.rolelay').count(), 0); await p.close();
+    assert.ok(['Gefahrstoff', 'Behandlungsplatz', 'Personenzahl', 'Koordinaten'].every(k => l.some(x => x.includes(k))), l.join('|')); assert.ok(!['Einheit hier', 'Problem hier', 'Hier zentrieren', 'KRITIS-Objekt hier', 'Taktisches Zeichen hier'].some(k => l.some(x => x.includes(k))), 'entfernte Einträge sind weg: ' + l.join('|')); assert.strictEqual(await p.locator('.rolelay').count(), 0); await p.close();
   });
   await t('Tastenkürzel: G, T, Fragezeichen', async () => {
     const p = await seite(b, '?rolle=S2'); await p.keyboard.press('g'); await p.waitForTimeout(200);
@@ -60,11 +60,6 @@ async function seite(b, q, w, h) {
     const p = await seite(b, '?rolle=S2&tour=1'); await p.waitForTimeout(2200); assert.strictEqual(await p.locator('.tour-card').count(), 1);
     for (let i = 0; i < 10; i++) { await p.keyboard.press('ArrowRight'); await p.waitForTimeout(100); }
     assert.strictEqual(await p.locator('.tour-card').count(), 0); assert.strictEqual(await p.evaluate(() => localStorage.getItem('kritis-tour')), '1'); await p.close();
-  });
-  await t('Fristen: überfälliges Problem erscheint im Kopf', async () => {
-    const p = await seite(b, '?rolle=S2');
-    await p.evaluate(() => { window.__lage.state.problems.unshift({ id: 'x1', title: 'Test', text: '', prio: 1, status: 'offen', owner: '', time: new Date().toISOString(), due: new Date(Date.now() - 60000).toISOString() }); });
-    await p.waitForTimeout(1500); assert.ok(/überfällig/.test(await p.textContent('#fristChip'))); await p.close();
   });
   await t('Rückgängig und Wiederholen', async () => {
     const p = await seite(b, '?rolle=S2'); const n0 = await p.evaluate(() => window.__lage.state.journal.length);
@@ -159,7 +154,7 @@ async function seite(b, q, w, h) {
       s.sections = [{ id: 'ea1', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [] }, { id: 'ea2', kind: 'poly', typ: 'ea', name: 'EA Süd', color: '#16a34a', pts: [] }];
       s.units = [{ id: 'a', name: 'LF 1', call: '', sym: null, f: 1, u: 3, h: 9, status: 'einsatz', sectionId: 'ea1', task: '', note: '', lat: null, lng: null, time: now }]; });
     const nav = await p.$$eval('#tabs button', x => x.filter(e => e.offsetParent).map(e => e.textContent.trim()));
-    assert.deepStrictEqual(nav.slice(0, 5), ['Lagekarte', 'Einsatzraum', 'Kräfte', 'Führungsstruktur', 'Einsatztagebuch']); assert.ok(nav.includes('KRITIS') && !nav.includes('Meldungen') && !nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
+    assert.deepStrictEqual(nav.slice(0, 5), ['Lagekarte', 'Einsatzraum', 'Kräfte', 'Führungsstruktur', 'Einsatztagebuch']); assert.ok(nav.includes('KRITIS') && !nav.includes('Meldungen') && !nav.includes('Problem erfassen') && !nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
     await p.keyboard.press('f'); await p.waitForTimeout(500);
     await p.click('.fsec[data-sid="ea1"]'.replace('.fsec[data-sid="ea1"]', '.fea:first-child .flab')); await p.fill('.dlg input', 'Kanal 12'); await p.keyboard.press('Enter'); await p.waitForTimeout(500);
     assert.strictEqual(await p.evaluate(() => window.__lage.state.sections[0].radio), 'Kanal 12');
@@ -246,6 +241,63 @@ async function seite(b, q, w, h) {
       assert.ok((await A.textContent('#syncChip')).includes('online'));
       await B.evaluate(() => { window.__lage.runtime.drawHandler = null; });
     } finally { srv.kill(); }
+  });
+  await t('Handy: Navigation unten, Seitenleiste als Blatt, Ansichten über der Karte, kein seitliches Scrollen', async () => {
+    const { devices } = require('playwright'); const c = await b.newContext(Object.assign({}, devices['iPhone 13'])); const p = await c.newPage();
+    await p.goto('file://' + require('path').resolve(__dirname, '../src/public/kritis-lage-einzeldatei.html')); await p.waitForTimeout(1500);
+    const over = () => p.evaluate(() => document.documentElement.scrollWidth - innerWidth); assert.ok((await over()) <= 1, 'kein seitliches Scrollen');
+    const bar = await p.locator('#tabs').boundingBox(); const H = await p.evaluate(() => innerHeight); assert.ok(bar && bar.y + bar.height >= H - 2 && bar.height >= 50, 'Navigation unten: ' + JSON.stringify(bar) + ' H=' + H);
+    assert.ok(await p.evaluate(() => document.querySelector('#app').classList.contains('collapsed')), 'Start mit eingeklapptem Blatt, Karte sichtbar');
+    assert.ok(!(await p.locator('#tabs [data-tab="einsatz"]').isVisible()), 'Übersicht ist nicht in der Leiste');
+    await p.tap('#tabs [data-tab="gebiet"]'); await p.waitForTimeout(500); assert.ok(await p.locator('#tab-gebiet').isVisible(), 'Blatt öffnet sich');
+    await p.tap('#tabs [data-act="wand"]'); await p.waitForTimeout(600); assert.ok(!(await p.locator('#unitOv').isHidden()) && !(await p.locator('#tab-gebiet').isVisible()), 'Kräfte über der Karte, Blatt eingeklappt');
+    await p.tap('#tabs [data-act="fue"]'); await p.waitForTimeout(600); assert.ok(await p.locator('#unitOv').isHidden() && !(await p.locator('#fueOv').isHidden()), 'auf dem Handy immer nur eine Ansicht');
+    await p.tap('#tabs [data-act="map"]'); await p.waitForTimeout(500); assert.ok(await p.locator('#fueOv').isHidden(), 'Lagekarte schließt die Ansicht'); assert.ok((await over()) <= 1);
+    await p.tap('#btnMore'); await p.waitForTimeout(500); const m = await p.locator('#hdrMenu').boundingBox(); assert.ok(m.x >= 0 && m.x + m.width <= 390 + 1, 'Menü passt auf den Bildschirm'); await c.close();
+  });
+  await t('Schadenslage: nur Schadensereignisse und Gefahren, Betroffenentabelle sagt Schwarz', async () => {
+    const p = await seite(b, '', 1700, 1300); await p.evaluate(() => document.querySelector('#tabs [data-tab=lage]').click()); await p.waitForTimeout(300);
+    assert.ok(!(await p.locator('#symCat').isVisible()), 'keine Kategorienwahl'); const titles = await p.$$eval('#symGrid button', x => x.map(b => b.title)); assert.ok(titles.length > 5, 'Zeichen vorhanden');
+    assert.ok(!titles.some(x => /HLF|LF 20|RTW|GW-/.test(x)), 'keine Einsatzkräfte in der Schadenslage: ' + titles.slice(0, 8).join('|'));
+    await p.keyboard.press('u'); await p.waitForTimeout(500); assert.ok(await p.locator('.vt th', { hasText: 'Schwarz' }).count() > 0 && !(await p.locator('.vt th', { hasText: /^Tot$/ }).count()), 'Schwarz statt Tot'); await p.close();
+  });
+  await t('Alarmiert, auf Marsch: Einheit anlegen wie beim EA, Ziehen zwischen Block und Abschnitt', async () => {
+    const p = await seite(b, '', 1700, 1300); await p.evaluate(() => { const s = window.__lage.state; s.sections = [{ id: 'ea1', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [] }]; s.units = []; });
+    await p.keyboard.press('u'); await p.waitForTimeout(500); await p.evaluate(() => document.querySelector('#ovStat').dispatchEvent(new Event('change'))); await p.waitForTimeout(300);
+    await p.locator('.walblock button', { hasText: '+ Einheit' }).click(); await p.waitForTimeout(300); await p.locator('.dlg input').first().fill('HLF Alarm'); await p.locator('.dlg button.primary').first().click(); await p.waitForTimeout(500);
+    const u = await p.evaluate(() => window.__lage.state.units[0]); assert.ok(u && u.status === 'anfahrt' && !u.sectionId, 'Einheit steht auf Anfahrt ohne Abschnitt');
+    assert.strictEqual(await p.locator('.walblock .wt').count(), 1, 'Kachel im Block Alarmiert'); assert.strictEqual(await p.locator('.wblock[data-drop="sec:"] .wt').count(), 0, 'nicht doppelt bei ohne Abschnitt');
+    const from = await p.locator('.walblock .wt').boundingBox(), to = await p.locator('.wblock[data-drop="sec:ea1"]').boundingBox();
+    await p.mouse.move(from.x + 30, from.y + 30); await p.mouse.down(); await p.mouse.move(from.x + 60, from.y + 10, { steps: 4 }); await p.mouse.move(to.x + 60, to.y + 40, { steps: 8 }); await p.mouse.up(); await p.waitForTimeout(600);
+    assert.strictEqual(await p.evaluate(() => window.__lage.state.units[0].sectionId), 'ea1', 'Ziehen in den Abschnitt'); await p.close();
+  });
+  await t('Kopfzeile: + EA, + Einsatzkräfte, + Objekt, Drucken; Kräfteübersicht teilt rot, weiß, blau auf', async () => {
+    const p = await seite(b, '', 1700, 1300); const labs = await p.$$eval('#app > header #mapActs .mb', x => x.map(e => e.textContent.trim())); assert.deepStrictEqual(labs, ['+ EA', '+ Einsatzkräfte', '+ Objekt']);
+    assert.strictEqual(await p.locator('#mapBar .mb').count(), 0, 'Kartenleiste ohne Kräfte, Stab und Drucken'); assert.ok(await p.$eval('#mapActs', e => e.parentElement.id === 'hdrSub'), 'Knöpfe in der unteren Zeile der Kopfzeile'); assert.ok(await p.locator('#btnPrint').count() === 1, 'Drucken im Menü');
+    await p.evaluate(() => { const s = window.__lage.state, now = new Date().toISOString(); s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: [] }];
+      const U = (id, n, st) => ({ id, name: n, call: '', sym: null, f: 1, u: 2, h: 5, status: st, sectionId: 'A', task: '', note: '', lat: null, lng: null, time: now }); s.units = [U('1', 'HLF 20', 'einsatz'), U('2', 'RTW 3', 'einsatz'), U('3', 'GKW 1', 'anfahrt')]; });
+    await p.keyboard.press('u'); await p.waitForTimeout(600); const rows = await p.$$eval('.kt-t tr.grp', x => x.map(r => r.innerText.replace(/\s+/g, ' ').trim()));
+    assert.strictEqual(rows.length, 3, rows.join('|')); assert.ok(rows[0].includes('rot') && rows[0].endsWith('0 8 0') && rows[1].includes('weiß') && rows[1].endsWith('0 8 0') && rows[2].includes('blau') && rows[2].endsWith('8 0 0'), rows.join('|'));
+    assert.strictEqual(await p.$eval('.kt-note', e => e.placeholder), '', 'Anmerkung bleibt leer'); const chips = await p.$$eval('.kt-t tbody tr:first-child .kgrp', x => x.map(e => e.innerText.replace(/\\s+/g, ' ').trim())); assert.ok(chips.length >= 2, 'rot und weiß beim Abschnitt Nord: ' + chips.join('|')); assert.ok(!(await p.textContent('body')).includes('weiße Einheiten'), 'kein Hinweis auf weiße Einheiten'); await p.close();
+  });
+  await t('Führungsstruktur: Bereitstellungsraum heißt BR, Sammellinie ohne Lücken', async () => {
+    const p = await seite(b, '', 1700, 1300); await p.evaluate(() => { const s = window.__lage.state; s.sections = [{ id: 'a', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: [] }, { id: 'b', kind: 'poly', typ: 'ea', name: 'Süd', color: '#16a34a', pts: [] }, { id: 'c', kind: 'poly', typ: 'br', name: 'Kaserne', color: '#d97706', pts: [] }]; s.units = []; });
+    await p.keyboard.press('f'); await p.waitForTimeout(600);
+    assert.ok((await p.textContent('.fsec[data-sid="c"] .ftag')).includes('BR') && !(await p.textContent('.fsec[data-sid="c"] .ftag')).includes('EA'), 'Kaserne ist BR');
+    assert.ok(!(await p.locator('.fsec[data-sid="c"] button', { hasText: '+ UEA' }).count()), 'BR hat kein + UEA'); assert.ok((await p.textContent('.fsec[data-sid="a"] .ftag')).includes('EA'));
+    const g = await p.$$eval('.feas > .fea', x => x.map(e => { const r = e.getBoundingClientRect(), cs = getComputedStyle(e, '::before'); return { l: r.left, r: r.right, bl: cs.left, br: cs.right, w: e.offsetWidth }; }));
+    for (let i = 1; i < g.length; i++) { const gap = g[i].l - g[i - 1].r; assert.ok(parseFloat(g[i].bl) <= -gap / 2 + 0.5 || g[i].bl.endsWith('%'), 'Linie links reicht bis zur Mitte der Lücke: ' + g[i].bl + ' bei Lücke ' + gap); if (i < g.length - 1) assert.ok(parseFloat(g[i].br) <= -gap / 2 + 0.5, 'Linie rechts reicht bis zur Mitte der Lücke: ' + g[i].br); }
+    await p.close();
+  });
+  await t('Viele Einheiten übereinander: Strich zum Kartenrand und Liste, nur solange der Abschnitt im Bild ist', async () => {
+    const p = await seite(b, '', 1500, 800); await p.evaluate(() => { const L = window.__lage, s = L.state, now = new Date().toISOString();
+      s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [[51.50, 7.40], [51.50, 7.43], [51.53, 7.43], [51.53, 7.40]] }];
+      const U = (id, n, lat, lng) => ({ id, name: n, call: '', sym: null, f: 1, u: 2, h: 5, status: 'einsatz', sectionId: 'A', task: '', note: '', lat, lng, time: now });
+      s.units = [U('1', 'HLF 20', 51.515, 7.415), U('2', 'LF 10', 51.5153, 7.4153), U('3', 'DLK 23', 51.5147, 7.4147), U('4', 'ELW 1', 51.5156, 7.4156)]; L.renderUnitMarkers && L.renderUnitMarkers(); });
+    const at = async (c, z) => { await p.evaluate(([c, z]) => window.__lage.map.setView(c, z, { animate: false }), [c, z]); await p.waitForTimeout(700); return p.evaluate(() => ({ panel: !!document.querySelector('#clusterPanel') && !document.querySelector('#clusterPanel').hidden, cards: document.querySelectorAll('.cl-card').length, units: [...document.querySelectorAll('.cl-u .cl-n')].map(x => x.textContent).sort(), marker: document.querySelectorAll('.leaflet-marker-icon').length, line: !!document.querySelector('#clusterLines path') })); };
+    const far = await at([51.515, 7.415], 12); assert.ok(far.panel && far.cards === 1 && far.units.join() === 'DLK 23,ELW 1,HLF 20,LF 10' && far.line && far.marker === 0, 'weit weg: Liste mit Strich ' + JSON.stringify(far));
+    const near = await at([51.515, 7.415], 18); assert.ok(!near.panel && near.marker === 4, 'nah: einzelne Marker ' + JSON.stringify(near));
+    const away = await at([48.0, 11.0], 12); assert.ok(!away.panel, 'Abschnitt nicht im Bild: keine Liste ' + JSON.stringify(away)); await p.close();
   });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
