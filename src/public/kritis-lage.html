@@ -977,6 +977,45 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
 #app > header #hdrMenu button:hover:not(:disabled) { background: rgba(30, 64, 175, .12) !important; }
 #app > header #hdrMenu button:disabled { opacity: .45; }
 .advsrv { margin: 10px 0 0; font-size: 12.5px; color: var(--muted); } .advsrv summary { cursor: pointer; } .advsrv input { margin-top: 6px; }
+
+/* Handy (bis 700 px): Navigation unten, Seitenleiste als Blatt darüber, Karte bleibt Hauptsache. Der Rechner bleibt unverändert. */
+@media (max-width: 700px) {
+  #app { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: auto minmax(0, 1fr) !important; height: 100dvh; padding-bottom: 58px; box-sizing: border-box; }
+  #app.collapsed { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: auto minmax(0, 1fr) !important; }
+  #app > header { flex-wrap: nowrap !important; min-height: 50px !important; padding: 4px 8px 4px 0 !important; gap: 6px !important; overflow: visible !important; }
+  #app > header h1 { margin: 0 !important; } #app > header h1 .logo { margin: 0 6px 0 8px !important; } #app > header h1 .logo svg { width: 36px; height: 36px; }
+  #app > header #hdrTitle { max-width: 34vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+  #app > header #qat, #app > header #btnVortrag, #app > header #btnShare, #app > header #hdrSub, #app > header #tacTime, #app > header #mtLine, #app > header #hdrArea { display: none !important; }
+  #app > header #clock { display: inline !important; font-size: 15px; letter-spacing: 0; margin-left: auto; } #app > header .sp { display: none; }
+  #app > header #syncChip { font-size: 11px; padding: 1px 6px; } #app > header #btnMore, #app > header #btnTheme { min-width: 40px; min-height: 40px; }
+  #panelToggle { display: none !important; }
+  #panel { position: fixed !important; left: 0; right: 0; bottom: 0; z-index: 1600; display: flex !important; flex-direction: column-reverse; max-height: 64vh; visibility: visible !important; border: 0 !important; border-top: 1px solid var(--line) !important; box-shadow: 0 -4px 18px rgba(0, 0, 0, .28); background: var(--panel); overflow: hidden !important; }
+  #panel .tabpane { overflow: auto; max-height: calc(64vh - 58px); padding: 12px 14px 18px; -webkit-overflow-scrolling: touch; }
+  #app.collapsed .tabpane { display: none !important; }
+  #app #tabs { flex: none; flex-direction: row !important; min-height: 58px; height: 58px; padding: 0 !important; overflow-x: auto !important; overflow-y: hidden !important; background: var(--nav); border: 0 !important; scrollbar-width: none; }
+  #app #tabs::-webkit-scrollbar { display: none; }
+  #app #tabs button { flex: 0 0 auto !important; width: auto !important; min-width: 68px; height: 58px; display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 4px 8px !important; font-size: 11px !important; font-weight: 600 !important; color: #d6dee6 !important; background: none; border: 0 !important; border-radius: 0 !important; white-space: nowrap; }
+  #app #tabs button span { line-height: 1.1; }
+  #app #tabs button.navhid { display: none !important; }
+  #app #tabs button::before { content: ''; flex: none; width: 22px; height: 22px; background: currentColor; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-position: center; mask-position: center; }
+  #app #tabs button[aria-selected="true"], #app #tabs button.on { background: var(--red2) !important; color: #fff !important; }
+  #app #tabs button.dim[aria-selected="true"] { background: none !important; color: #d6dee6 !important; }
+  .nav-grp, .nav-saved { display: none !important; }
+  /* Kartenleiste: eine scrollbare Zeile, Suche als Symbol */
+  #mapBar { height: 50px; flex-wrap: nowrap; overflow-x: auto; padding: 0 8px 0 52px; gap: 6px; scrollbar-width: none; } #mapBar .mb-t, #mapBar .sp { display: none; } #mapBar .mb { flex: none; white-space: nowrap; min-height: 38px; }
+  #placeSearch { left: 8px !important; top: 6px !important; width: auto !important; }
+  #placeSearch:not(.min) { right: 8px !important; top: 56px !important; z-index: 1300 !important; }
+  .leaflet-top { top: 54px; }
+  #secPop { right: 8px; left: 8px; width: auto; top: 54px; } #mtPop { width: min(320px, 94vw); }
+  /* Ansichten über der Karte */
+  #unitOv, #fueOv { background: var(--bg, #f4f6fa) !important; padding: 10px 10px 70px !important; } #unitOv .ovhead { gap: 6px; } .ovtools { flex-wrap: wrap; } #ovCols { grid-template-columns: 1fr; }
+  #fueOv .fuehd { top: -10px; } #fueBody .feas { padding-bottom: 20px; }
+  /* Fenster und Eingaben */
+  .dlg > div, .rolecard { max-width: 96vw; max-height: 92dvh; overflow: auto; } input, select, textarea { font-size: 16px; } .btn { min-height: 42px; }
+  .bmcard, .synccard, .setupcard { width: 94vw; }
+  #chemBand { bottom: 62px; }
+  #hdrMenu { right: 6px; max-width: 92vw; }
+}
 </style>
 </head>
 <body>
@@ -5281,7 +5320,7 @@ function initOvDrag() {
   window.addEventListener('pointercancel', () => ovDragEnd(false));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && ovDrag && ovDrag.on) { e.stopPropagation(); ovDragEnd(false); } }, true);
 }
-function openUnitOverview() { if (runtime.vortrag) closeFue(); $('#unitOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderUnitOverview(); $('#ovClose').focus(); }
+function openUnitOverview() { if (runtime.vortrag || isPhone()) closeFue(); if (isPhone()) setPanel(false, false); $('#unitOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderUnitOverview(); $('#ovClose').focus(); }
 function closeUnitOverview() { $('#unitOv').hidden = true; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); }
 function initUnitOverview() {
   $('#btnUnits').onclick = () => ($('#unitOv').hidden ? openUnitOverview() : closeUnitOverview());
@@ -5445,7 +5484,7 @@ function renderFunk() {
     el('div', { class: 'hint', text: 'Kanäle, Rufnamen und Rufnummern trägt der S6 ein. Es werden keine Werte vorgegeben.' }));
   if (vw) lockViewer(box);
 }
-function openFue() { if (runtime.vortrag) closeUnitOverview(); $('#fueOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderFue(); $('#fueClose').focus(); }
+function openFue() { if (runtime.vortrag || isPhone()) closeUnitOverview(); if (isPhone()) setPanel(false, false); $('#fueOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderFue(); $('#fueClose').focus(); }
 function closeFue() { $('#fueOv').hidden = true; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); }
 function initFue() {
   $('#btnFue').onclick = () => ($('#fueOv').hidden ? openFue() : closeFue()); $('#fueClose').onclick = closeFue;
@@ -5914,7 +5953,7 @@ function syncNav() {
 function initNavActs() {
   document.querySelectorAll('#tabs [data-act]').forEach(b => b.addEventListener('click', () => {
     const a = b.dataset.act;
-    if (a === 'map') { if (!$('#unitOv').hidden || !$('#fueOv').hidden) { closeUnitOverview(); closeFue(); } else setPanel($('#app').classList.contains('collapsed')); }
+    if (a === 'map') { if (!$('#unitOv').hidden || !$('#fueOv').hidden) { closeUnitOverview(); closeFue(); } else if (isPhone()) setPanel(false, false); else setPanel($('#app').classList.contains('collapsed')); }
     else if (a === 'wand') { if (!$('#unitOv').hidden) closeUnitOverview(); else { $('#ovGroup').value = 'wand'; openUnitOverview(); } }
     else if (a === 'fue') { if (!$('#fueOv').hidden) closeFue(); else openFue(); }
     syncNav();
@@ -6251,6 +6290,7 @@ document.addEventListener('keydown', e => {
 });
 /* Seitenleiste einklappen */
 const panelGlyph = open => window.matchMedia('(max-width: 860px)').matches ? (open ? '&#9662;' : '&#9652;') : (open ? '&lsaquo;' : '&rsaquo;');
+const isPhone = () => window.matchMedia('(max-width: 700px)').matches;
 function setPanel(open, remember) {
   const app = $('#app'); app.classList.toggle('collapsed', !open); setTimeout(() => { if (typeof syncNav === 'function') syncNav(); }, 0);
   const t = $('#panelToggle'); t.setAttribute('aria-expanded', String(open));
@@ -6323,7 +6363,7 @@ initKeule(); initEinsatz(); initKraefte(); initAbschnitte(); initUnitOverview();
 setInterval(() => { if (!document.hidden && !runtime.viewer) renderUnitMarkers(); }, 30000);   // überfällige Ablösungen erscheinen von selbst
 initMeldungen(); initStaende(); $('#roleAdd').onclick = () => { state.roles.push({ id: 'R' + uid(), label: 'neue Rolle' }); renderRoles(); renderJournal(); fillMsgRefs(); persist(); };
 renderAreas(); renderAreaList(); renderMarkers(); renderSymbols(); renderSections(); renderJournal(); renderAll(); renderCas(); renderProblems(); renderKeulen(); renderChem(); renderBhp(); renderEinsatz(); renderUnits(); renderAbschnitte(); renderMessages(); fillMsgRefs(); renderRoles(); renderStands(); $('#mExtraOn').checked = !!state.msgExtra; $('#mExtra').hidden = !state.msgExtra;
-initPlaceSearch(); initialView();
+initPlaceSearch(); initialView(); if (isPhone()) { setPanel(false, false); setPlaceMin(true, true); }
 tickClock(); setInterval(tickClock, 1000);
 $('#panelToggle').innerHTML = panelGlyph(!$('#app').classList.contains('collapsed'));
 liveInit();

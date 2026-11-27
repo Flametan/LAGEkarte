@@ -247,6 +247,19 @@ async function seite(b, q, w, h) {
       await B.evaluate(() => { window.__lage.runtime.drawHandler = null; });
     } finally { srv.kill(); }
   });
+  await t('Handy: Navigation unten, Seitenleiste als Blatt, Ansichten über der Karte, kein seitliches Scrollen', async () => {
+    const { devices } = require('playwright'); const c = await b.newContext(Object.assign({}, devices['iPhone 13'])); const p = await c.newPage();
+    await p.goto('file://' + require('path').resolve(__dirname, '../src/public/kritis-lage-einzeldatei.html')); await p.waitForTimeout(1500);
+    const over = () => p.evaluate(() => document.documentElement.scrollWidth - innerWidth); assert.ok((await over()) <= 1, 'kein seitliches Scrollen');
+    const bar = await p.locator('#tabs').boundingBox(); const H = await p.evaluate(() => innerHeight); assert.ok(bar && bar.y + bar.height >= H - 2 && bar.height >= 50, 'Navigation unten: ' + JSON.stringify(bar) + ' H=' + H);
+    assert.ok(await p.evaluate(() => document.querySelector('#app').classList.contains('collapsed')), 'Start mit eingeklapptem Blatt, Karte sichtbar');
+    assert.ok(!(await p.locator('#tabs [data-tab="einsatz"]').isVisible()), 'Übersicht ist nicht in der Leiste');
+    await p.tap('#tabs [data-tab="gebiet"]'); await p.waitForTimeout(500); assert.ok(await p.locator('#tab-gebiet').isVisible(), 'Blatt öffnet sich');
+    await p.tap('#tabs [data-act="wand"]'); await p.waitForTimeout(600); assert.ok(!(await p.locator('#unitOv').isHidden()) && !(await p.locator('#tab-gebiet').isVisible()), 'Kräfte über der Karte, Blatt eingeklappt');
+    await p.tap('#tabs [data-act="fue"]'); await p.waitForTimeout(600); assert.ok(await p.locator('#unitOv').isHidden() && !(await p.locator('#fueOv').isHidden()), 'auf dem Handy immer nur eine Ansicht');
+    await p.tap('#tabs [data-act="map"]'); await p.waitForTimeout(500); assert.ok(await p.locator('#fueOv').isHidden(), 'Lagekarte schließt die Ansicht'); assert.ok((await over()) <= 1);
+    await p.tap('#btnMore'); await p.waitForTimeout(500); const m = await p.locator('#hdrMenu').boundingBox(); assert.ok(m.x >= 0 && m.x + m.width <= 390 + 1, 'Menü passt auf den Bildschirm'); await c.close();
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));
