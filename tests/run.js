@@ -61,11 +61,6 @@ async function seite(b, q, w, h) {
     for (let i = 0; i < 10; i++) { await p.keyboard.press('ArrowRight'); await p.waitForTimeout(100); }
     assert.strictEqual(await p.locator('.tour-card').count(), 0); assert.strictEqual(await p.evaluate(() => localStorage.getItem('kritis-tour')), '1'); await p.close();
   });
-  await t('Fristen: überfälliges Problem erscheint im Kopf', async () => {
-    const p = await seite(b, '?rolle=S2');
-    await p.evaluate(() => { window.__lage.state.problems.unshift({ id: 'x1', title: 'Test', text: '', prio: 1, status: 'offen', owner: '', time: new Date().toISOString(), due: new Date(Date.now() - 60000).toISOString() }); });
-    await p.waitForTimeout(1500); assert.ok(/überfällig/.test(await p.textContent('#fristChip'))); await p.close();
-  });
   await t('Rückgängig und Wiederholen', async () => {
     const p = await seite(b, '?rolle=S2'); const n0 = await p.evaluate(() => window.__lage.state.journal.length);
     await p.evaluate(() => { const L = window.__lage; L.state.problems.push({ id: 'u1', title: 'U', text: '', prio: 2, status: 'offen', owner: '', time: new Date().toISOString() }); L.commit('Test'); });
@@ -159,7 +154,7 @@ async function seite(b, q, w, h) {
       s.sections = [{ id: 'ea1', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [] }, { id: 'ea2', kind: 'poly', typ: 'ea', name: 'EA Süd', color: '#16a34a', pts: [] }];
       s.units = [{ id: 'a', name: 'LF 1', call: '', sym: null, f: 1, u: 3, h: 9, status: 'einsatz', sectionId: 'ea1', task: '', note: '', lat: null, lng: null, time: now }]; });
     const nav = await p.$$eval('#tabs button', x => x.filter(e => e.offsetParent).map(e => e.textContent.trim()));
-    assert.deepStrictEqual(nav.slice(0, 5), ['Lagekarte', 'Einsatzraum', 'Kräfte', 'Führungsstruktur', 'Einsatztagebuch']); assert.ok(nav.includes('KRITIS') && !nav.includes('Meldungen') && nav.includes('Problem erfassen') && !nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
+    assert.deepStrictEqual(nav.slice(0, 5), ['Lagekarte', 'Einsatzraum', 'Kräfte', 'Führungsstruktur', 'Einsatztagebuch']); assert.ok(nav.includes('KRITIS') && !nav.includes('Meldungen') && !nav.includes('Problem erfassen') && !nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
     await p.keyboard.press('f'); await p.waitForTimeout(500);
     await p.click('.fsec[data-sid="ea1"]'.replace('.fsec[data-sid="ea1"]', '.fea:first-child .flab')); await p.fill('.dlg input', 'Kanal 12'); await p.keyboard.press('Enter'); await p.waitForTimeout(500);
     assert.strictEqual(await p.evaluate(() => window.__lage.state.sections[0].radio), 'Kanal 12');
@@ -278,12 +273,12 @@ async function seite(b, q, w, h) {
   });
   await t('Kopfzeile: + EA, + Einsatzkräfte, + Objekt, Drucken; Kräfteübersicht teilt rot, weiß, blau auf', async () => {
     const p = await seite(b, '', 1700, 1300); const labs = await p.$$eval('#app > header #mapActs .mb', x => x.map(e => e.textContent.trim())); assert.deepStrictEqual(labs, ['+ EA', '+ Einsatzkräfte', '+ Objekt']);
-    assert.deepStrictEqual(await p.$$eval('#mapBar .mb', x => x.map(e => e.textContent.trim())), ['Drucken'], 'Kartenleiste ohne Kräfte und Stab');
+    assert.strictEqual(await p.locator('#mapBar .mb').count(), 0, 'Kartenleiste ohne Kräfte, Stab und Drucken'); assert.ok(await p.$eval('#mapActs', e => e.parentElement.id === 'hdrSub'), 'Knöpfe in der unteren Zeile der Kopfzeile'); assert.ok(await p.locator('#btnPrint').count() === 1, 'Drucken im Menü');
     await p.evaluate(() => { const s = window.__lage.state, now = new Date().toISOString(); s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: [] }];
       const U = (id, n, st) => ({ id, name: n, call: '', sym: null, f: 1, u: 2, h: 5, status: st, sectionId: 'A', task: '', note: '', lat: null, lng: null, time: now }); s.units = [U('1', 'HLF 20', 'einsatz'), U('2', 'RTW 3', 'einsatz'), U('3', 'GKW 1', 'anfahrt')]; });
     await p.keyboard.press('u'); await p.waitForTimeout(600); const rows = await p.$$eval('.kt-t tr.grp', x => x.map(r => r.innerText.replace(/\s+/g, ' ').trim()));
     assert.strictEqual(rows.length, 3, rows.join('|')); assert.ok(rows[0].includes('rot') && rows[0].endsWith('0 8 0') && rows[1].includes('weiß') && rows[1].endsWith('0 8 0') && rows[2].includes('blau') && rows[2].endsWith('8 0 0'), rows.join('|'));
-    assert.strictEqual(await p.$eval('.kt-note', e => e.placeholder), '', 'Anmerkung bleibt leer'); assert.ok(!(await p.textContent('body')).includes('weiße Einheiten'), 'kein Hinweis auf weiße Einheiten'); await p.close();
+    assert.strictEqual(await p.$eval('.kt-note', e => e.placeholder), '', 'Anmerkung bleibt leer'); const chips = await p.$$eval('.kt-t tbody tr:first-child .kgrp', x => x.map(e => e.innerText.replace(/\\s+/g, ' ').trim())); assert.ok(chips.length >= 2, 'rot und weiß beim Abschnitt Nord: ' + chips.join('|')); assert.ok(!(await p.textContent('body')).includes('weiße Einheiten'), 'kein Hinweis auf weiße Einheiten'); await p.close();
   });
   await t('Führungsstruktur: Bereitstellungsraum heißt BR, Sammellinie ohne Lücken', async () => {
     const p = await seite(b, '', 1700, 1300); await p.evaluate(() => { const s = window.__lage.state; s.sections = [{ id: 'a', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: [] }, { id: 'b', kind: 'poly', typ: 'ea', name: 'Süd', color: '#16a34a', pts: [] }, { id: 'c', kind: 'poly', typ: 'br', name: 'Kaserne', color: '#d97706', pts: [] }]; s.units = []; });

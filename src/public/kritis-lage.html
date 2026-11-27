@@ -1027,6 +1027,9 @@ body.viewer #mapActs, body.beamerwin #mapActs, body.vortrag #mapActs, body.print
 .kt-t tr.grp th, .kt-t tr.grp td { font-size: .86em; font-weight: 500; color: var(--muted); border-bottom: 1px dotted var(--line); padding-top: 3px; padding-bottom: 3px; } .gdot { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 7px; border: 1px solid rgba(0,0,0,.25); vertical-align: -1px; }
 #fueBody .fea::before { left: -15px; right: -15px; } #fueBody .fea:first-child::before { left: 50%; } #fueBody .fea:last-child::before { right: 50%; } #fueBody .fea:only-child::before { display: none; }
 #hdrMenu #btnUnits, #hdrMenu #btnFue, #hdrMenu #btnAddPoi { display: none !important; }   /* stehen in Navigation und Kartenleiste, die Tasten U und F nutzen sie weiter */
+#app > header #hdrSub #mapActs { margin-left: auto; margin-right: 6px; }
+.kgrp { display: flex; gap: 8px; margin-top: 3px; font-size: 11.5px; color: var(--muted); font-weight: 600; } .kgrp .gdot { margin-right: 3px; }
+.vt th.bk { width: 54px; padding: 3px 4px; font-size: 11.5px; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -1078,7 +1081,7 @@ body.viewer #mapActs, body.beamerwin #mapActs, body.vortrag #mapActs, body.print
       <button role="tab" data-tab="meldungen" class="navhid" aria-selected="false"><span>Meldungen</span></button>
       <div class="nav-grp">Weitere Bereiche</div>
       <button role="tab" data-tab="tagebuch" aria-selected="false"><span>Einsatztagebuch</span></button>
-      <button role="tab" data-tab="probleme" aria-selected="false"><span>Problem erfassen</span></button>
+      <button role="tab" data-tab="probleme" class="navhid" aria-selected="false"><span>Probleme</span></button>
       <button role="tab" data-tab="ebenen" aria-selected="false"><span>KRITIS</span></button>
       <button role="tab" data-tab="objekte" aria-selected="false"><span>Objekte</span></button>
       <button role="tab" data-tab="kraefte" class="navhid" aria-selected="false"><span>Einheiten (Liste)</span></button>
@@ -1410,7 +1413,7 @@ body.viewer #mapActs, body.beamerwin #mapActs, body.vortrag #mapActs, body.print
         <ul class="hint">
           <li>GHS-Piktogramme (Flamme, Flamme über Kreis, Gasflasche, Ätzwirkung, Totenkopf, Gesundheitsgefahr, Ausrufezeichen, Umwelt): UNECE, Dateien von Wikimedia Commons, gemeinfrei (PD-ineligible)</li>
           <li>Stoffdaten: GESTIS-Stoffdatenbank (DGUV, Benzol), Emergency Response Guidebook (PHMSA/Transport Canada), CAMEO Chemicals (NOAA), Datenbank GEFAHRGUT (BAM), ECHA, AEGL (US EPA) und ERPG (AIHA). Quellen mit Adresse im Reiter Gefahrstoff</li>
-          <li>Zeichen für Personen (Betroffene, Sichtungskategorien, Tote, Vermisste, Gerettete): eigene Zeichnung für diese Anwendung, MIT-Lizenz wie das Repository</li>
+          <li>Zeichen für Personen (Betroffene, Sichtungskategorien, Schwarz, Vermisste, Gerettete): eigene Zeichnung für diese Anwendung, MIT-Lizenz wie das Repository</li>
           <li>Zensus 2022, Gitterzellen (Bevölkerung, Alter): © Statistische Ämter des Bundes und der Länder, 2025, Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0). Für diese Anwendung als Auszug aufbereitet, Altersklassen zusammengefasst</li>
           <li>Leaflet 1.9.4: BSD-2-Clause, (c) 2010-2023 Vladimir Agafonkin, (c) 2010-2011 CloudMade</li>
           <li>Leaflet.draw 1.0.4: MIT, (c) 2012-2017 Jacob Toye, Jon West, Smartrak, Leaflet</li>
@@ -1524,7 +1527,7 @@ SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
     <div id="secPop" hidden role="dialog" aria-label="Einsatzabschnitt zeichnen"><b>Neuer Einsatzabschnitt (EA)</b>
       <div class="row"><input type="text" id="secName" placeholder="Bezeichnung, z. B. Abschnitt Nord"><input type="color" id="secColor" value="#e11d48" title="Farbe"></div>
       <div class="row"><button class="btn" id="btnSecPoly">Fläche zeichnen</button><button class="btn" id="btnSecLine">Linie zeichnen</button></div>
-      <div class="hint">Zeichnen, dann Doppelklick zum Beenden. Abschnitte ohne Karte legt man in der Führungsstruktur oder auf der Stabswand an.</div></div><div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span><button type="button" class="mb" data-mb="print" title="Karte drucken oder als PDF speichern">Drucken</button></div>
+      <div class="hint">Zeichnen, dann Doppelklick zum Beenden. Abschnitte ohne Karte legt man in der Führungsstruktur oder auf der Stabswand an.</div></div><div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span></div>
     <div id="map"></div>
     <form id="placeSearch" role="search" autocomplete="off"><button type="button" id="placeToggle" aria-label="Ortssuche ein- oder ausklappen" aria-expanded="true" title="Ortssuche ein- oder ausklappen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 21 21"/></svg></button><input type="search" id="placeQ" placeholder="Ort suchen und hinzoomen" aria-label="Ort suchen"><button type="submit" aria-label="Suchen">Suchen</button><div id="placeRes" role="listbox"></div></form>
     <div id="editBar" role="toolbar" aria-label="Eckpunkte bearbeiten"><span id="editTxt">Eckpunkte bearbeiten</span><button id="editOk">Übernehmen (Enter)</button><button id="editCancel">Verwerfen (Esc)</button></div>
@@ -2532,7 +2535,7 @@ const CAS = {
   sk1:       { tag: 'SK I', label: 'SK I (rot), akut lebensbedrohlich', short: 'SK I',   color: '#dc2626', sym: 'sk1' },
   sk2:       { tag: 'SK II', label: 'SK II (gelb), schwer verletzt',     short: 'SK II',  color: '#ca8a04', sym: 'sk2' },
   sk3:       { tag: 'SK III', label: 'SK III (grün), leicht verletzt',    short: 'SK III', color: '#16a34a', sym: 'sk3' },
-  tot:       { label: 'Tote',        short: 'T',     color: '#111827', sym: 'tot' },
+  tot:       { label: 'Schwarz',        short: 'T',     color: '#111827', sym: 'tot' },
   vermisst:  { label: 'Vermisste',   short: 'Vm',    color: '#7c3aed', sym: 'vermisst' },
   evakuiert: { label: 'Evakuierte',  short: 'E',     color: '#0369a1' },                 // kein Zeichen im Vorrat
   gerettet:  { label: 'Gerettete',   short: 'G',     color: '#0d9488', sym: 'gerettet' },
@@ -2987,7 +2990,6 @@ function problemItems(x) {
   return [
     { label: 'Titel ändern…', onclick: async () => { const v = await askText('Titel', x.title); if (v == null || !v.trim()) return; x.title = v.trim(); renderProblems(); save('Problem bearbeitet: ' + x.title); } },
     { label: 'Status setzen', sub: Object.entries(PSTAT).map(([k, v]) => ({ label: v, check: x.status === k, onclick: () => { x.status = k; addJournal('Problem „' + x.title + '“: ' + v, true); renderProblems(); renderCounts(); save('Problemstatus: ' + x.title + ' ' + v); } })) },
-    { label: 'In der Liste zeigen', onclick: () => { setPanel(true); openTab('probleme'); $('#pfStatus').value = ''; renderProblems(); const c = document.querySelector('[data-pid="' + x.id + '"]'); if (c) c.scrollIntoView({ block: 'center' }); } },
     { label: 'Duplizieren', onclick: () => { state.problems.unshift(Object.assign({}, x, { id: uid(), title: x.title + ' (Kopie)', lat: x.lat + 0.0004, lng: x.lng + 0.0004, time: nowIso() })); renderProblems(); renderCounts(); save('Problem dupliziert: ' + x.title); } },
     { label: 'Zoom', onclick: () => map.setView([x.lat, x.lng], Math.max(map.getZoom(), 16)) },
     { sep: true },
@@ -3656,7 +3658,6 @@ const fmtClock = ms => new Date(ms).toLocaleString('de-DE', { weekday: 'short', 
 /* Fristen: Probleme mit Frist, Nachforderungen mit Lieferzeit */
 function fristItems() {
   const out = [];
-  state.problems.forEach(p => { if (p.due && p.status !== 'erledigt') out.push({ key: 'p' + p.id, t: Date.parse(p.due), text: p.title || 'Problem', tab: 'probleme' }); });
   state.units.forEach(u => { const l = state.logi[u.id]; if (l && l.req && l.eta) out.push({ key: 'l' + u.id + l.eta, t: Date.parse(l.eta), text: 'Nachforderung ' + (u.name || 'Einheit') + ': ' + l.req, tab: 'kraefte' }); });
   (state.auftraege || []).forEach(a => { if (a.due && !a.done) out.push({ key: 'u' + a.id + a.due, t: Date.parse(a.due), text: 'Auftrag: ' + (a.title || '') + (a.by ? ' (' + a.by + ')' : ''), tab: 'wand' }); });
   return out.filter(x => isFinite(x.t)).sort((a, b) => a.t - b.t);
@@ -4770,7 +4771,7 @@ function renderVortrag() {
   if (!runtime.vortrag) return; const ex = state.exercise, t = casTotals().t, probs = state.problems.filter(p => p.status !== 'erledigt').length;
   $('#vtTop').replaceChildren(el('span', { class: 'nm', text: 'LAGEkarte' }), ex && ex.active ? el('span', { class: 'ex', text: 'ÜBUNG' }) : '', ex && ex.name ? el('span', { class: 'en', text: ex.name }) : '', el('span', { class: 't', text: fmtClock(nowMs()) }), el('span', { class: 'tz', text: fmtTac(nowMs()) }), el('span', { class: 'mt', text: vtMeetingText() }));
   const k = (c, n, l, id) => el('div', { class: 'vtk', style: '--c:' + c }, el('b', { text: n, id: id || null }), el('span', { text: l })), zone = vtZone(), meas = (state.measure || []);
-  $('#vtKpi').replaceChildren(k('#dc2626', String(t.sk1 || 0), 'SK I (rot)'), k('#ca8a04', String(t.sk2 || 0), 'SK II (gelb)'), k('#16a34a', String(t.sk3 || 0), 'SK III (grün)'), k('#111827', String(t.vermisst || 0), 'Vermisste, ' + (t.tot || 0) + ' Tote'), ...(bhpTotals().n ? [k('#b91c1c', String(bhpTotals().w.sk1), 'SK I im Behandlungsplatz wartend')] : []),
+  $('#vtKpi').replaceChildren(k('#dc2626', String(t.sk1 || 0), 'SK I (rot)'), k('#ca8a04', String(t.sk2 || 0), 'SK II (gelb)'), k('#16a34a', String(t.sk3 || 0), 'SK III (grün)'), k('#111827', String(t.vermisst || 0), 'Vermisste, ' + (t.tot || 0) + ' Schwarz'), ...(bhpTotals().n ? [k('#b91c1c', String(bhpTotals().w.sk1), 'SK I im Behandlungsplatz wartend')] : []),
     k('#0e7490', zone ? '…' : POP.total != null ? '≈ ' + popFmtN(POP.total) : '–', zone ? 'Einwohner im ' + zone.label : 'Einwohner im Abfragegebiet', 'vtPop'), k(probs ? '#b91c1c' : '#15803d', String(probs), 'Probleme offen'),
     meas.length ? k('#0e7490', Math.max(...meas.map(m => m.ppm)) + ' ppm', 'höchster Messwert') : '');
   if (zone && zone.ring) popFor([zone.ring]).then(r => { const e = $('#vtPop'); if (e) e.textContent = r.noData || r.missing.length ? '–' : '≈ ' + popFmtN(r.pop); });
@@ -5179,11 +5180,19 @@ function wandTable(secs) {
   const rows = secs.map(sx => ({ sx, id: sx.id, name: sx.name, sums: wandSums(sx.id) })).concat([{ sx: null, id: null, name: 'ohne Abschnitt', sums: wandSums(null) }]).filter(r => r.sx || r.sums.alle.n || r.sums.abg.n);
   const val = (r, k) => { const o = (state.kraefte.ovr[r.id == null ? '_' : r.id] || {})[k]; return o != null ? o : r.sums[k].m; };
   const tot = k => rows.reduce((a, r) => a + val(r, k), 0);
-  const tr = r => el('tr', {}, el('th', { scope: 'row', text: r.name }), ...['anf', 'vor', 'abg'].map(k => el('td', {}, kcell(r.id, k, val(r, k), r.sums[k].m), r.sums[k].n ? el('small', { text: r.sums[k].n + ' Einh.' }) : null)));
+  const tr = r => el('tr', {}, el('th', { scope: 'row', text: r.name }), ...['anf', 'vor', 'abg'].map(k => el('td', {}, kcell(r.id, k, val(r, k), r.sums[k].m), r.sums[k].n ? el('small', { text: r.sums[k].n + ' Einh.' }) : null, wandGroupChips(r.id, k))));
   return el('div', { class: 'kt' }, el('div', { class: 'kt-h' }, el('span', { class: 'lbl', text: 'Kräfteübersicht (S1)' }), ),
     el('table', { class: 'kt-t' }, el('thead', {}, el('tr', {}, el('th', { text: 'EA' }), el('th', { text: 'alarmiert, auf Anfahrt' }), el('th', { text: 'vor Ort' }), el('th', { text: 'abgelöst' }))),
       el('tbody', {}, ...rows.map(tr), ...wandGroupRows(), el('tr', { class: 'sig' }, el('th', { text: 'Σ' }), el('td', { text: String(tot('anf')) }), el('td', { text: String(tot('vor')) }), el('td', { text: String(tot('abg')) })))),
     el('textarea', { class: 'kt-note', rows: '1', disabled: ro('kraefte') ? 'disabled' : null, onchange: e => { state.kraefte.note = e.target.value; save('Kräfteübersicht: Anmerkung'); } }));
+}
+function wandGroupChips(secId, k) {   // rot, weiß, blau in diesem Abschnitt, unter der Zahl
+  const ids = secId == null ? null : new Set([secId, ...state.sections.filter(x => x.parentId === secId).map(x => x.id)]);
+  const st = { anf: u => u.status === ST_ANF, vor: u => u.status !== ST_ANF && u.status !== ST_ABG && u.status !== 'nicht', abg: u => u.status === ST_ABG }[k];
+  const us = state.units.filter(u => (ids ? ids.has(u.sectionId) : (!u.sectionId || !state.sections.some(x => x.id === u.sectionId))) && st(u));
+  const col = { rot: '#dc2626', weiss: '#cbd5e1', blau: '#2563eb' }, lab = { rot: 'Feuerwehr (rot)', weiss: 'Rettungsdienst (weiß)', blau: 'THW (blau)' };
+  const parts = ['rot', 'weiss', 'blau'].map(g => [g, us.filter(u => unitGroup(u) === g).reduce((a, u) => a + uTotal(u), 0)]).filter(p => p[1]);
+  return parts.length ? el('div', { class: 'kgrp' }, ...parts.map(([g, n]) => el('span', { title: lab[g] + ': ' + n }, el('i', { class: 'gdot', style: 'background:' + col[g] }), String(n)))) : null;
 }
 function wandGroupRows() {   // davon rot, weiß, blau: automatisch aus den Einsatzkräften
   const defs = [['rot', 'davon Feuerwehr (rot)', '#dc2626'], ['weiss', 'davon Rettungsdienst (weiß)', '#cbd5e1'], ['blau', 'davon THW (blau)', '#2563eb']];
@@ -5251,10 +5260,10 @@ function wandNotizen() {
   const sum = r => (r.sk1 || 0) + (r.sk2 || 0) + (r.sk3 || 0) + (r.tot || 0) + (r.vm || 0);
   const tr = (r, isLive) => el('tr', { class: isLive ? 'live' : '' }, el('td', { text: isLive ? 'jetzt' : fmtTac(Date.parse(r.iso)).slice(2) }), ...['sk1', 'sk2', 'sk3', 'tot', 'vm'].map(k => el('td', { text: String(r[k] || 0) })), el('td', { text: String(sum(r)) }),
     isLive || vw ? el('td') : el('td', {}, el('button', { class: 'btn small danger', 'aria-label': 'Zeile löschen', text: '×', onclick: () => { state.kraefte.rows = rows.filter(x => x !== r); renderUnitOverview(); save('Betroffenenzeile gelöscht'); } })));
-  const tbl = el('table', { class: 'vt' }, el('thead', {}, el('tr', {}, el('th', { text: 'Zeit' }), el('th', { class: 'r', text: 'SK I' }), el('th', { class: 'g', text: 'SK II' }), el('th', { class: 'gr', text: 'SK III' }), el('th', { text: 'Schwarz' }), el('th', { text: 'Vm' }), el('th', { class: 'bl', text: 'Σ' }), el('th'))),
+  const tbl = el('table', { class: 'vt' }, el('thead', {}, el('tr', {}, el('th', { text: 'Zeit' }), el('th', { class: 'r', text: 'SK I' }), el('th', { class: 'g', text: 'SK II' }), el('th', { class: 'gr', text: 'SK III' }), el('th', { class: 'bk', text: 'Schwarz' }), el('th', { text: 'Vm' }), el('th', { class: 'bl', text: 'Σ' }), el('th'))),
     el('tbody', {}, ...rows.map(r => tr(r, false)), tr(live, true)));
   return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Notizen' }), el('div', { class: 'card wc' }, el('h4', { text: 'Betroffene nach Zeit' }), tbl,
-    vw ? null : el('button', { class: 'btn small', text: 'Stand festhalten', title: 'Die aktuellen Zahlen aus dem Reiter Zahlen als neue Zeile speichern', onclick: () => { state.kraefte.rows.push(Object.assign({ id: uid(), iso: nowIso() }, live)); addJournal('Betroffene festgehalten: SK I ' + live.sk1 + ', SK II ' + live.sk2 + ', SK III ' + live.sk3 + ', Tote ' + live.tot + ', Vermisste ' + live.vm, true); renderUnitOverview(); save('Betroffene festgehalten'); } }),
+    vw ? null : el('button', { class: 'btn small', text: 'Stand festhalten', title: 'Die aktuellen Zahlen aus dem Reiter Zahlen als neue Zeile speichern', onclick: () => { state.kraefte.rows.push(Object.assign({ id: uid(), iso: nowIso() }, live)); addJournal('Betroffene festgehalten: SK I ' + live.sk1 + ', SK II ' + live.sk2 + ', SK III ' + live.sk3 + ', Schwarz ' + live.tot + ', Vermisste ' + live.vm, true); renderUnitOverview(); save('Betroffene festgehalten'); } }),
     el('div', { class: 'hint', text: 'Die Zahlen kommen aus dem Reiter Zahlen. „Stand festhalten“ speichert sie mit Uhrzeit.' })),
     el('div', { class: 'card wc' }, el('h4', { text: 'Notiz' }), el('textarea', { rows: '4', class: 'kt-note2', placeholder: 'Freie Notizen, zum Beispiel Wind, Absprachen', disabled: vw ? 'disabled' : null, onchange: e => { state.kraefte.notiz = e.target.value; save('Notiz'); } })));
 }
@@ -5521,7 +5530,7 @@ function initFue() {
 /* Rollen: Auswahl am Anfang, nur eigene Aufgaben, Export, Einlesen    */
 /* ------------------------------------------------------------------ */
 const ROLLEN = [
-  { id: 'EL', name: 'Einsatzleiter', d: 'Gesamtlage, Führungsstruktur, Entscheidungen' }, { id: 'S1', name: 'S1 Personal', d: 'Personen erfassen (Sichtung, Tote, Vermisste)' },
+  { id: 'EL', name: 'Einsatzleiter', d: 'Gesamtlage, Führungsstruktur, Entscheidungen' }, { id: 'S1', name: 'S1 Personal', d: 'Personen erfassen (Sichtung, Schwarz, Vermisste)' },
   { id: 'S2', name: 'S2 Lage', d: 'Lagevortrag, alles bearbeiten, Daten der anderen einlesen' }, { id: 'S3', name: 'S3 Einsatz', d: 'Einheiten und Abschnitte' },
   { id: 'S4', name: 'S4 Versorgung', d: 'Ablösung, Atemschutz, Nachforderung, Ausfälle' }, { id: 'S5', name: 'S5 Presse', d: 'Meldungen' }, { id: 'S6', name: 'S6 Kommunikation', d: 'Kommunikationsplan' }];
 const ROLE_DOM = { EL: ['people', 'fb', 'auftraege'], S1: ['casualties', 'bhp', 'kraefte'], S2: ['areas', 'objects', 'deps', 'symbols', 'manualPois', 'wind', 'weather', 'plumes', 'chem', 'measure', 'problems', 'exercise', 'meeting'], S3: ['units', 'sections'], S4: ['logi'], S5: [], S6: ['funk'] };
@@ -5671,7 +5680,7 @@ function openGuidedMeeting() {
   const render = () => {
     const us = state.units, inE = us.filter(u => u.status === 'einsatz'), bound = us.filter(u => u.status !== 'bereit').reduce((a, u) => a + uTotal(u), 0), res = us.filter(u => u.status === 'bereit').reduce((a, u) => a + uTotal(u), 0);
     const lgOf = u => state.logi[u.id] || {}, soon = us.filter(u => { const l = lgOf(u); return l.relief && Date.parse(l.relief) - nowMs() < 30 * 60000; }), out = us.filter(u => lgOf(u).ausfall), t = casTotals().t, ca = chemActive(), cs = ca ? chemSub(ca.sid) : null; let body;
-    if (step === 1) body = el('div', {}, el('h2', { text: 'Lage' }), el('p', { class: 'hint', text: 'Das Wichtigste zuerst.' }), el('div', { class: 'kpi' }, kpi(t.sk1 || 0, 'SK I (rot)', '#dc2626'), kpi(t.sk2 || 0, 'SK II (gelb)', '#ca8a04'), kpi(t.sk3 || 0, 'SK III (grün)', '#16a34a'), kpi((t.tot || 0) + (t.vermisst || 0), 'Tote und Vermisste', '#111827')),
+    if (step === 1) body = el('div', {}, el('h2', { text: 'Lage' }), el('p', { class: 'hint', text: 'Das Wichtigste zuerst.' }), el('div', { class: 'kpi' }, kpi(t.sk1 || 0, 'SK I (rot)', '#dc2626'), kpi(t.sk2 || 0, 'SK II (gelb)', '#ca8a04'), kpi(t.sk3 || 0, 'SK III (grün)', '#16a34a'), kpi((t.tot || 0) + (t.vermisst || 0), 'Schwarz und Vermisste', '#111827')),
       el('p', { text: (state.wind.dir != null ? 'Wind aus ' + state.wind.dir + ' Grad, ' + (state.wind.speed != null ? state.wind.speed + ' m/s. ' : '') : 'Wind nicht gesetzt. ') + (cs ? 'Gefahrstoff ' + cs.name + ' (UN ' + cs.un + ') gemeldet.' : 'Kein Gefahrstoff gemeldet.') }), el('p', { text: state.problems.filter(p => p.status !== 'erledigt').length + ' Probleme offen.' }));
     if (step === 2) body = el('div', {}, el('h2', { text: 'Kräfte' }), el('p', { class: 'hint', text: 'Rot braucht eine Entscheidung.' }), el('div', { class: 'kpi' }, kpi(inE.length, 'Einheiten im Einsatz', '#15803d'), kpi(bound, 'Kräfte gebunden, ' + res + ' einsatzbereit', '#15803d'), kpi(soon.length, 'Ablösungen in 30 Minuten', '#c2410c'), kpi(out.length, 'Ausfälle', '#b91c1c')),
       el('div', { class: 'tblwrap' }, el('table', { class: 'fst' }, el('thead', {}, el('tr', {}, ...['Einheit', 'Abschnitt', 'Auftrag', 'Seit', 'Atemschutz', 'Ablösung'].map(h => el('th', { text: h })))),
@@ -5693,7 +5702,7 @@ function openGuidedMeeting() {
 /* ---- Einweisung (Rundgang) und Tastenkürzel ---- */
 const SHORTCUTS = [
   ['?', 'Diese Übersicht'], ['U', 'Einheiten'], ['F', 'Führungsstruktur'], ['H', 'Karten-Beamer festhalten oder freigeben'], ['V', 'Lagevortrag starten oder beenden'], ['D', 'Dunkelmodus umschalten'],
-  ['K', 'Reiter Kräfte'], ['B', 'Reiter Behandlungsplatz'], ['T', 'Reiter Tagebuch'], ['M', 'Reiter Meldungen'], ['P', 'Reiter Probleme'], ['Z', 'Reiter Zahlen'], ['W', 'Reiter Wetter'], ['G', 'Reiter Gefahrstoff'],
+  ['K', 'Reiter Kräfte'], ['B', 'Reiter Behandlungsplatz'], ['T', 'Reiter Tagebuch'], ['M', 'Reiter Meldungen'], ['Z', 'Reiter Zahlen'], ['W', 'Reiter Wetter'], ['G', 'Reiter Gefahrstoff'],
   ['N', 'Neue Einheit'], ['J', 'Journaleintrag'], ['/', 'Ortssuche'], ['Strg+Z, Strg+Y', 'Rückgängig, Wiederholen'], ['Umschalt+P', 'Seitenleiste ein- oder ausklappen'], ['Esc', 'Schließen, Abbrechen']
 ];
 function infoDialog(title, ...body) {
@@ -5714,7 +5723,7 @@ function goTab(name) {
 document.addEventListener('keydown', e => {
   if (typing(e.target) || e.ctrlKey || e.metaKey || e.altKey || document.querySelector('.dlg:not(.dlgout)') || menuStack.length) return;
   if (e.target && /^(SELECT|BUTTON)$/.test(e.target.tagName) && e.key === ' ') return;
-  const k = e.key.toLowerCase(), tabs = { b: 'bhp', k: 'kraefte', t: 'tagebuch', m: 'meldungen', p: 'probleme', z: 'zahlen', w: 'keule', g: 'chem' };
+  const k = e.key.toLowerCase(), tabs = { b: 'bhp', k: 'kraefte', t: 'tagebuch', m: 'meldungen', z: 'zahlen', w: 'keule', g: 'chem' };
   if (e.shiftKey && k !== '?') return;
   if (k === '?') { e.preventDefault(); showShortcuts(); }
   else if (k === 'u') { e.preventDefault(); $('#btnUnits').click(); }
@@ -5929,7 +5938,7 @@ function lageFacts() {
   const st = id => us.filter(u => u.status === id).length, due = typeof meetingDue === 'function' ? meetingDue() : null;
   return {
     zeit: fmtTac(nowMs()) + ' (' + fmtHM2(nowMs()) + ' Uhr)', name: (e.active && e.name) ? e.name : 'Einsatz',
-    personen: 'SK I ' + (t.sk1 || 0) + ', SK II ' + (t.sk2 || 0) + ', SK III ' + (t.sk3 || 0) + ', Tote ' + (t.tot || 0) + ', Vermisste ' + (t.vermisst || 0),
+    personen: 'SK I ' + (t.sk1 || 0) + ', SK II ' + (t.sk2 || 0) + ', SK III ' + (t.sk3 || 0) + ', Schwarz ' + (t.tot || 0) + ', Vermisste ' + (t.vermisst || 0),
     kraefte: us.length + ' Einheiten, Stärke ' + sum('f') + '/' + sum('u') + '/' + sum('h') + '/' + (sum('f') + sum('u') + sum('h')) + ', im Einsatz ' + st('einsatz') + ', Reserve ' + st('reserve') + ', einsatzbereit ' + st('bereit'),
     gefahr: cs ? cs.name + ' (UN ' + cs.un + ', Kemler ' + cs.kemler + '), Absperrung ' + chemM(chemErg(cs, ca).isolate) + (ca.fire ? ', Brand ' + chemM(chemErg(cs, ca).fire) : '') : 'kein Gefahrstoff gemeldet',
     wetter: w && w.dir != null ? 'Wind aus ' + Math.round(w.dir) + ' Grad' + (w.speed != null ? ', ' + w.speed + ' m/s' : '') : 'Wind nicht gesetzt',
@@ -6043,7 +6052,7 @@ function renderStands() {
     box.append(el('div', { class: 'card', style: '--c:#1e40af' },
       el('div', {}, el('b', { text: 'Nr. ' + st.nr + ' · ' + st.title }), el('span', { class: 'hint', text: ' · ' + fmtTime(st.time) + (st.by ? ' · ' + st.by : '') })),
       st.note ? el('div', { text: st.note, style: 'white-space:pre-wrap' }) : null,
-      el('div', { class: 'hint', text: 'Objekte: ' + o.ausgefallen + ' ausgefallen, ' + o.eingeschraenkt + ' eingeschränkt, ' + o.intakt + ' intakt · Verletzte ' + (c.verletzt + c.schwer) + ', Tote ' + c.tot + ', Betroffene ' + c.betroffen + ' · Probleme offen ' + st.sum.probOpen + ' · Einheiten ' + st.sum.units + ' (Stärke ' + st.sum.strength + ')' }),
+      el('div', { class: 'hint', text: 'Objekte: ' + o.ausgefallen + ' ausgefallen, ' + o.eingeschraenkt + ' eingeschränkt, ' + o.intakt + ' intakt · Verletzte ' + (c.verletzt + c.schwer) + ', Schwarz ' + c.tot + ', Betroffene ' + c.betroffen + ' · Probleme offen ' + st.sum.probOpen + ' · Einheiten ' + st.sum.units + ' (Stärke ' + st.sum.strength + ')' }),
       el('div', { class: 'row' }, el('button', { class: 'btn small', text: 'Anzeigen', onclick: () => enterReview(st) }), el('button', { class: 'btn small', text: 'Mit jetzt vergleichen', onclick: () => compareStand(st) }),
         !runtime.viewer ? el('button', { class: 'btn small danger', text: 'Löschen', onclick: () => { if (confirm('Lagestand Nr. ' + st.nr + ' endgültig löschen?')) { state.stands = state.stands.filter(x => x !== st); addJournal('Lagestand Nr. ' + st.nr + ' gelöscht', true); renderStands(); persist(); } } }) : null)));
   });
@@ -6317,7 +6326,7 @@ document.addEventListener('keydown', e => {
 const panelGlyph = open => window.matchMedia('(max-width: 860px)').matches ? (open ? '&#9662;' : '&#9652;') : (open ? '&lsaquo;' : '&rsaquo;');
 const isPhone = () => window.matchMedia('(max-width: 700px)').matches;
 function placeMapActs() {   // Rechner: Knöpfe in der Kopfzeile, Handy: in der Kartenleiste
-  const a = $('#mapActs'), apply = () => { if (isPhone()) $('#mapBar').append(a); else $('#hdrTop').insertBefore(a, $('#clock')); }; apply(); window.matchMedia('(max-width: 700px)').addEventListener('change', apply);
+  const a = $('#mapActs'), apply = () => { if (isPhone()) $('#mapBar').append(a); else $('#hdrSub').append(a); }; apply(); window.matchMedia('(max-width: 700px)').addEventListener('change', apply);
 }
 function setPanel(open, remember) {
   const app = $('#app'); app.classList.toggle('collapsed', !open); setTimeout(() => { if (typeof syncNav === 'function') syncNav(); }, 0);
@@ -6328,7 +6337,7 @@ function setPanel(open, remember) {
 }
 function togglePanel() { setPanel($('#app').classList.contains('collapsed')); }
 $('#panelToggle').onclick = togglePanel;
-$('#fristChip').onclick = () => { const t = $('#fristChip').dataset.tab || 'probleme'; if (t === 'wand') { openUnitOverview(); return; } setPanel(true); openTab(t); };
+$('#fristChip').onclick = () => { const t = $('#fristChip').dataset.tab || 'wand'; if (t === 'wand') { openUnitOverview(); return; } setPanel(true); openTab(t); };
 $('#btnTheme').onclick = () => { const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); try { localStorage.setItem('kritis-theme', t); } catch (e) { /* ohne Speicher */ } };
 try { if (localStorage.getItem('kritis-panel') === '0') { $('#app').classList.add('collapsed'); $('#panelToggle').innerHTML = panelGlyph(false); $('#panelToggle').setAttribute('aria-expanded', 'false'); setTimeout(() => map.invalidateSize(), 0); } } catch (e) { /* egal */ }
 
