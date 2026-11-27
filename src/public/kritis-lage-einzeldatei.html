@@ -980,6 +980,8 @@ body.wandlook .lbl { background: #fff; }
 :root[data-theme="dark"] body.wandlook .lbl, :root[data-theme="dark"] body.wandlook .tabpane h2, :root[data-theme="dark"] body.wandlook #unitOv .ovhead h2 { background: #17233a; color: var(--ink); border-color: #4a6fd1; }
 @media (max-width: 900px) { .wall { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .ovunit.wt { transition: none; } }
+.ucsym { position: relative; border: 2px dashed #94a3b8; background: #fff; border-radius: 6px; padding: 4px; cursor: pointer; } .ucsym:hover { border-color: var(--red); } .ucsym-h { position: absolute; bottom: 2px; right: 4px; font-size: 10px; background: var(--red); color: #fff; border-radius: 8px; padding: 0 6px; }
+.ucname { width: 100%; font-size: 20px; font-weight: 800; border: 1px solid transparent; border-bottom-color: #cbd5e1; border-radius: 4px; padding: 2px 4px; background: transparent; color: inherit; } .ucname:hover, .ucname:focus { border-color: #94a3b8; background: #fff; color: #111; }
 .bhpm { display: flex; align-items: center; gap: 2px; background: #fff; border: 2px solid #b91c1c; border-radius: 6px; padding: 2px 3px; box-shadow: 0 1px 4px rgba(0,0,0,.4); font: 700 13px Inter, sans-serif; }
 .bhpm b { color: #b91c1c; padding: 0 3px; } .bhpm i { font-style: normal; color: #fff; min-width: 20px; text-align: center; border-radius: 4px; padding: 1px 3px; }
 .bhp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 6px 0 6px 8px; border-left: 5px solid var(--c); margin: 6px 0; }
@@ -1592,8 +1594,6 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
 #tabs [data-tab='tagebuch']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5 3h13a1 1 0 0 1 1 1v17H6a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1zm3 4v2h8V7zm0 4v2h8v-2z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5 3h13a1 1 0 0 1 1 1v17H6a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1zm3 4v2h8V7zm0 4v2h8v-2z'/%3E%3C/svg%3E"); }
 #tabs [data-tab='meldungen']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 5h18v14H3zm2 2v.5l7 5 7-5V7zm0 3v7h14v-7l-7 5z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 5h18v14H3zm2 2v.5l7 5 7-5V7zm0 3v7h14v-7l-7 5z'/%3E%3C/svg%3E"); }
 #tabs [data-act='wand']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM9 13c-2.700 0-8 1.300-8 4v2h16v-2c0-2.700-5.300-4-8-4zm6 0c-.4 0-.8 0-1.300.1 1.600 1 2.300 2.300 2.300 3.900v2h7v-2c0-2.700-5.300-4-8-4z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM9 13c-2.700 0-8 1.300-8 4v2h16v-2c0-2.700-5.300-4-8-4zm6 0c-.4 0-.8 0-1.300.1 1.600 1 2.300 2.300 2.300 3.900v2h7v-2c0-2.700-5.300-4-8-4z'/%3E%3C/svg%3E"); }
-#tabs [data-tab='abschnitte']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z'/%3E%3C/svg%3E"); }
-#tabs [data-act='auftr']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 16.200 4.800 12l-1.400 1.400L9 19 21 7l-1.400-1.400z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 16.200 4.800 12l-1.400 1.400L9 19 21 7l-1.400-1.400z'/%3E%3C/svg%3E"); }
 #tabs [data-act='fue']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 1a2.500 2.500 0 1 0 0-5 2.500 2.500 0 0 0 0 5zM9 13c-2.700 0-8 1.300-8 4v2h16v-2c0-2.700-5.300-4-8-4zm8 1c-.6 0-1.200.1-1.900.3 1.200.9 1.900 2.100 1.900 3.700v1h6v-1.500c0-2.200-3.700-3.500-6-3.500z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 1a2.500 2.500 0 1 0 0-5 2.500 2.500 0 0 0 0 5zM9 13c-2.700 0-8 1.300-8 4v2h16v-2c0-2.700-5.300-4-8-4zm8 1c-.6 0-1.200.1-1.900.3 1.200.9 1.900 2.100 1.900 3.700v1h6v-1.500c0-2.200-3.700-3.500-6-3.500z'/%3E%3C/svg%3E"); }
 #tabs [data-tab='gebiet']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2l9 5v10l-9 5-9-5V7z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2l9 5v10l-9 5-9-5V7z'/%3E%3C/svg%3E"); }
 #tabs [data-tab='ebenen']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2 2 7l10 5 10-5zM2 12l10 5 10-5-2-1-8 4-8-4zm0 5 10 5 10-5-2-1-8 4-8-4z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2 2 7l10 5 10-5zM2 12l10 5 10-5-2-1-8 4-8-4zm0 5 10 5 10-5-2-1-8 4-8-4z'/%3E%3C/svg%3E"); }
@@ -1652,8 +1652,6 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
       <button role="tab" data-tab="tagebuch" aria-selected="false"><span>Einsatztagebuch</span></button>
       <button role="tab" data-tab="meldungen" aria-selected="false"><span>Meldungen</span></button>
       <button type="button" class="nav-act" data-act="wand" title="Stabswand mit Kräfteübersicht (Taste U)"><span>Kräfte</span></button>
-      <button role="tab" data-tab="abschnitte" aria-selected="false"><span>Abschnitte</span></button>
-      <button type="button" class="nav-act" data-act="auftr" title="Auftragsstreifen der Stabswand"><span>Aufträge</span></button>
       <button type="button" class="nav-act" data-act="fue" title="Führungsstruktur und Kommunikationsplan (Taste F)"><span>Stab &amp; Kontakte</span></button>
       <div class="nav-grp">Weitere Bereiche</div>
       <button role="tab" data-tab="gebiet" aria-selected="false"><span>Gebiete</span></button>
@@ -5978,32 +5976,33 @@ function importDlg() {
   };
 }
 /* ---- Einheitenkarte (Entwurf 5) ---- */
-function openUnitCard(u0, more0) {
-  const u = u0, ed = !ro('units'), e4 = !ro('logi'); let more = more0 || e4; const lg = logiOf(u);
+function openUnitCard(u0) {
+  const u = u0, ed = !ro('units');
   const dlg = el('div', { class: 'dlg', role: 'dialog', 'aria-modal': 'true' }); const card = el('div', { class: 'rolecard ucardlg' }); dlg.append(card);
-  const num = (id, v, label) => el('label', { class: 'hint' }, label, el('input', { type: 'number', min: '0', 'data-f': id, value: v, disabled: e4 ? null : 'disabled' }));
-  const txt = (id, v, label, ph) => el('label', { class: 'hint' }, label, el('input', { type: 'text', 'data-f': id, value: v || '', placeholder: ph || '', disabled: e4 ? null : 'disabled' }));
-  const tim = (id, v, label) => el('label', { class: 'hint' }, label, el('input', { type: 'time', 'data-f': id, value: timeVal(v), disabled: e4 ? null : 'disabled' }));
+  const nz = v => Math.max(0, Math.round(+v || 0));
   const grab = () => {
-    if (ed) { const sc = card.querySelector('#ucSec'), tk = card.querySelector('#ucTask'); if (sc) { const nv = sc.value || null; if ((u.sectionId || null) !== nv) assignUnit(u, nv); } if (tk && tk.value !== (u.task || '')) { u.task = tk.value; save('Auftrag: ' + u.name); } }
-    if (e4 && more) { const g = k => card.querySelector('[data-f="' + k + '"]'); if (g('agtN')) { Object.assign(lg, { since: toIsoToday(g('since').value), relief: toIsoToday(g('relief').value), agtN: +g('agtN').value || 0, agtMin: +g('agtMin').value || 0, gebunden: +g('gebunden').value || 0, verf: +g('verf').value || 0, res: +g('res').value || 0, req: g('req').value, eta: toIsoToday(g('eta').value), bereit: g('bereit').value, ausfall: g('ausfall').value }); save('Einheit ' + u.name + ': Angaben'); } }
+    if (!ed) return; const q = k => card.querySelector('[data-f="' + k + '"]');
+    const nm = q('name'), sc = card.querySelector('#ucSec');
+    if (nm && nm.value.trim() && nm.value.trim() !== (u.name || '')) { u.name = nm.value.trim(); save('Einheit umbenannt: ' + u.name); }
+    if (q('f')) { const f = nz(q('f').value), uu = nz(q('u').value), h = nz(q('h').value), fz = nz(q('fz').value);
+      if (f !== (u.f || 0) || uu !== (u.u || 0) || h !== (u.h || 0)) { u.f = f; u.u = uu; u.h = h; addJournal('Stärke ' + (u.name || 'Einheit') + ': ' + fmtStr(u), true); save('Stärke geändert: ' + u.name); }
+      if (fz !== (u.fz || 0)) { u.fz = fz || undefined; save('Fahrzeuge: ' + u.name); } }
+    if (sc) { const nv = sc.value || null; if ((u.sectionId || null) !== nv) assignUnit(u, nv); }
   };
+  const field = (k, v, label) => el('label', { class: 'hint' }, label, el('input', { type: 'number', min: '0', 'data-f': k, value: v || 0, disabled: ed ? null : 'disabled' }));
   const render = () => {
     const sec = el('select', { id: 'ucSec', disabled: ed ? null : 'disabled', 'aria-label': 'Abschnitt' }, el('option', { value: '', text: 'noch offen' }), ...state.sections.filter(x => x.kind !== 'line').map(x => el('option', { value: x.id, text: x.name }))); sec.value = u.sectionId || '';
-    card.replaceChildren(el('div', { class: 'row', style: 'align-items:center' }, el('img', { src: unitSym(u).url, alt: '', style: 'height:60px;width:86px;object-fit:contain' }), el('div', {}, el('h2', { text: u.name || 'Einheit', style: 'margin:0' }), el('div', { class: 'hint', text: [u.call, 'Stärke ' + fmtStr(u)].filter(Boolean).join(' · ') }))),
-      el('div', { class: 'lbl', text: 'Was macht die Einheit gerade?' }),
-      el('div', { class: 'grid2x' }, ...state.unitStatus.slice(0, 6).map(st => el('button', { class: 'btn big' + (u.status === st.id ? ' sel' : ''), style: u.status === st.id ? '--c:' + safeColor(st.color) : '', disabled: ed ? null : 'disabled', text: st.label, onclick: () => { grab(); setUnitStatus(u, st.id); if (st.id === 'einsatz' && !lg.since) lg.since = nowIso(); render(); } }))),
-      el('div', { class: 'lbl', text: 'Wo ist sie eingesetzt?' }), sec, el('div', { class: 'lbl', text: 'Auftrag' }), el('input', { type: 'text', id: 'ucTask', value: u.task || '', placeholder: 'z. B. Menschenrettung, 2. OG', disabled: ed ? null : 'disabled' }),
-      more ? el('div', {}, el('div', { class: 'lbl', text: 'Einsatzdauer und Ablösung' }), el('div', { class: 'grid2x' }, tim('since', lg.since, 'Seit'), tim('relief', lg.relief, 'Ablösung um')),
-        el('div', { class: 'lbl', text: 'Atemschutz' }), el('div', { class: 'grid2x' }, num('agtN', lg.agtN, 'Geräteträger'), num('agtMin', lg.agtMin, 'Minuten im Einsatz')),
-        el('div', { class: 'lbl', text: 'Stärke' }), el('div', { class: 'grid2x', style: 'grid-template-columns:repeat(3,1fr)' }, num('gebunden', lg.gebunden, 'Gebunden'), num('verf', lg.verf, 'Verfügbar'), num('res', lg.res, 'Reserve')),
-        el('div', { class: 'lbl', text: 'Nachforderung' }), el('div', { class: 'grid2x' }, txt('req', lg.req, 'Was wird angefordert?'), tim('eta', lg.eta, 'ETA')),
-        el('div', { class: 'lbl', text: 'Bereitstellungsraum und Ausfall' }), el('div', { class: 'grid2x' }, txt('bereit', lg.bereit, 'Bereitstellungsraum'), txt('ausfall', lg.ausfall, 'Ausfall (leer = kein Ausfall)')))
-      : el('button', { class: 'btn', style: 'margin-top:12px;border-style:dashed;justify-content:center;width:100%', text: 'Weitere Angaben zeigen (Dauer, Atemschutz, Nachforderung, Ausfall)', onclick: () => { grab(); more = true; render(); } }),
+    const sym = el(ed ? 'button' : 'div', { class: 'ucsym', title: ed ? 'Taktisches Zeichen ändern' : null, 'aria-label': 'Taktisches Zeichen ändern', onclick: ed ? async () => { grab(); const v = await pickSymbol(u.sym); if (v === undefined) return; u.sym = v; save('Zeichen geändert: ' + u.name); renderUnits(); render(); } : null }, el('img', { src: unitSym(u).url, alt: '', style: 'height:60px;width:86px;object-fit:contain' }), ed ? el('span', { class: 'ucsym-h', text: 'ändern' }) : null);
+    card.replaceChildren(el('div', { class: 'row', style: 'align-items:center;gap:12px' }, sym, el('div', { style: 'flex:1;min-width:0' }, el('input', { type: 'text', 'data-f': 'name', class: 'ucname', value: u.name || '', placeholder: 'Bezeichnung', disabled: ed ? null : 'disabled', 'aria-label': 'Name der Einheit' }), el('div', { class: 'hint', text: 'Stärke ' + fmtStr(u) }))),
+      el('div', { class: 'lbl', text: 'Stärke' }), el('div', { class: 'grid2x', style: 'grid-template-columns:repeat(4,1fr)' }, field('f', u.f, 'Führer'), field('u', u.u, 'Unterführer'), field('h', u.h, 'Helfer'), field('fz', u.fz, 'Fahrzeuge')),
+      el('div', { class: 'grid2x', style: 'margin-top:12px' }, ...state.unitStatus.filter(st => st.id !== 'bereit').slice(0, 6).map(st => el('button', { class: 'btn big' + (u.status === st.id ? ' sel' : ''), style: u.status === st.id ? '--c:' + safeColor(st.color) : '', disabled: ed ? null : 'disabled', text: st.label, onclick: () => { grab(); setUnitStatus(u, st.id); render(); } }))),
+      el('div', { class: 'lbl', text: 'Wo ist sie eingesetzt?' }), sec,
       el('div', { class: 'row', style: 'margin-top:14px' }, ed ? el('button', { class: 'btn', text: 'Teil herauslösen', disabled: uTotal(u) < 2 ? 'disabled' : null, onclick: async () => { grab(); const d = await splitDialog(u); if (d) { splitUnit(u, d); dlg.remove(); } } }) : null,
         ed ? el('button', { class: 'btn danger', text: 'Entfernen', onclick: async () => { await removeUnitAsk(u); if (!state.units.includes(u)) dlg.remove(); } }) : null, el('button', { class: 'btn primary', style: 'flex:1;justify-content:center', text: 'Fertig', onclick: () => { grab(); dlg.remove(); renderUnitOverview(); renderUnits(); } })));
   };
-  dlg.addEventListener('mousedown', e => { if (e.target === dlg) { grab(); dlg.remove(); renderUnitOverview(); } }); render(); document.body.append(dlg);
+  dlg.addEventListener('mousedown', e => { if (e.target === dlg) { grab(); dlg.remove(); renderUnitOverview(); renderUnits(); } });
+  dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); grab(); dlg.remove(); renderUnitOverview(); renderUnits(); } });
+  render(); document.body.append(dlg);
 }
 /* ---- Einheit melden: Assistent (Entwurf 3) ---- */
 const UX_VEH = [['LF 20', 'Löschfahrzeug LF 20', 'FW_LF20'], ['HLF 20', 'Hilfeleistungs-LF', 'FW_HLF20'], ['DLK 23', 'Drehleiter', 'FW_DLK'], ['ELW 1', 'Einsatzleitwagen', 'FW_ELW1'], ['GW', 'Gerätewagen', 'FW_GW-G'], ['RW', 'Rüstwagen', 'FW_RW']];
@@ -6347,7 +6346,6 @@ function initNavActs() {
     const a = b.dataset.act;
     if (a === 'map') { closeUnitOverview(); closeFue(); setPanel(false); }
     else if (a === 'wand') { if (!$('#unitOv').hidden) closeUnitOverview(); else { $('#ovGroup').value = 'wand'; openUnitOverview(); } }
-    else if (a === 'auftr') { $('#ovGroup').value = 'wand'; openUnitOverview(); setTimeout(() => { const w = $('#ovCols .wall2'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 120); }
     else if (a === 'fue') { if (!$('#fueOv').hidden) closeFue(); else openFue(); }
     syncNav();
   }));
