@@ -44,3 +44,18 @@ test('Daten überleben einen Neustart, Löschen funktioniert', async () => {
   assert.strictEqual((await fetch(`${base}/v1/room/${ID}`, { method: 'DELETE', headers: { 'X-Sync-Token': TOKEN } })).status, 204);
   assert.strictEqual((await fetch(`${base}/v1/room/${ID}/ops?since=0`, { headers: { 'X-Sync-Token': TOKEN } })).status, 404); await new Promise(r => srv2.close(r));
 });
+
+test('Lesetoken: lesen ja, schreiben und löschen nein; Schreiber legt es auch nachträglich fest', async () => {
+  const s = await start(), RT = 'R'.repeat(40); await s.call('POST', `/v1/room/${ID}/ops`, { ops: ['geheim'] });
+  assert.strictEqual((await s.call('GET', `/v1/room/${ID}/ops?since=0`, null, RT)).status, 403, 'ohne Freigabe kein Zugriff');
+  assert.strictEqual((await s.call('PUT', `/v1/room/${ID}/readtoken`, { readToken: RT }, RT)).status, 403, 'Leser kann sich nicht freischalten');
+  assert.strictEqual((await s.call('PUT', `/v1/room/${ID}/readtoken`, { readToken: RT })).status, 200);
+  const g = await s.call('GET', `/v1/room/${ID}/ops?since=0`, null, RT); assert.strictEqual(g.status, 200); assert.deepStrictEqual((await g.json()).ops.map(o => o.d), ['geheim']);
+  assert.strictEqual((await s.call('POST', `/v1/room/${ID}/ops`, { ops: ['x'] }, RT)).status, 403, 'Leser darf nicht schreiben');
+  assert.strictEqual((await s.call('PUT', `/v1/room/${ID}/snapshot`, { seq: 0, data: 'x' }, RT)).status, 403);
+  assert.strictEqual((await s.call('DELETE', `/v1/room/${ID}`, null, RT)).status, 403, 'Leser darf nicht löschen'); await s.close();
+});
+test('Lesetoken beim Anlegen mitgeben', async () => {
+  const s = await start(), RT = 'Q'.repeat(40); await s.call('PUT', `/v1/room/${ID}/snapshot`, { seq: 0, data: 'S', readToken: RT });
+  const g = await (await s.call('GET', `/v1/room/${ID}/ops?since=0`, null, RT)).json(); assert.strictEqual(g.snapshot, 'S'); await s.close();
+});

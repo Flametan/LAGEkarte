@@ -302,6 +302,22 @@ async function seite(b, q, w, h) {
     await p.evaluate(() => window.__lage.map.setView([48.0, 11.0], 12, { animate: false })); await p.waitForTimeout(700); const away = await st(); assert.ok(away.l.length === 0 && away.r.length === 0, 'Abschnitte nicht im Bild: keine Fenster ' + JSON.stringify(away));
     await p.evaluate(() => window.__lage.map.setView([51.515, 7.38], 18, { animate: false })); await p.waitForTimeout(700); const near = await st(); assert.ok(near.l.length === 0 && near.marker >= 3, 'weit hineingezoomt: einzelne Marker ' + JSON.stringify(near)); await p.close();
   });
+  await t('Ansehen per QR-Code: nur lesen, Änderungen kommen an, Manipulation nicht', async () => {
+    const { spawn } = require('child_process'), os = require('os'), fs = require('fs'), path = require('path'), dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ls-'));
+    const srv = spawn('node', ['sync-server/server.js'], { env: Object.assign({}, process.env, { PORT: '18792', DATA_DIR: dir, ALLOW_ORIGINS: '*' }), cwd: path.resolve(__dirname, '..') });
+    try {
+      await new Promise(r => setTimeout(r, 700)); const url = 'file://' + path.resolve(__dirname, '../src/public/kritis-lage-einzeldatei.html'), SRV = 'http://127.0.0.1:18792';
+      const A = await (await b.newContext({ viewport: { width: 1400, height: 800 } })).newPage(); await A.goto(url); await A.waitForTimeout(1200);
+      await A.evaluate(() => { window.__lage.state.units = [{ id: 'u1', name: 'LF Eins', call: '', sym: null, f: 1, u: 1, h: 4, status: 'einsatz', sectionId: null, task: '', note: '', lat: null, lng: null, time: new Date().toISOString() }]; });
+      await A.evaluate(async s => { await window.__lage.SYNC.create(s); }, SRV); await A.evaluate(() => document.querySelector('#btnSync').click()); await A.waitForTimeout(300); await A.click('text=QR-Code zum Ansehen'); await A.waitForSelector('.qrimg', { timeout: 5000 });
+      const link = await A.evaluate(() => window.__lage.SYNC.viewLink()); assert.ok(link.includes('#ansehen=') && !link.includes('einsatz='), 'Ansichtslink');
+      const V = await (await b.newContext({ viewport: { width: 1400, height: 800 } })).newPage(); await V.goto(url + '#' + link.split('#')[1] + '&server=' + encodeURIComponent(SRV)); await V.waitForTimeout(2500);
+      assert.ok(await V.evaluate(() => window.__lage.runtime.viewer) && /Ansicht/.test(await V.textContent('#syncChip')), 'Zuschauer im Lesemodus'); assert.deepStrictEqual(await V.evaluate(() => window.__lage.state.units.map(u => u.name)), ['LF Eins']);
+      await A.evaluate(() => { window.__lage.state.units[0].name = 'LF Neu'; window.__lage.SYNC.schedulePush(); }); await V.waitForTimeout(2500); assert.deepStrictEqual(await V.evaluate(() => window.__lage.state.units.map(u => u.name)), ['LF Neu'], 'Änderung kommt beim Zuschauer an');
+      await V.evaluate(() => { window.__lage.state.units[0].name = 'MANIPULIERT'; window.__lage.SYNC.schedulePush(); }); await V.waitForTimeout(1500); assert.deepStrictEqual(await A.evaluate(() => window.__lage.state.units.map(u => u.name)), ['LF Neu'], 'Zuschauer kann nichts ändern');
+      assert.ok(!(await V.evaluate(() => { try { return !!localStorage.getItem('kritis-lage-v1'); } catch (e) { return false; } })), 'beim Zuschauer wird nichts gespeichert');
+    } finally { srv.kill(); }
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));

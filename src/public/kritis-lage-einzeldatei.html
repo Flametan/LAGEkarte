@@ -1784,6 +1784,34 @@ body.viewer #mapActs, body.beamerwin #mapActs, body.vortrag #mapActs, body.print
 .cl-u img { width: 30px; height: 24px; object-fit: contain; flex: none; pointer-events: none; } .cl-n { flex: 1; min-width: 0; font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .cl-u small { font-size: 10.5px; color: var(--muted); }
 body.printing .clpanel, body.printing #clusterLines { display: none; }
 @media (max-width: 700px) { .clpanel { width: 150px; top: 110px; bottom: 70px; } #clusterPanelL { left: 8px; top: 110px; } .cl-u small { display: none; } }
+.qrwrap { text-align: center; } .qrimg { width: 220px; height: 220px; image-rendering: pixelated; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 4px; }
+
+/* Handy: Kräfte (Stabswand) lesbar */
+@media (max-width: 700px) {
+  #unitOv { padding: 8px 8px 70px !important; font-size: 14px; }
+  #unitOv .ovhead { position: static !important; display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 0 !important; margin: 0 0 8px; background: none !important; border: 0 !important; }
+  #unitOv .ovhead h2, #ovGroup, #ovStat, #ovSmall, #ovBig, #ovMap { display: none !important; }
+  #unitOv .ovhead, #unitOv .ovtools { min-width: 0; max-width: 100%; box-sizing: border-box; }
+  #ovSum { min-width: 0; max-width: 100%; display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 6px; scrollbar-width: none; } #ovSum::-webkit-scrollbar { display: none; } #ovSum .chip { flex: none; font-size: 12px; padding: 2px 8px; }
+  #unitOv .ovtools { display: flex; gap: 8px; } #unitOv .ovtools .btn { flex: 1; justify-content: center; min-height: 40px; }
+  /* Kräfteübersicht: Tabelle passt in die Breite */
+  .kt { padding: 8px 8px 10px; border-width: 1px; border-radius: 8px; margin-bottom: 10px; max-width: none; }
+  .kt-h .lbl { font-size: 13px; padding: 3px 8px; border-width: 1px; }
+  .kt-t { table-layout: fixed; font-size: 13px; } .kt-t th { padding: 4px 3px; font-size: 11px; line-height: 1.15; border-bottom-width: 2px; } .kt-t tbody th { font-size: 13px; width: 27%; overflow-wrap: anywhere; }
+  .kt-t td { padding: 3px 2px; font-size: 16px; } .kt-t td small { display: block; margin: 0; font-size: 10px; }
+  .kc { width: 100%; font-size: 16px; padding: 4px 4px; border: 1px solid var(--line); background: var(--panel, #fff); }
+  .kgrp { flex-wrap: wrap; gap: 4px 6px; font-size: 10.5px; } .kt-t tr.grp th { font-size: 11px; } .kt-t tr.grp td { font-size: 11px; }
+  .kt-note { rows: 1; }
+  /* Stabswand: alles untereinander, Kopfkarten kompakt */
+  #ovCols.wand .wall, #ovCols.wand .wall2, .wall, .wall2 { display: block !important; } .wcol { margin-bottom: 12px; min-width: 0; }
+  .wcol > .lbl { display: block; font-size: 12px; padding: 4px 8px; border-width: 1px; margin: 4px 0; text-align: left; }
+  .ea.wcard { grid-template-columns: 52px 1fr; font-size: 12.5px; } .ea.wcard .s { grid-column: 1 / -1; border-top: 1px solid #aaa; display: flex; flex-wrap: wrap; gap: 2px 12px; } .ea.wcard .m { border-right: 0; }
+  .ea.wcard .wbtns { width: 100%; }
+  .ea.wcard .m > div:has(> b:empty), .ea.wcard .s > div:has(> b:empty) { display: none; }
+  .wblock { padding: 6px; } .wtiles { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ovunit.wt { width: calc(33.33% - 4px) !important; min-width: 92px; }
+  .wal-r input { font-size: 16px; }
+}
 </style>
 </head>
 <body>
@@ -2673,7 +2701,8 @@ let state = freshState();
 const runtime = { sector: {}, mode: null, placing: null, drawPurpose: null, drawHandler: null, vis: new Set() };
 const qs = new URLSearchParams(location.search);
 runtime.beamerView = ['karte', 'wand', 'fue'].includes(qs.get('beamer')) ? qs.get('beamer') : null;   // Beamer-Fenster auf demselben Rechner
-runtime.viewer = qs.has('ansicht') || !!runtime.beamerView; runtime.beamer = qs.has('beamer');
+runtime.viewOnly = /[#&]ansehen=/.test(location.hash);   // nur ansehen über den QR-Code des gemeinsamen Einsatzes
+runtime.viewer = qs.has('ansicht') || !!runtime.beamerView || runtime.viewOnly; runtime.beamer = qs.has('beamer');
 if (runtime.viewer) document.body.classList.add('viewer');
 if (runtime.beamer) document.body.classList.add('beamer');
 if (runtime.beamerView) document.body.classList.add('beamerwin');
@@ -2845,7 +2874,7 @@ function save(label) {
   if (label) commit(label);
 }
 function saveNow() {
-  saveTimer = 0;
+  saveTimer = 0; if (runtime.viewer) return;   // Ansicht und Beamer-Fenster schreiben nie in den Browserspeicher
   {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); runtime.storeWarn = ''; const ns = document.getElementById('navSaved'); if (ns) ns.textContent = 'Gespeichert ' + new Date().toLocaleTimeString('de-DE'); }
     catch (e) { runtime.storeWarn = 'gekürzt'; try { const s = Object.assign({}, state, { pois: Object.fromEntries(Object.entries(state.pois).filter(([, q]) => q.manual)), loaded: {} }); localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e2) { runtime.storeWarn = 'voll'; } }
@@ -4334,7 +4363,8 @@ const SYNC = (() => {
     const k0 = await crypto.subtle.importKey('raw', ENC.encode(norm(code)), 'HKDF', false, ['deriveBits', 'deriveKey']);
     const bits = async (info, n) => new Uint8Array(await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt: ENC.encode('lagekarte-sync-v1'), info: ENC.encode(info) }, k0, n * 8));
     const key = await crypto.subtle.deriveKey({ name: 'HKDF', hash: 'SHA-256', salt: ENC.encode('lagekarte-sync-v1'), info: ENC.encode('key') }, k0, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
-    return { id: hex(await bits('id', 16)), token: b64u(await bits('token', 32)), key };
+    const idB = await bits('id', 16), rtB = await bits('rtoken', 32), keyRaw = await bits('key', 32);
+    return { id: hex(idB), token: b64u(await bits('token', 32)), key, idB, rtB, rtoken: b64u(rtB), keyRaw };
   }
   async function seal(obj) { const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, S.creds.key, ENC.encode(JSON.stringify(obj)))); const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12); return b64(out); }
   async function open(str) { const raw = unb64(str); return JSON.parse(DEC.decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(0, 12) }, S.creds.key, raw.slice(12)))); }
@@ -4400,7 +4430,7 @@ const SYNC = (() => {
     const cur = S.reg.get(p); if (cur && cur.t >= t) return false; seeT(t);
     S.reg.set(p, { v: x ? null : v, t, x: !!x }); const seg = p.split('/'), e = entOf(p);
     if (e && !p.endsWith('/@del') && tomb(seg[0], seg[1])) return false;           // gelöschte Einträge bleiben gelöscht
-    if (applyOne(state, { p, v, x })) { if (x) S.base.leaf.delete(p); else S.base.leaf.set(p, v); if (p.endsWith('/@del')) { S.base.ents.delete(e); [...S.base.leaf.keys()].forEach(k => { if (k.startsWith(e + '/')) S.base.leaf.delete(k); }); } else if (e) S.base.ents.add(e); return true; }
+    if (applyOne(state, { p, v, x })) { if (!S.base) return true; if (x) S.base.leaf.delete(p); else S.base.leaf.set(p, v); if (p.endsWith('/@del')) { S.base.ents.delete(e); [...S.base.leaf.keys()].forEach(k => { if (k.startsWith(e + '/')) S.base.leaf.delete(k); }); } else if (e) S.base.ents.add(e); return true; }
     return false;
   }
   function renderRemote() {
@@ -4425,7 +4455,7 @@ const SYNC = (() => {
     const c = $('#syncChip'); if (!c) return; if (!S.active) { c.hidden = true; return; } c.hidden = false;
     const lab = 'Einsatz ' + norm(S.code).slice(0, 4);
     c.className = 'chip sync-' + (S.status === 'ok' ? 'ok' : S.status === 'denied' ? 'bad' : 'warn');
-    c.textContent = lab + ' · ' + (S.status === 'ok' ? (S.online || 1) + ' online' : S.status === 'denied' ? 'kein Zugriff' : 'getrennt'); c.title = S.msg || 'Gemeinsamer Einsatz: Klicken für Einzelheiten';
+    c.textContent = S.readOnly ? 'Ansicht · ' + (S.status === 'ok' ? 'live' : S.status === 'denied' ? 'kein Zugriff' : 'getrennt') : lab + ' · ' + (S.status === 'ok' ? (S.online || 1) + ' online' : S.status === 'denied' ? 'kein Zugriff' : 'getrennt'); c.title = S.msg || 'Gemeinsamer Einsatz: Klicken für Einzelheiten';
     if (typeof updateUndoButtons === 'function') updateUndoButtons(); const d = $('#syncDlg'); if (d && d.refresh) d.refresh();
   }
   async function loadFull(r) {            // Gesamtstand und Blöcke -> Register
@@ -4448,7 +4478,7 @@ const SYNC = (() => {
   const regEntries = () => { const out = []; S.reg.forEach((r, p) => out.push([p, r.v, r.t, r.x ? 1 : 0])); return out; };
   async function putSnapshot(seq) { const r = await api('/snapshot', { method: 'PUT', body: JSON.stringify({ seq, data: await seal(regEntries()) }) }); if (!r.ok) throw Object.assign(new Error('Server ' + r.status), { status: r.status }); const j = await r.json(); S.snapSeq = j.snapSeq; return j; }
   async function push() {
-    S.pushT = 0; if (!S.active || !S.creds || !S.base) return; const cur = flatten(), ops = diff(cur); if (!ops.length) return;
+    S.pushT = 0; if (!S.active || !S.creds || !S.base || S.readOnly) return; const cur = flatten(), ops = diff(cur); if (!ops.length) return;
     ops.forEach(o => { o.t = nextT(); S.reg.set(o.p, { v: o.v, t: o.t, x: !!o.x }); });
     try {
       const r = await api('/ops', { method: 'POST', body: JSON.stringify({ ops: [await seal(ops)] }) });
@@ -4459,7 +4489,7 @@ const SYNC = (() => {
       setStatus('ok');
     } catch (e) { setStatus(e.status === 403 ? 'denied' : 'warn', 'Änderungen werden nachgeholt (' + e.message + ')'); S.pushT = setTimeout(push, 4000); }
   }
-  function schedulePush() { if (!S.active || !S.base) return; clearTimeout(S.pushT); S.pushT = setTimeout(push, 400); }
+  function schedulePush() { if (!S.active || !S.base || S.readOnly) return; clearTimeout(S.pushT); S.pushT = setTimeout(push, 400); }
   async function loop(id) {
     let fail = 0;
     while (S.active && S.loopId === id) {
@@ -4483,7 +4513,7 @@ const SYNC = (() => {
 
   async function create(url) {
     const code = newCode(); await creds(code, url); S.reg = new Map(); await pushAll();
-    const r = await api('/snapshot', { method: 'PUT', body: JSON.stringify({ seq: 0, data: await seal(regEntries()) }) }); if (!r.ok) throw new Error(r.status === 507 ? 'Der Server ist voll.' : 'Der Server hat abgelehnt (' + r.status + ').');
+    const r = await api('/snapshot', { method: 'PUT', body: JSON.stringify({ seq: 0, data: await seal(regEntries()), readToken: S.creds.rtoken }) }); if (!r.ok) throw new Error(r.status === 507 ? 'Der Server ist voll.' : 'Der Server hat abgelehnt (' + r.status + ').');
     S.seq = 0; S.snapSeq = 0; keep(); addJournal('Einsatz geteilt: gemeinsamer Einsatz ' + pretty(code).slice(0, 4), true); start(); return pretty(code);
   }
   async function join(code, url, resume) {
@@ -4494,18 +4524,32 @@ const SYNC = (() => {
     if (local) { local.leaf.forEach((v, p) => { const e = entOf(p); if (!S.reg.has(p) && !(e && S.reg.has(e + '/@del')) && !p.endsWith('/#o')) S.reg.set(p, { v, t: nextT() }); }); }
     materialize(); rebuildAll(!resume); keep(); start(); if (local) schedulePush(); if (!resume) addJournal('Gemeinsamem Einsatz beigetreten', true); save();
   }
+  const unb64u = t => unb64(t.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((t.length + 3) % 4));
+  async function viewLink() {              // Link und QR-Code zum Ansehen: enthält Kennung, Lesetoken und Schlüssel, aber nicht das Schreibtoken
+    if (!S.active || S.readOnly) throw new Error('Nur im geteilten Einsatz möglich.');
+    const r = await api('/readtoken', { method: 'PUT', body: JSON.stringify({ readToken: S.creds.rtoken }) }); if (!r.ok) throw new Error('Der Server hat den Lesezugriff abgelehnt (' + r.status + ').');
+    const raw = new Uint8Array(80); raw.set(S.creds.idB, 0); raw.set(S.creds.rtB, 16); raw.set(S.creds.keyRaw, 48);
+    return location.href.split('#')[0].split('?')[0] + '#ansehen=' + b64u(raw) + (S.url !== SYNC_SERVER ? '&server=' + encodeURIComponent(S.url) : '');
+  }
+  async function joinView(code, url) {      // nur ansehen: kein Schreibtoken, nichts wird gespeichert
+    let raw; try { raw = unb64u(code); } catch (e) { throw new Error('Der Link ist unvollständig.'); } if (raw.length !== 80) throw new Error('Der Link ist unvollständig.');
+    S.readOnly = true; S.url = String(url || SYNC_SERVER).trim().replace(/\/+$/, ''); S.code = 'ANSICHT';
+    S.creds = { id: hex(raw.slice(0, 16)), token: b64u(raw.slice(16, 48)), key: await crypto.subtle.importKey('raw', raw.slice(48, 80), 'AES-GCM', false, ['decrypt']) };
+    const r = await api('/ops?since=0'); if (r.status === 404 || r.status === 403) throw new Error('Dieser Einsatz ist nicht (mehr) freigegeben.'); if (!r.ok) throw new Error('Der Server antwortet nicht richtig (' + r.status + ').');
+    await loadFull(await r.json()); materialize(); rebuildAll(true); start();
+  }
   function leave() { S.active = false; S.loopId++; try { S.ac && S.ac.abort(); } catch (e) { /* weg */ } ls.del(K.code); S.status = 'off'; updateChip(); addJournal('Gemeinsamen Einsatz verlassen', true); save(); }
   async function resume() { const c = ls.get(K.code), u = ls.get(K.url) || SYNC_SERVER; if (!c || runtime.viewer || runtime.beamerView) return; try { await join(c, u, true); } catch (e) { S.code = norm(c); S.url = u; S.active = true; try { S.creds = await derive(c); } catch (x) { return; } setStatus('warn', e.message); S.loopId++; const id = S.loopId; (async () => { while (S.active && S.loopId === id) { await sleep(5000); try { await join(c, u, true); return; } catch (x) { setStatus(/verweigert|nicht/.test(x.message) ? 'denied' : 'warn', x.message); } } })(); } }
   function downloadBackup() {
     const blob = new Blob([JSON.stringify({ gesichert: new Date().toISOString(), hinweis: 'Stand vor dem Beitritt zu einem gemeinsamen Einsatz', state: shareState() })], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'lagekarte-vor-beitritt-' + new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-') + '.json'; document.body.append(a); a.click(); setTimeout(() => { a.remove(); URL.revokeObjectURL(a.href); }, 500);
   }
-  return { S, K, ls, DEFAULT: SYNC_SERVER, pretty, norm, valid, create, join, leave, resume, schedulePush, derive, flatten, get active() { return S.active; }, updateChip };
+  return { S, K, ls, DEFAULT: SYNC_SERVER, viewLink, joinView, pretty, norm, valid, create, join, leave, resume, schedulePush, derive, flatten, get active() { return S.active; }, updateChip };
 })();
 
 function openSyncDlg(tab, pre) {
   if ($('#syncDlg') || runtime.viewer) return;
-  let mode = SYNC.active && !tab ? 'teilen' : (tab || 'teilen'); const busy = { v: false };
+  let mode = SYNC.active && !tab ? 'teilen' : (tab || 'teilen'); const busy = { v: false }; let viewUrl = '';
   const urlIn = el('input', { type: 'url', placeholder: 'https://ihr-server.example', value: (pre && pre.server) || SYNC.ls.get(SYNC.K.url) || SYNC.DEFAULT, 'aria-label': 'Adresse des Servers' });
   const srvBox = () => el('details', { class: 'advsrv', open: urlIn.value !== SYNC.DEFAULT ? 'open' : null }, el('summary', { text: 'Server (voreingestellt)' }), urlIn);
   const codeIn = el('input', { type: 'text', class: 'synccode', placeholder: 'XXXX-XXXX-XXXX-XXXX-XXXX', value: (pre && pre.code) || '', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Code' });
@@ -4525,6 +4569,9 @@ function openSyncDlg(tab, pre) {
         el('div', { class: 'line' }, el('button', { class: 'btn', text: 'Code kopieren', onclick: () => copy(pc, 'Code') }), el('button', { class: 'btn', text: 'Link kopieren', onclick: () => copy(link(), 'Link') })),
         el('div', { class: 'slb2', text: 'Verbunden' }), el('div', { class: 'who' }, el('i', { class: 'dot' + (S.status === 'ok' ? '' : ' off') }), el('b', { text: 'Dieses Fenster' }), el('span', { class: 'hint', style: 'margin-left:auto', text: S.status === 'ok' ? 'verbunden' : (S.msg || 'getrennt') })),
         el('div', { class: 'who' }, el('i', { class: 'dot' + (S.online > 1 ? '' : ' off') }), el('b', { text: 'Weitere Geräte' }), el('span', { class: 'hint', style: 'margin-left:auto', text: S.online > 1 ? (S.online - 1) + ' online' : 'keines online' })),
+        el('div', { class: 'slb2', text: 'Nur ansehen' }),
+        viewUrl ? el('div', { class: 'qrwrap' }, (() => { const q = qrcode(0, 'M'); q.addData(viewUrl); q.make(); return el('img', { class: 'qrimg', alt: 'QR-Code zum Ansehen des Einsatzes', src: q.createDataURL(5, 8) }); })(), el('div', { class: 'hint', text: 'Wer den QR-Code scannt, sieht den Einsatz live, kann aber nichts ändern.' }), el('div', { class: 'line' }, el('button', { class: 'btn', text: 'Ansichtslink kopieren', onclick: () => copy(viewUrl, 'Ansichtslink') }), el('button', { class: 'btn', text: 'QR-Code ausblenden', onclick: () => { viewUrl = ''; render(); } })))
+          : el('div', { class: 'line', style: 'margin-top:4px' }, el('button', { class: 'btn', text: 'QR-Code zum Ansehen', title: 'Für Zuschauer: nur lesen, nichts ändern', onclick: () => go(async () => { viewUrl = await SYNC.viewLink(); }) })),
         el('div', { class: 'warn', text: 'Wer den Code kennt, kann den Einsatz lesen und bearbeiten. Die Daten sind auf dem Gerät verschlüsselt, der Server sieht nur unlesbare Daten. Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.' }), err,
         el('div', { class: 'line' }, el('button', { class: 'btn', style: 'color:#b71c1c', text: 'Einsatz verlassen', onclick: async () => { if (await askYesNo('Gemeinsamen Einsatz verlassen?', 'Sie behalten Ihre Kopie auf diesem Gerät. Änderungen der anderen kommen nicht mehr an.', 'Verlassen')) { SYNC.leave(); render(); } } }), el('button', { class: 'btn primary', text: 'Fertig', onclick: close })));
     } else if (mode === 'teilen') {
@@ -4541,7 +4588,10 @@ function openSyncDlg(tab, pre) {
   dlg.addEventListener('mousedown', e => { if (e.target === dlg) close(); }); dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
   render(); document.body.append(dlg);
 }
-function syncFromHash() { const m = /[#&]einsatz=([A-Z0-9]{20})(?:&server=([^&]+))?/i.exec(location.hash || ''); if (!m || runtime.viewer) return; setTimeout(() => openSyncDlg('beitreten', { code: SYNC.pretty(m[1]), server: m[2] ? decodeURIComponent(m[2]) : '' }), 800); }
+function syncFromHash() {
+  const v = /[#&]ansehen=([A-Za-z0-9_-]+)(?:&server=([^&]+))?/.exec(location.hash || '');
+  if (v) { SYNC.joinView(v[1], v[2] ? decodeURIComponent(v[2]) : '').then(() => say('Ansicht des gemeinsamen Einsatzes, nur lesen.', 4000)).catch(e => say(e.message, 9000)); return; }
+  const m = /[#&]einsatz=([A-Z0-9]{20})(?:&server=([^&]+))?/i.exec(location.hash || ''); if (!m || runtime.viewer) return; setTimeout(() => openSyncDlg('beitreten', { code: SYNC.pretty(m[1]), server: m[2] ? decodeURIComponent(m[2]) : '' }), 800); }
 let pushTimer = null;
 function schedulePush() { clearTimeout(pushTimer); pushTimer = setTimeout(pushLive, 700); }
 function shareState() {
