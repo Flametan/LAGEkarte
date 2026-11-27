@@ -92,7 +92,7 @@ async function seite(b, q, w, h) {
   await t('Touch: langes Drücken öffnet das Kartenmenü', async () => {
     const ctx = await b.newContext({ viewport: { width: 1000, height: 700 }, hasTouch: true }), p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.goto(FILE + '?rolle=S2'); await p.waitForFunction(() => window.__lage); await p.waitForTimeout(600);
-    const cdp = await ctx.newCDPSession(p); await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 600, y: 400 }] }); await p.waitForTimeout(900);
+    const cdp = await ctx.newCDPSession(p); await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 850, y: 400 }] }); await p.waitForTimeout(900);
     assert.ok((await p.locator('.ctx-item').count()) > 3); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await ctx.close();
   });
   await t('Karten-Zwischenspeicher: Kachel wird gespeichert und ohne Netz angezeigt', async () => {

@@ -788,17 +788,94 @@ body.vt-no-bottom #chemBand { display: none !important; }
 body.vortrag .leaflet-top.leaflet-left { margin-left: calc(var(--vtL, 236px) + 6px); margin-top: calc(var(--vtT, 64px) + 6px); }
 body.vortrag .leaflet-top.leaflet-right { margin-right: var(--vtR, 436px); margin-top: var(--vtT, 64px); }
 [data-theme="dark"] #vtTop .nm { color: #bcd2ff; } [data-theme="dark"] #vtTop .mt { color: #fbbf24; } [data-theme="dark"] #vtRight, [data-theme="dark"] #vtTop { background: #0e1625; } [data-theme="dark"] .vtk, [data-theme="dark"] .vtsec { background: #152036; }
+
+/* ===== Stab-Oberfläche: roter Kopf, dunkle Navigation links, Werkzeugleiste über der Karte ===== */
+:root { --red: #b71c1c; --red2: #c62828; --navw: 212px; --nav: #232f3b; --accent: #b71c1c; }
+:root[data-theme="dark"] { --red: #c62828; --accent: #ff8a80; }
+body { background: #f2f3f5; }
+:root[data-theme="dark"] body { background: var(--bg); }
+#app header { background: var(--red) !important; color: #fff !important; border-bottom: 0 !important; padding: 6px 16px 6px 0 !important; min-height: 58px; }
+#app header h1 { display: flex; align-items: stretch; margin: 0 6px 0 0; color: #fff !important; font-size: 18px; letter-spacing: 0; }
+#app header h1 .logo { background: #fff; color: var(--red); font-weight: 900; letter-spacing: .06em; padding: 12px 14px; font-size: 17px; border-radius: 0; }
+#app header h1 .lk { display: none; }
+.hdr-title { font-size: 21px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 38vw; }
+#app header button, #app header .chip { background: rgba(255,255,255,.12) !important; border: 1px solid rgba(255,255,255,.6) !important; color: #fff !important; border-radius: 4px !important; }
+#app header button:hover:not(:disabled) { background: rgba(255,255,255,.26) !important; }
+#app header .qb button { border: 0 !important; background: none !important; color: #fff !important; }
+#app header .qb button:hover:not(:disabled) { background: rgba(255,255,255,.22) !important; }
+#app header #clock { color: #fff; font-size: 23px; font-weight: 700; letter-spacing: .04em; }
+#app header #tacTime { font-size: 15px; }
+#app header #mtLine, #app header #mtLine.soon, #app header #mtLine.due, #app header #exTag { color: #ffe082; }
+#app header #fristChip { background: #fff !important; color: var(--red) !important; border-color: #fff !important; }
+#app header #fristChip.over { background: #fff !important; }
+#app header #hdrSub { color: #fff; padding-left: 16px; } #app header #hdrCounts .chip { background: rgba(0,0,0,.18) !important; border-color: rgba(255,255,255,.35) !important; }
+#app header #btnMore i { background: #fff; }
+.btn.primary, button.primary { background: var(--red); border-color: var(--red); color: #fff; }
+.tabpane h2 { color: #263340; font-size: 12.5px; letter-spacing: .06em; border-bottom: 2px solid var(--red); padding-bottom: 4px; }
+:root[data-theme="dark"] .tabpane h2 { color: var(--ink); }
+#mapBar { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 1100; display: flex; align-items: center; gap: 8px; padding: 0 14px 0 24px; background: rgba(255,255,255,.96); border-bottom: 1px solid var(--line); box-shadow: 0 1px 5px rgba(0,0,0,.14); pointer-events: auto; }
+#mapBar .mb-t { font-size: 22px; font-weight: 600; color: #263340; margin-right: 6px; }
+#mapBar .sp { flex: 1; }
+#mapBar .mb { border: 1px solid #cdd4dc; background: #fff; color: #263340; border-radius: 5px; padding: 6px 12px; font-weight: 600; }
+#mapBar .mb:hover { border-color: var(--red); background: #fdecea; }
+:root[data-theme="dark"] #mapBar { background: rgba(17,26,43,.96); } :root[data-theme="dark"] #mapBar .mb-t { color: var(--ink); } :root[data-theme="dark"] #mapBar .mb { background: #17233a; color: var(--ink); border-color: #3a4a63; }
+.leaflet-top { top: 54px; }
+#placeSearch { top: 7px !important; z-index: 1200 !important; left: 150px !important; width: min(340px, 30vw) !important; }
+#placeSearch input, #placeSearch button { box-shadow: none !important; }
+body.vortrag #mapBar, body.printing #mapBar, body.beamer #mapBar { display: none; }
+body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
+@media (min-width: 861px) {
+  #app { grid-template-columns: calc(var(--navw) + 400px) 1fr; }
+  #app.collapsed { grid-template-columns: var(--navw) 1fr; }
+  #app.collapsed #panel { visibility: visible; border-right: 0; overflow: hidden; }
+  #app.collapsed .tabpane { display: none !important; }
+  #panel { grid-template-columns: var(--navw) 1fr; }
+  #app #tabs { background: var(--nav); border-right: 0; padding: 6px 0 0; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+  #app #tabs button { display: flex; align-items: center; gap: 13px; width: 100%; flex: 0 0 auto; text-align: left; padding: 11px 18px; font-size: 14.5px; font-weight: 500; color: #d6dee6; background: none; border: 0; border-radius: 0; min-height: 0; }
+  #app #tabs button:hover { background: rgba(255,255,255,.08); }
+  #app #tabs button[aria-selected="true"], #app #tabs button.on { background: var(--red2); color: #fff; font-weight: 600; }
+  #app #tabs button.dim[aria-selected="true"] { background: none; color: #d6dee6; font-weight: 500; }
+  #app #tabs button::before { content: ''; flex: none; width: 20px; height: 20px; background: currentColor; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-position: center; mask-position: center; }
+  .nav-grp { color: #8fa1b3; font-size: 11px; text-transform: uppercase; letter-spacing: .09em; padding: 16px 18px 5px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,.12); }
+  .nav-saved { margin-top: auto; padding: 14px 18px; font-size: 12px; color: #8fa1b3; }
+}
+@media (max-width: 860px) {
+  #app #tabs { flex-direction: row; background: var(--nav); overflow-x: auto; } #app #tabs button { flex: 0 0 auto; color: #d6dee6; padding: 10px 12px; white-space: nowrap; border: 0; background: none; }
+  #app #tabs button[aria-selected="true"] { background: var(--red2); color: #fff; } .nav-grp, .nav-saved { display: none; }
+  #mapBar .mb-t { display: none; } #placeSearch { left: 12px !important; }
+}
+#tabs [data-tab='einsatz']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M4 3h2v18H4zM7 4h11l-2 4 2 4H7z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M4 3h2v18H4zM7 4h11l-2 4 2 4H7z'/%3E%3C/svg%3E"); }
+#tabs [data-act='map']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.500A2.500 2.500 0 1 1 12 6.500a2.500 2.500 0 0 1 0 5z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.500A2.500 2.500 0 1 1 12 6.500a2.500 2.500 0 0 1 0 5z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='tagebuch']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5 3h13a1 1 0 0 1 1 1v17H6a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1zm3 4v2h8V7zm0 4v2h8v-2z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5 3h13a1 1 0 0 1 1 1v17H6a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1zm3 4v2h8V7zm0 4v2h8v-2z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='meldungen']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 5h18v14H3zm2 2v.5l7 5 7-5V7zm0 3v7h14v-7l-7 5z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 5h18v14H3zm2 2v.5l7 5 7-5V7zm0 3v7h14v-7l-7 5z'/%3E%3C/svg%3E"); }
+#tabs [data-act='wand']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM9 13c-2.700 0-8 1.300-8 4v2h16v-2c0-2.700-5.300-4-8-4zm6 0c-.4 0-.8 0-1.300.1 1.600 1 2.300 2.300 2.300 3.900v2h7v-2c0-2.700-5.300-4-8-4z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM9 13c-2.700 0-8 1.300-8 4v2h16v-2c0-2.700-5.300-4-8-4zm6 0c-.4 0-.8 0-1.300.1 1.600 1 2.300 2.300 2.300 3.900v2h7v-2c0-2.700-5.300-4-8-4z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='abschnitte']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z'/%3E%3C/svg%3E"); }
+#tabs [data-act='auftr']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 16.200 4.800 12l-1.400 1.400L9 19 21 7l-1.400-1.400z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 16.200 4.800 12l-1.400 1.400L9 19 21 7l-1.400-1.400z'/%3E%3C/svg%3E"); }
+#tabs [data-act='fue']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 1a2.500 2.500 0 1 0 0-5 2.500 2.500 0 0 0 0 5zM9 13c-2.700 0-8 1.300-8 4v2h16v-2c0-2.700-5.300-4-8-4zm8 1c-.6 0-1.200.1-1.900.3 1.200.9 1.900 2.100 1.900 3.700v1h6v-1.500c0-2.200-3.700-3.500-6-3.500z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 1a2.500 2.500 0 1 0 0-5 2.500 2.500 0 0 0 0 5zM9 13c-2.700 0-8 1.300-8 4v2h16v-2c0-2.700-5.300-4-8-4zm8 1c-.6 0-1.200.1-1.900.3 1.200.9 1.900 2.100 1.900 3.700v1h6v-1.500c0-2.200-3.700-3.500-6-3.500z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='gebiet']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2l9 5v10l-9 5-9-5V7z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2l9 5v10l-9 5-9-5V7z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='ebenen']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2 2 7l10 5 10-5zM2 12l10 5 10-5-2-1-8 4-8-4zm0 5 10 5 10-5-2-1-8 4-8-4z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2 2 7l10 5 10-5zM2 12l10 5 10-5-2-1-8 4-8-4zm0 5 10 5 10-5-2-1-8 4-8-4z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='objekte']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M4 21V6l8-4 8 4v15h-6v-6h-4v6z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M4 21V6l8-4 8 4v15h-6v-6h-4v6z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='kraefte']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 7h13l3 4h2v6h-2a2.500 2.500 0 0 1-5 0H8a2.500 2.500 0 0 1-5 0H3zm4 8a1.500 1.500 0 1 0 0 3 1.500 1.500 0 0 0 0-3zm10 0a1.500 1.500 0 1 0 0 3 1.500 1.500 0 0 0 0-3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 7h13l3 4h2v6h-2a2.500 2.500 0 0 1-5 0H8a2.500 2.500 0 0 1-5 0H3zm4 8a1.500 1.500 0 1 0 0 3 1.500 1.500 0 0 0 0-3zm10 0a1.500 1.500 0 1 0 0 3 1.500 1.500 0 0 0 0-3z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='probleme']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2 1 21h22zM11 9h2v6h-2zm0 7h2v2h-2z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2 1 21h22zM11 9h2v6h-2zm0 7h2v2h-2z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='zahlen']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M4 20V11h4v9zm6 0V4h4v16zm6 0v-6h4v6z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M4 20V11h4v9zm6 0V4h4v16zm6 0v-6h4v6z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='bhp']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 3h6v6h6v6h-6v6H9v-6H3V9h6z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 3h6v6h6v6h-6v6H9v-6H3V9h6z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='keule']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M6 19a4 4 0 0 1-.5-8 6 6 0 0 1 11.500-1.500A4.500 4.500 0 0 1 17.500 19z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M6 19a4 4 0 0 1-.5-8 6 6 0 0 1 11.500-1.500A4.500 4.500 0 0 1 17.500 19z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='chem']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 2h6v2h-1v5l5.500 9.500A2 2 0 0 1 17.800 21H6.200a2 2 0 0 1-1.700-2.500L10 9V4H9z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M9 2h6v2h-1v5l5.500 9.500A2 2 0 0 1 17.800 21H6.200a2 2 0 0 1-1.700-2.500L10 9V4H9z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='lage']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 5l6-2 6 2 6-2v16l-6 2-6-2-6 2zm6-.5v13l6 2v-13z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 5l6-2 6 2 6-2v16l-6 2-6-2-6 2zm6-.5v13l6 2v-13z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='staende']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 5h-2v6l5 3 1-1.700-4-2.300z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 5h-2v6l5 3 1-1.700-4-2.300z'/%3E%3C/svg%3E"); }
+#tabs [data-tab='daten']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5 3h11l5 5v13H5zm3 0v6h7V3zm1 11v7h6v-7z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5 3h11l5 5v13H5zm3 0v6h7V3zm1 11v7h6v-7z'/%3E%3C/svg%3E"); }
 </style>
 </head>
 <body>
 <div id="app">
   <header>
     <div id="hdrTop">
+    <h1><span class="logo">LAGE</span><span class="lk">karte</span></h1>
+    <span id="hdrTitle" class="hdr-title"></span>
     <div id="qat" role="toolbar" aria-label="Schnellzugriff">
       <span class="qb"><button id="btnUndo" disabled aria-label="Rückgängig"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></button><button id="btnUndoMenu" class="caret" disabled aria-label="Rückgängig-Liste"><svg viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path fill="currentColor" d="M0 0h10L5 6z"/></svg></button></span>
       <span class="qb"><button id="btnRedo" disabled aria-label="Wiederholen"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg></button><button id="btnRedoMenu" class="caret" disabled aria-label="Wiederholen-Liste"><svg viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path fill="currentColor" d="M0 0h10L5 6z"/></svg></button></span>
     </div>
-    <h1>LAGEkarte</h1>
     <span id="exTag" class="chip ex" hidden>ÜBUNG</span>
     <span id="hdrArea"></span>
     <div id="mtLine" hidden></div>
@@ -826,24 +903,30 @@ body.vortrag .leaflet-top.leaflet-right { margin-right: var(--vtR, 436px); margi
   </header>
 
   <aside id="panel">
-    <div id="tabs" role="tablist">
-      <button role="tab" data-tab="einsatz" aria-selected="true">Einsatz</button>
-      <button role="tab" data-tab="gebiet" aria-selected="false">Gebiete</button>
-      <button role="tab" data-tab="ebenen" aria-selected="false">Ebenen</button>
-      <button role="tab" data-tab="objekte" aria-selected="false">Objekte</button>
-      <button role="tab" data-tab="kraefte" aria-selected="false">Kräfte</button>
-      <button role="tab" data-tab="abschnitte" aria-selected="false">Abschnitte</button>
-      <button role="tab" data-tab="meldungen" aria-selected="false">Meldungen</button>
-      <button role="tab" data-tab="tagebuch" aria-selected="false">Tagebuch</button>
-      <button role="tab" data-tab="probleme" aria-selected="false">Probleme</button>
-      <button role="tab" data-tab="zahlen" aria-selected="false">Zahlen</button>
-      <button role="tab" data-tab="bhp" aria-selected="false" title="Behandlungsplatz: Sichtungskategorien, Transport, Kliniken">Behandlung</button>
-      <button role="tab" data-tab="keule" aria-selected="false" title="Wetter, Wind und Keule">Wetter</button>
-      <button role="tab" data-tab="chem" aria-selected="false" title="Gefahrstoffe: Datenblatt, Absperrzonen, Betroffene, Keule">Gefahrstoff</button>
-      <button role="tab" data-tab="lage" aria-selected="false">Lage</button>
-      <button role="tab" data-tab="staende" aria-selected="false">Stände</button>
-      <button role="tab" data-tab="daten" aria-selected="false">Daten</button>
-    </div>
+    <nav id="tabs" role="tablist" aria-label="Bereiche">
+      <button role="tab" data-tab="einsatz" aria-selected="true"><span>Übersicht</span></button>
+      <button type="button" class="nav-act" data-act="map" title="Nur die Karte zeigen, Seitenleiste einklappen"><span>Lagekarte</span></button>
+      <button role="tab" data-tab="tagebuch" aria-selected="false"><span>Einsatztagebuch</span></button>
+      <button role="tab" data-tab="meldungen" aria-selected="false"><span>Meldungen</span></button>
+      <button type="button" class="nav-act" data-act="wand" title="Stabswand mit Kräfteübersicht (Taste U)"><span>Kräfte</span></button>
+      <button role="tab" data-tab="abschnitte" aria-selected="false"><span>Abschnitte</span></button>
+      <button type="button" class="nav-act" data-act="auftr" title="Auftragsstreifen der Stabswand"><span>Aufträge</span></button>
+      <button type="button" class="nav-act" data-act="fue" title="Führungsstruktur und Kommunikationsplan (Taste F)"><span>Stab &amp; Kontakte</span></button>
+      <div class="nav-grp">Weitere Bereiche</div>
+      <button role="tab" data-tab="gebiet" aria-selected="false"><span>Gebiete</span></button>
+      <button role="tab" data-tab="ebenen" aria-selected="false"><span>Ebenen</span></button>
+      <button role="tab" data-tab="objekte" aria-selected="false"><span>Objekte</span></button>
+      <button role="tab" data-tab="kraefte" aria-selected="false"><span>Einheiten (Liste)</span></button>
+      <button role="tab" data-tab="probleme" aria-selected="false"><span>Probleme</span></button>
+      <button role="tab" data-tab="zahlen" aria-selected="false"><span>Zahlen</span></button>
+      <button role="tab" data-tab="bhp" aria-selected="false" title="Behandlungsplatz: Sichtungskategorien, Transport, Kliniken"><span>Behandlungsplatz</span></button>
+      <button role="tab" data-tab="keule" aria-selected="false" title="Wetter, Wind und Keule"><span>Wetter und Keule</span></button>
+      <button role="tab" data-tab="chem" aria-selected="false" title="Gefahrstoffe: Datenblatt, Absperrzonen, Betroffene, Keule"><span>Gefahrstoff</span></button>
+      <button role="tab" data-tab="lage" aria-selected="false"><span>Lage</span></button>
+      <button role="tab" data-tab="staende" aria-selected="false"><span>Lagestände</span></button>
+      <button role="tab" data-tab="daten" aria-selected="false"><span>Daten</span></button>
+      <div id="navSaved" class="nav-saved">Noch nicht gespeichert</div>
+    </nav>
 
     <section class="tabpane active" id="tab-einsatz">
       <h2>Übung oder Einsatz</h2>
@@ -1268,6 +1351,7 @@ SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
   </aside>
 
   <div id="mapWrap">
+    <div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button><button type="button" class="mb" data-mb="units" title="Einheiten und Stabswand (U)">Kräfte</button><button type="button" class="mb" data-mb="fue" title="Führungsstruktur (F)">Stab</button><button type="button" class="mb" data-mb="print" title="Karte drucken oder als PDF speichern">Drucken</button></div>
     <div id="map"></div>
     <form id="placeSearch" role="search" autocomplete="off"><button type="button" id="placeToggle" aria-label="Ortssuche ein- oder ausklappen" aria-expanded="true" title="Ortssuche ein- oder ausklappen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 21 21"/></svg></button><input type="search" id="placeQ" placeholder="Ort suchen und hinzoomen" aria-label="Ort suchen"><button type="submit" aria-label="Suchen">Suchen</button><div id="placeRes" role="listbox"></div></form>
     <div id="editBar" role="toolbar" aria-label="Eckpunkte bearbeiten"><span id="editTxt">Eckpunkte bearbeiten</span><button id="editOk">Übernehmen (Enter)</button><button id="editCancel">Verwerfen (Esc)</button></div>
@@ -1585,7 +1669,7 @@ function save(label) {
 function saveNow() {
   saveTimer = 0;
   {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); runtime.storeWarn = ''; }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); runtime.storeWarn = ''; const ns = document.getElementById('navSaved'); if (ns) ns.textContent = 'Gespeichert ' + new Date().toLocaleTimeString('de-DE'); }
     catch (e) { runtime.storeWarn = 'gekürzt'; try { const s = Object.assign({}, state, { pois: Object.fromEntries(Object.entries(state.pois).filter(([, q]) => q.manual)), loaded: {} }); localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e2) { runtime.storeWarn = 'voll'; } }
     const sc = document.getElementById('storeChip'); if (sc) { sc.hidden = !runtime.storeWarn; sc.textContent = runtime.storeWarn === 'voll' ? 'Speicher voll: Lage als Datei sichern' : 'Speicher knapp: Lage als Datei sichern'; sc.title = 'Der Browserspeicher reicht nicht. Reiter Daten, Lage speichern.'; }
   }
@@ -3077,7 +3161,7 @@ function updateFristChip() {
 function tickClock() {
   const e = state.exercise; $('#clock').textContent = fmtClock(nowMs()); $('#tacTime').textContent = fmtTac(nowMs());
   $('#exTag').hidden = !(e && e.active); $('#exTag').title = e && e.name ? e.name : 'Übungsuhr aktiv';
-  updateMeetingChip(); updateFristChip();
+  updateMeetingChip(); updateFristChip(); const ht = $('#hdrTitle'); if (ht) ht.textContent = (e && e.name) ? e.name : 'Lage';
 }
 function renderEinsatz() {
   const e = state.exercise, w = state.weather, m = state.meeting;
@@ -4694,8 +4778,8 @@ function initOvDrag() {
   window.addEventListener('pointercancel', () => ovDragEnd(false));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && ovDrag && ovDrag.on) { e.stopPropagation(); ovDragEnd(false); } }, true);
 }
-function openUnitOverview() { closeFue(); $('#unitOv').hidden = false; if (runtime.vortrag) vtApply(); renderUnitOverview(); $('#ovClose').focus(); }
-function closeUnitOverview() { $('#unitOv').hidden = true; if (runtime.vortrag) vtApply(); }
+function openUnitOverview() { closeFue(); $('#unitOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderUnitOverview(); $('#ovClose').focus(); }
+function closeUnitOverview() { $('#unitOv').hidden = true; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); }
 function initUnitOverview() {
   $('#btnUnits').onclick = () => ($('#unitOv').hidden ? openUnitOverview() : closeUnitOverview());
   $('#ovAdd').onclick = () => openUnitWizard({}); $('#ovClose').onclick = closeUnitOverview; $('#ovStat').addEventListener('change', renderUnitOverview); $('#ovGroup').addEventListener('change', renderUnitOverview); initOvDrag();
@@ -4817,8 +4901,8 @@ function renderFunk() {
     el('div', { class: 'hint', text: 'Kanäle, Rufnamen und Rufnummern trägt der S6 ein. Es werden keine Werte vorgegeben.' }));
   if (vw) lockViewer(box);
 }
-function openFue() { closeUnitOverview(); $('#fueOv').hidden = false; if (runtime.vortrag) vtApply(); renderFue(); $('#fueClose').focus(); }
-function closeFue() { $('#fueOv').hidden = true; if (runtime.vortrag) vtApply(); }
+function openFue() { closeUnitOverview(); $('#fueOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderFue(); $('#fueClose').focus(); }
+function closeFue() { $('#fueOv').hidden = true; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); }
 function initFue() {
   $('#btnFue').onclick = () => ($('#fueOv').hidden ? openFue() : closeFue()); $('#fueClose').onclick = closeFue;
   $('#fueAddEA').onclick = () => fueAddSection(null);
@@ -5268,6 +5352,25 @@ function initTileCacheUi() {
   show();
 }
 /* Wandoptik schalten */
+/* Navigation links: Sonderpunkte (Karte, Stabswand, Aufträge, Stab und Kontakte), Hervorhebung, Titel und Speicherzeit im Kopf */
+function syncNav() {
+  const on = (a, v) => { const n = document.querySelector('#tabs [data-act="' + a + '"]'); if (n) n.classList.toggle('on', !!v); };
+  const open = id => { const n = $(id); return !!n && !n.hidden; };
+  on('map', $('#app').classList.contains('collapsed') && !open('#unitOv') && !open('#fueOv')); on('wand', open('#unitOv')); on('fue', open('#fueOv'));
+  document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('dim', open('#unitOv') || open('#fueOv') || $('#app').classList.contains('collapsed')));
+}
+function initNavActs() {
+  document.querySelectorAll('#tabs [data-act]').forEach(b => b.addEventListener('click', () => {
+    const a = b.dataset.act;
+    if (a === 'map') { closeUnitOverview(); closeFue(); setPanel(false); }
+    else if (a === 'wand') { if (!$('#unitOv').hidden) closeUnitOverview(); else { $('#ovGroup').value = 'wand'; openUnitOverview(); } }
+    else if (a === 'auftr') { $('#ovGroup').value = 'wand'; openUnitOverview(); setTimeout(() => { const w = $('#ovCols .wall2'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 120); }
+    else if (a === 'fue') { if (!$('#fueOv').hidden) closeFue(); else openFue(); }
+    syncNav();
+  }));
+  document.querySelectorAll('#mapBar [data-mb]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mb; if (k === 'poi') $('#btnAddPoi').click(); else if (k === 'units') $('#btnUnits').click(); else if (k === 'fue') $('#btnFue').click(); else if (k === 'print') $('#btnPrint').click(); syncNav(); }));
+  syncNav();
+}
 function initLook() {
   const b = $('#btnLook'); if (!b) return; const set = on => { document.body.classList.toggle('wandlook', on); b.textContent = 'Wandoptik: ' + (on ? 'ein' : 'aus'); try { localStorage.setItem('kritis-look', on ? '1' : '0'); } catch (e) { /* egal */ } };
   let on = false; try { on = localStorage.getItem('kritis-look') === '1'; } catch (e) { /* egal */ } set(on); b.onclick = () => set(!document.body.classList.contains('wandlook'));
@@ -5283,7 +5386,7 @@ function initMsgTpl() {
 function initMeldungen() {
   $('#mKind').append(...MSG_KINDS.map(k => el('option', { value: k, text: k }))); $('#mWay').append(...MSG_WAY.map(w => el('option', { value: w, text: w || '– Weg –' })));
   $('#mExtraOn').addEventListener('change', e => { state.msgExtra = e.target.checked; $('#mExtra').hidden = !e.target.checked; persist(); });
-  initMsgTpl(); initTileCacheUi(); initBhp(); initLook();
+  initMsgTpl(); initTileCacheUi(); initBhp(); initLook(); initNavActs();
   $('#mAdd').onclick = () => {
     const text = $('#mText').value.trim(); if (!text) { $('#mText').focus(); return; }
     addMessage({ dir: $('#mDir').value, kind: $('#mKind').value, from: $('#mFrom').value.trim(), to: $('#mTo').value.trim(), text, prio: prioNum($('#mPrio').value), ref: $('#mRef').value,
@@ -5526,7 +5629,7 @@ function openTab(name) {
   document.querySelectorAll('#tabs button').forEach(x => x.setAttribute('aria-selected', String(x.dataset.tab === name)));
   document.querySelectorAll('.tabpane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
 }
-document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => openTab(b.dataset.tab)));
+document.querySelectorAll('#tabs button[data-tab]').forEach(b => b.addEventListener('click', () => { openTab(b.dataset.tab); if ($('#app').classList.contains('collapsed')) setPanel(true); }));
 $('#btnPoly').onclick = e => startDraw('polygon', 'area', e.currentTarget);
 $('#btnRect').onclick = e => startDraw('rectangle', 'area', e.currentTarget);
 $('#btnCircle').onclick = startCircleMode;
@@ -5581,7 +5684,7 @@ document.addEventListener('keydown', e => {
 /* Seitenleiste einklappen */
 const panelGlyph = open => window.matchMedia('(max-width: 860px)').matches ? (open ? '&#9662;' : '&#9652;') : (open ? '&lsaquo;' : '&rsaquo;');
 function setPanel(open, remember) {
-  const app = $('#app'); app.classList.toggle('collapsed', !open);
+  const app = $('#app'); app.classList.toggle('collapsed', !open); setTimeout(() => { if (typeof syncNav === 'function') syncNav(); }, 0);
   const t = $('#panelToggle'); t.setAttribute('aria-expanded', String(open));
   t.innerHTML = panelGlyph(open);
   if (remember !== false) { try { localStorage.setItem('kritis-panel', open ? '1' : '0'); } catch (e) { /* egal */ } }
