@@ -177,6 +177,24 @@ async function seite(b, q, w, h) {
     const c = await p.evaluate(() => { const m = window.__lage.map.getCenter(); return [m.lat, m.lng, window.__lage.map.getZoom()]; });
     assert.ok(Math.abs(c[0] - 51.5135) < 0.01 && Math.abs(c[1] - 7.4653) < 0.01 && c[2] >= 16, 'Karte zeigt die Adresse: ' + c); assert.ok(await p.locator('.leaflet-marker-icon').count() >= 1); await p.close();
   });
+  await t('Navigation: erneuter Klick klappt zu, mehrere Punkte zugleich aktiv', async () => {
+    const p = await seite(b, '', 1600, 950); const on = k => p.evaluate(k2 => { const n = document.querySelector('#tabs [data-act="' + k2 + '"],#tabs [data-tab="' + k2 + '"]'); return n.classList.contains('on') || (n.getAttribute('aria-selected') === 'true' && !n.classList.contains('dim')); }, k);
+    await p.click('#tabs [data-tab="gebiet"]'); await p.waitForTimeout(300); assert.ok(await on('gebiet') && await on('map'), 'Gebiete und Lagekarte aktiv');
+    await p.click('#tabs [data-tab="gebiet"]'); await p.waitForTimeout(500); assert.ok(await p.evaluate(() => document.querySelector('#app').classList.contains('collapsed')), 'Panel zugeklappt'); assert.ok(!(await on('gebiet')));
+    await p.click('#tabs [data-tab="gebiet"]'); await p.waitForTimeout(400); assert.ok(!(await p.evaluate(() => document.querySelector('#app').classList.contains('collapsed'))));
+    await p.click('#tabs [data-act="wand"]'); await p.click('#tabs [data-act="fue"]'); await p.waitForTimeout(500);
+    assert.ok(await on('wand') && await on('fue') && !(await on('map')), 'Kräfte und Führungsstruktur zugleich');
+    assert.ok(await p.evaluate(() => document.body.classList.contains('dual') && !document.querySelector('#unitOv').hidden && !document.querySelector('#fueOv').hidden));
+    await p.click('#tabs [data-act="map"]'); await p.waitForTimeout(400); assert.ok(await on('map') && !(await on('wand'))); await p.close();
+  });
+  await t('Stabswand: + Einheit im Abschnitt, Aufforderung zum Einzeichnen auf der Karte', async () => {
+    const p = await seite(b, '', 1700, 1300); await p.evaluate(() => { const s = window.__lage.state; s.areas = []; s.sections = [{ id: 'ea1', kind: 'poly', typ: 'ea', name: 'EA Süd', color: '#2563eb', pts: [] }]; s.units = []; });
+    await p.keyboard.press('u'); await p.waitForTimeout(500); await p.evaluate(() => document.querySelector('#ovStat').dispatchEvent(new Event('change'))); await p.waitForTimeout(300);
+    await p.locator('.wcard button', { hasText: '+ Einheit' }).click(); await p.waitForTimeout(300);
+    await p.locator('.dlg input').first().fill('LF Test'); await p.locator('.dlg button.primary').first().click(); await p.waitForTimeout(400);
+    const u = await p.evaluate(() => window.__lage.state.units[0]); assert.ok(u && u.sectionId === 'ea1' && u.lat != null, 'Einheit im Abschnitt und mit Ort');
+    await p.click('#tabs [data-act="map"]'); await p.waitForSelector('.drawask', { timeout: 4000 }); assert.ok((await p.textContent('.drawask')).includes('EA Süd')); await p.close();
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));

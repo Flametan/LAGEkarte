@@ -490,6 +490,8 @@ header .qb button:hover:not(:disabled) { background: #e2e8f0; }
 .clamp.open { display: block; -webkit-line-clamp: unset; cursor: pointer; }
 #panelToggle { z-index: 1700; }
 #unitOv { padding-left: 28px; }
+.wbtns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+body.dual #unitOv { right: 50%; } body.dual #fueOv { left: 50%; border-left: 2px solid var(--line); }
 .ovunit { touch-action: pan-y; position: relative; }
 .ovunit .grip { cursor: grab; touch-action: none; user-select: none; color: #94a3b8; font-weight: 700; letter-spacing: -2px; padding: 8px 2px; margin: -8px 0 -8px -6px; align-self: stretch; display: flex; align-items: center; }
 .ovunit.ovdrag { opacity: .3; }
@@ -841,6 +843,7 @@ body { background: #f2f3f5; }
 .addr-opt { display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: inherit; padding: 8px 6px; font: inherit; cursor: pointer; } .addr-opt:hover { background: rgba(183,28,28,.08); }
 #secPop { position: absolute; top: 56px; right: 14px; z-index: 1200; width: 330px; background: #fff; color: #263340; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.25); padding: 12px; } #secPop[hidden] { display: none; } #secPop .row { margin: 8px 0; } :root[data-theme="dark"] #secPop { background: #17233a; color: var(--ink); } body.vortrag #secPop, body.printing #secPop { display: none; }
 #mapBar .mb { border: 1px solid #cdd4dc; background: #fff; color: #263340; border-radius: 5px; padding: 6px 12px; font-weight: 600; }
+#mapBar .mb-ea { background: var(--red); border-color: var(--red); color: #fff; } #mapBar .mb-ea:hover { background: #8e1515; color: #fff; } :root[data-theme="dark"] #mapBar .mb.mb-ea { background: var(--red); color: #fff; border-color: var(--red); }
 #mapBar .mb:hover { border-color: var(--red); background: #fdecea; }
 :root[data-theme="dark"] #mapBar { background: rgba(17,26,43,.96); } :root[data-theme="dark"] #mapBar .mb-t { color: var(--ink); } :root[data-theme="dark"] #mapBar .mb { background: #17233a; color: var(--ink); border-color: #3a4a63; }
 .leaflet-top { top: 54px; }
@@ -1027,6 +1030,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
         <button class="btn primary" id="btnLoad" disabled>Objekte laden</button>
       </div>
       <h2>Abschnitte und Linien</h2>
+      <div class="row"><button class="btn primary" type="button" id="btnEaGebiet" title="Neuen Einsatzabschnitt (EA) anlegen">+ EA</button></div>
       <div id="secList"></div>
       <div class="notice">Die Objekte stammen aus OpenStreetMap und sind keine amtliche KRITIS-Liste. Die Vollständigkeit schwankt je Sektor, am schwächsten bei Rechenzentren, Funkmasten und Finanzwesen. Betreiberdaten des Krisenstabs sind Voraussetzung für eine belastbare Lage.</div>
     </section>
@@ -1391,10 +1395,10 @@ SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
   </aside>
 
   <div id="mapWrap">
-    <div id="secPop" hidden role="dialog" aria-label="Einsatzabschnitt zeichnen"><b>Einsatzabschnitt auf der Karte</b>
+    <div id="secPop" hidden role="dialog" aria-label="Einsatzabschnitt zeichnen"><b>Neuer Einsatzabschnitt (EA)</b>
       <div class="row"><input type="text" id="secName" placeholder="Bezeichnung, z. B. Abschnitt Nord"><input type="color" id="secColor" value="#e11d48" title="Farbe"></div>
       <div class="row"><button class="btn" id="btnSecPoly">Fläche zeichnen</button><button class="btn" id="btnSecLine">Linie zeichnen</button></div>
-      <div class="hint">Zeichnen, dann Doppelklick zum Beenden. Abschnitte ohne Karte legt man in der Führungsstruktur oder auf der Stabswand an.</div></div><div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button><button type="button" class="mb" data-mb="units" title="Einheiten und Stabswand (U)">Kräfte</button><button type="button" class="mb" data-mb="fue" title="Führungsstruktur (F)">Stab</button><button type="button" class="mb" data-mb="sec" title="Einsatzabschnitt oder Linie auf der Karte zeichnen">Abschnitt</button><button type="button" class="mb" data-mb="print" title="Karte drucken oder als PDF speichern">Drucken</button></div>
+      <div class="hint">Zeichnen, dann Doppelklick zum Beenden. Abschnitte ohne Karte legt man in der Führungsstruktur oder auf der Stabswand an.</div></div><div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span><button type="button" class="mb mb-ea" data-mb="sec" title="Neuen Einsatzabschnitt (EA) anlegen: Name und Farbe wählen, Fläche oder Linie auf der Karte zeichnen">+ EA</button><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button><button type="button" class="mb" data-mb="units" title="Einheiten und Stabswand (U)">Kräfte</button><button type="button" class="mb" data-mb="fue" title="Führungsstruktur (F)">Stab</button><button type="button" class="mb" data-mb="print" title="Karte drucken oder als PDF speichern">Drucken</button></div>
     <div id="map"></div>
     <form id="placeSearch" role="search" autocomplete="off"><button type="button" id="placeToggle" aria-label="Ortssuche ein- oder ausklappen" aria-expanded="true" title="Ortssuche ein- oder ausklappen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 21 21"/></svg></button><input type="search" id="placeQ" placeholder="Ort suchen und hinzoomen" aria-label="Ort suchen"><button type="submit" aria-label="Suchen">Suchen</button><div id="placeRes" role="listbox"></div></form>
     <div id="editBar" role="toolbar" aria-label="Eckpunkte bearbeiten"><span id="editTxt">Eckpunkte bearbeiten</span><button id="editOk">Übernehmen (Enter)</button><button id="editCancel">Verwerfen (Esc)</button></div>
@@ -1943,13 +1947,36 @@ function inlineRename(node, current, done) {
 /* Zeichnen */
 function stopDraw() {
   if (runtime.drawHandler) { try { runtime.drawHandler.disable(); } catch (e) { /* bereits aus */ } }
-  runtime.drawHandler = null; runtime.drawPurpose = null;
+  runtime.drawHandler = null; runtime.drawPurpose = null; runtime.drawSecId = null;
   runtime.mode = null; runtime.placing = null;
   if (runtime.measure) { map.removeLayer(runtime.measure.line); runtime.measure = null; }
   document.querySelectorAll('.btn.active').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('#symGrid .sel').forEach(b => b.classList.remove('sel'));
   map.getContainer().style.cursor = '';
   say('');
+}
+function einsatzCenter() {
+  let pts = [];
+  state.areas.forEach(a => a.rings.forEach(r => r.forEach(p => pts.push(p))));
+  if (!pts.length) state.units.forEach(u => { if (u.lat != null) pts.push([u.lat, u.lng]); });
+  if (!pts.length) state.sections.forEach(x => (x.pts || []).forEach(p => pts.push(p)));
+  const c = pts.length ? L.latLngBounds(pts).getCenter() : map.getCenter();
+  return map.getBounds().contains(c) ? c : (pts.length ? c : map.getCenter());
+}
+function promptDrawSection() {
+  if (runtime.viewer || ro('sections') || runtime.drawHandler) return;
+  runtime.drawAsked = runtime.drawAsked || new Set();
+  const sx = state.sections.find(x => x.kind !== 'line' && (!x.pts || x.pts.length < 3) && !runtime.drawAsked.has(x.id)); if (!sx) return;
+  const c = einsatzCenter(); if (!map.getBounds().pad(-0.15).contains(c)) map.setView(c, Math.max(map.getZoom(), 14));
+  const kind = { ea: 'EA', br: 'BR', el: 'EL' }[sx.typ] || (sx.parentId ? 'UEA' : 'EA');
+  const pop = L.popup({ closeOnClick: false, autoClose: false, className: 'drawask', minWidth: 240 }).setLatLng(c).setContent(el('div', {},
+    el('b', { text: kind + ' „' + sx.name + '“ ist noch nicht auf der Karte.' }), el('div', { class: 'hint', text: 'Fläche einzeichnen: Ecken anklicken, Doppelklick beendet.' }),
+    el('div', { class: 'row' }, el('button', { class: 'btn small primary', text: 'Jetzt einzeichnen', onclick: () => { map.closePopup(pop); runtime.drawAsked.add(sx.id); drawExistingSection(sx); } }),
+      el('button', { class: 'btn small', text: 'Später', onclick: () => { map.closePopup(pop); runtime.drawAsked.add(sx.id); setTimeout(promptDrawSection, 300); } })))).openOn(map);
+}
+function drawExistingSection(sx) {
+  try { $('#secColor').value = /^#[0-9a-f]{6}$/i.test(sx.color || '') ? sx.color : $('#secColor').value; } catch (e) { /* Farbe egal */ }
+  startDraw('polygon', 'section'); runtime.drawSecId = sx.id; say('„' + sx.name + '“: Ecken anklicken, Doppelklick beendet. Esc bricht ab.', 8000);
 }
 function startDraw(kind, purpose, btn) {
   stopDraw();
@@ -1961,11 +1988,14 @@ function startDraw(kind, purpose, btn) {
   if (btn) btn.classList.add('active');
 }
 map.on(L.Draw.Event.CREATED, e => {
-  const purpose = runtime.drawPurpose; stopDraw();
+  const purpose = runtime.drawPurpose, secId0 = runtime.drawSecId; stopDraw();
   if (purpose === 'area') {
     const ring = e.layer.getLatLngs()[0].map(p => [p.lat, p.lng]);
     const rect = e.layerType === 'rectangle', cnt = state.areas.filter(a => a.kind === (rect ? 'rect' : 'polygon')).length + 1;
     addArea({ kind: rect ? 'rect' : 'polygon', name: (rect ? 'Rechteck ' : 'Polygon ') + cnt, rings: [ring] });
+  } else if (purpose === 'section' && secId0 && state.sections.some(x => x.id === secId0)) {
+    const sx = state.sections.find(x => x.id === secId0); sx.pts = e.layer.getLatLngs()[0].map(p => [p.lat, p.lng]);
+    addJournal('Abschnitt eingezeichnet: ' + sx.name, true); renderSections(); renderUnits(); renderAbschnitte(); save('Abschnitt eingezeichnet: ' + sx.name); setTimeout(promptDrawSection, 600);
   } else if (purpose === 'section') {
     const isLine = e.layerType === 'polyline';
     const ll = isLine ? e.layer.getLatLngs() : e.layer.getLatLngs()[0];
@@ -2296,7 +2326,7 @@ function renameSection(sx, name) {
 function removeSection(sx) { state.sections.forEach(x => { if (x.parentId === sx.id) x.parentId = sx.parentId || null; }); state.sections = state.sections.filter(x => x !== sx); state.units.forEach(u => { if (u.sectionId === sx.id) u.sectionId = null; }); renderSections(); renderUnits(); renderAbschnitte(); save('Abschnitt entfernt: ' + sx.name); }
 function renderSecList() {
   const box = $('#secList'); if (!box) return; box.replaceChildren();
-  if (!state.sections.length) box.append(el('div', { class: 'hint', text: 'Noch keine. Im Reiter Lage zeichnen.' }));
+  if (!state.sections.length) box.append(el('div', { class: 'hint', text: 'Noch keine. Mit „+ EA“ anlegen.' }));
   state.sections.forEach(sx => {
     const nm = el('span', { class: 'nm', title: 'Doppelklick zum Umbenennen', text: sx.name, ondblclick: () => inlineRename(nm, sx.name, v => renameSection(sx, v)) });
     const col = el('input', { type: 'color', value: safeColor(sx.color, '#e11d48'), title: 'Farbe',
@@ -2317,17 +2347,20 @@ function renderSectionsKeepList() {   // während der Farbwahl nur die Karte neu
     lyr.bindTooltip(el('span', { text: sx.name }), { permanent: true, direction: 'center', className: 'seclabel' }); lyr.addTo(secLayer);
   });
 }
+const SYM_ORD = { 1: 0, 3: 1, 4: 2, 2: 3, 5: 4 };   // Feuerwehr, Rettungsdienst, THW, dann Führung, dann Gefahren
+const symCats = () => symbolProperties.categories.slice().sort((a, b) => (SYM_ORD[a.id] ?? 9) - (SYM_ORD[b.id] ?? 9));
+const symSort = list => list.map((x, i) => [x, i]).sort((a, b) => ((SYM_ORD[a[0].category] ?? 9) - (SYM_ORD[b[0].category] ?? 9)) || a[1] - b[1]).map(p => p[0]);
 function buildPalette() {
   const sel = $('#symCat');
   if (window.symbolsMissing || typeof symbolProperties === 'undefined') {
     $('#symHint').textContent = 'Zeichenvorrat nicht gefunden. Die Datei muss im Ordner src/public liegen (images/symbols).'; sel.hidden = $('#symQ').hidden = true; return;
   }
   sel.append(el('option', { value: '', text: 'alle Kategorien' }));
-  symbolProperties.categories.forEach(c => sel.append(el('option', { value: c.id, text: c.name })));
-  sel.value = String(symbolProperties.categories[0].id);
+  symCats().forEach(c => sel.append(el('option', { value: c.id, text: c.name })));
+  sel.value = String(symCats()[0].id);
   const draw = () => {
     const q = $('#symQ').value.trim().toLowerCase(), cat = sel.value, grid = $('#symGrid'); grid.replaceChildren();
-    symbolProperties.symbols.filter(s => (!cat || String(s.category) === cat) && (!q || (s.title + ' ' + s.name).toLowerCase().includes(q))).forEach(s => {
+    symSort(symbolProperties.symbols.filter(s => (!cat || String(s.category) === cat) && (!q || (s.title + ' ' + s.name).toLowerCase().includes(q)))).forEach(s => {
       const b = el('button', { title: s.title, onclick: () => { stopDraw(); runtime.placing = s; b.classList.add('sel'); map.getContainer().style.cursor = 'crosshair'; say('Zeichen „' + s.title + '“: Ort auf der Karte anklicken. Esc bricht ab.'); } },
         el('img', { src: symUrl(s.name), alt: '', loading: 'lazy' }), s.title);
       grid.append(b);
@@ -2693,7 +2726,7 @@ function symbolItems(ll) {
   const mk = sy => ({ label: sy.title, icon: symUrl(sy.name), onclick: () => placeSymbolAt(ll, sy) });
   const rec = recent('kritis-recent-sym').map(n => byName[n]).filter(Boolean);
   const out = rec.map(mk); if (rec.length) out.push({ sep: true });
-  symbolProperties.categories.forEach(c => out.push({ label: c.name, sub: () => symbolProperties.symbols.filter(x => x.category === c.id).map(mk) }));
+  symCats().forEach(c => out.push({ label: c.name, sub: () => symbolProperties.symbols.filter(x => x.category === c.id).map(mk) }));
   return out;
 }
 function reportProblemAt(ll) {
@@ -4348,10 +4381,10 @@ function pickSymbol(cur) {
     const buildLib = () => {
       body.replaceChildren(); const cat = el('select', { 'aria-label': 'Kategorie' }), q = el('input', { type: 'search', placeholder: 'Suchen, z. B. Löschgruppe' }), grid = el('div', { class: 'sgrid' });
       if (typeof symbolProperties === 'undefined') { body.append(el('div', { class: 'hint', text: 'Zeichenvorrat nicht gefunden.' })); return; }
-      cat.append(el('option', { value: '', text: 'alle Kategorien' })); symbolProperties.categories.forEach(c => cat.append(el('option', { value: c.id, text: c.name })));
+      cat.append(el('option', { value: '', text: 'alle Kategorien' })); symCats().forEach(c => cat.append(el('option', { value: c.id, text: c.name })));
       const draw = () => {
         grid.replaceChildren(); const t = q.value.trim().toLowerCase(), c = cat.value;
-        const list = symbolProperties.symbols.filter(x => (!c || String(x.category) === c) && (!t || (x.title + ' ' + x.name + ' ' + (x.keywords || '')).toLowerCase().includes(t)));
+        const list = symSort(symbolProperties.symbols.filter(x => (!c || String(x.category) === c) && (!t || (x.title + ' ' + x.name + ' ' + (x.keywords || '')).toLowerCase().includes(t))));
         list.slice(0, 150).forEach(x => { const b = el('button', { title: x.title, class: sel && sel.name === x.name ? 'sel' : '', onclick: () => { sel = { k: 'lib', name: x.name }; showPrev(); draw(); } }, el('img', { src: symUrl(x.name), alt: '', loading: 'lazy' }), x.title); grid.append(b); });
         if (list.length > 150) grid.append(el('div', { class: 'hint', text: (list.length - 150) + ' weitere Treffer, bitte Suche verfeinern.' }));
       };
@@ -4641,10 +4674,9 @@ function editSectionDialog(sx) {
     row('Bezeichnung', inp('name', 'z. B. EA ICE', sx.name)), row('Art', typ), row('Befehlsstelle (Adresse, Koordinaten)', inp('befehl', '', sx.befehl)), row('Leiter (Name, Dienstgrad)', inp('leader', '', sx.leader)),
     row('Kommunikation (Funk)', inp('radio', '', sx.radio)), row('Auftrag', inp('task', '', sx.task)), row('Einsatzbeginn (TTHHMM)', inp('start', 'z. B. 260915', sx.start)),
     el('div', { class: 'hint', text: 'Mannschaft und Fahrzeuge rechnet das Programm aus den Kacheln des Abschnitts.' }),
-    el('div', { class: 'row', style: 'margin-top:12px' }, el('button', { class: 'btn primary', text: 'Speichern', onclick: () => { const v = {}; dlg.querySelectorAll('[data-k]').forEach(n => { v[n.dataset.k] = n.value.trim(); }); if (!v.name) { say('Bitte eine Bezeichnung eintragen.', 3000); return; }
+    el('div', { class: 'row', style: 'margin-top:12px' }, isNew ? null : el('button', { class: 'btn danger', text: 'Löschen', onclick: () => { dlg.remove(); fueRemoveSection(sx); } }), el('button', { class: 'btn', style: 'margin-left:auto', text: 'Abbrechen', onclick: () => dlg.remove() }), el('button', { class: 'btn primary', text: 'Speichern', onclick: () => { const v = {}; dlg.querySelectorAll('[data-k]').forEach(n => { v[n.dataset.k] = n.value.trim(); }); if (!v.name) { say('Bitte eine Bezeichnung eintragen.', 3000); return; }
       if (isNew) { const n = Object.assign({ id: uid(), kind: 'poly', color: PAL[state.sections.length % PAL.length], pts: [], parentId: null }, v); state.sections.push(n); addJournal('Abschnitt angelegt: ' + v.name, true); } else { Object.assign(sx, v); addJournal('Abschnitt geändert: ' + v.name, true); }
-      dlg.remove(); renderSections(); renderUnits(); renderAbschnitte(); save('Abschnitt ' + (isNew ? 'angelegt' : 'geändert') + ': ' + v.name); } }), el('button', { class: 'btn', text: 'Abbrechen', onclick: () => dlg.remove() }),
-      isNew ? null : el('button', { class: 'btn danger', style: 'margin-left:auto', text: 'Löschen', onclick: () => { dlg.remove(); fueRemoveSection(sx); } }))));
+      dlg.remove(); renderSections(); renderUnits(); renderAbschnitte(); save('Abschnitt ' + (isNew ? 'angelegt' : 'geändert') + ': ' + v.name); } }))));
   dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); dlg.remove(); } });
   document.body.append(dlg); dlg.querySelector('input').focus();
 }
@@ -4655,7 +4687,7 @@ function wandCard(sx, sums) {
   return el('div', { class: 'ea wcard', 'data-kind': wandKind(sx) }, el('div', { class: 'k' }, el('span', { text: kind }), el('b', { text: sx.name })),
     el('div', { class: 'm' }, el('div', {}, el('span', { text: 'Befehlsstelle ' }), el('b', { text: sx.befehl || '' })), el('div', {}, el('span', { text: 'Leiter ' }), el('b', { text: sx.leader || '' })), el('div', {}, el('span', { text: 'Kommunikation ' }), el('b', { text: sx.radio || '' })), el('div', {}, el('span', { text: 'Auftrag ' }), el('b', { text: sx.task || '' }))),
     el('div', { class: 's' }, el('div', {}, el('span', { text: 'Einsatzbeginn ' }), el('b', { text: sx.start || '' })), el('div', {}, el('span', { text: 'Mannschaft ' }), el('b', { text: a.f + '/' + a.u + '/' + a.h + ' = ' + a.m })), el('div', {}, el('span', { text: 'Fahrzeuge ' }), el('b', { text: fz })),
-      vw ? null : el('button', { class: 'btn small wedit', text: 'Bearbeiten', onclick: () => editSectionDialog(sx) })));
+      vw ? null : el('div', { class: 'wbtns' }, el('button', { class: 'btn small wedit', text: 'Bearbeiten', onclick: () => editSectionDialog(sx) }), el('button', { class: 'btn small wedit primary', text: '+ Einheit', title: 'Neue Einheit in diesem Abschnitt anlegen, sie erscheint auf der Karte', onclick: () => addUnitDialog({ sectionId: sx.id }) }))));
 }
 function wandBlock(sx, units) {
   const sums = wandSums(sx ? sx.id : null), ids = new Set(sx ? [sx.id, ...state.sections.filter(x => x.parentId === sx.id).map(x => x.id)] : []);
@@ -4673,9 +4705,9 @@ function kcell(secId, key, val, computed) {
 function wandTable(secs) {
   const rows = secs.map(sx => ({ sx, id: sx.id, name: sx.name, sums: wandSums(sx.id) })).concat([{ sx: null, id: null, name: 'ohne Abschnitt', sums: wandSums(null) }]).filter(r => r.sx || r.sums.alle.n || r.sums.abg.n);
   const val = (r, k) => { const o = (state.kraefte.ovr[r.id == null ? '_' : r.id] || {})[k]; return o != null ? o : r.sums[k].m; };
-  const tot = k => rows.reduce((a, r) => a + val(r, k), 0), stand = wandStand();
+  const tot = k => rows.reduce((a, r) => a + val(r, k), 0);
   const tr = r => el('tr', {}, el('th', { scope: 'row', text: r.name }), ...['anf', 'vor', 'abg'].map(k => el('td', {}, kcell(r.id, k, val(r, k), r.sums[k].m), r.sums[k].n ? el('small', { text: r.sums[k].n + ' Einh.' }) : null)));
-  return el('div', { class: 'kt' }, el('div', { class: 'kt-h' }, el('span', { class: 'lbl', text: 'Kräfteübersicht (S1)' }), el('span', { class: 'kt-stand', text: 'STAND: ' + (stand ? fmtTac(stand) : '–') }), ro('kraefte') ? null : el('button', { class: 'btn small', text: 'Stand jetzt', title: 'Stand der Übersicht auf die aktuelle Zeit setzen', onclick: () => { state.kraefte.standIso = nowIso(); renderUnitOverview(); save('Kräfteübersicht: Stand'); } })),
+  return el('div', { class: 'kt' }, el('div', { class: 'kt-h' }, el('span', { class: 'lbl', text: 'Kräfteübersicht (S1)' }), ),
     el('table', { class: 'kt-t' }, el('thead', {}, el('tr', {}, el('th', { text: 'EA' }), el('th', { text: 'alarmiert, auf Anfahrt' }), el('th', { text: 'vor Ort' }), el('th', { text: 'abgelöst' }))),
       el('tbody', {}, ...rows.map(tr), el('tr', { class: 'sig' }, el('th', { text: 'Σ' }), el('td', { text: String(tot('anf')) }), el('td', { text: String(tot('vor')) }), el('td', { text: String(tot('abg')) })))),
     el('textarea', { class: 'kt-note', rows: '1', placeholder: 'Anmerkung, zum Beispiel: davon 560 „weiße Einheiten“', disabled: ro('kraefte') ? 'disabled' : null, onchange: e => { state.kraefte.note = e.target.value; save('Kräfteübersicht: Anmerkung'); } }));
@@ -4830,7 +4862,7 @@ function initOvDrag() {
   window.addEventListener('pointercancel', () => ovDragEnd(false));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && ovDrag && ovDrag.on) { e.stopPropagation(); ovDragEnd(false); } }, true);
 }
-function openUnitOverview() { closeFue(); $('#unitOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderUnitOverview(); $('#ovClose').focus(); }
+function openUnitOverview() { if (runtime.vortrag) closeFue(); $('#unitOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderUnitOverview(); $('#ovClose').focus(); }
 function closeUnitOverview() { $('#unitOv').hidden = true; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); }
 function initUnitOverview() {
   $('#btnUnits').onclick = () => ($('#unitOv').hidden ? openUnitOverview() : closeUnitOverview());
@@ -4994,7 +5026,7 @@ function renderFunk() {
     el('div', { class: 'hint', text: 'Kanäle, Rufnamen und Rufnummern trägt der S6 ein. Es werden keine Werte vorgegeben.' }));
   if (vw) lockViewer(box);
 }
-function openFue() { closeUnitOverview(); $('#fueOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderFue(); $('#fueClose').focus(); }
+function openFue() { if (runtime.vortrag) closeUnitOverview(); $('#fueOv').hidden = false; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); renderFue(); $('#fueClose').focus(); }
 function closeFue() { $('#fueOv').hidden = true; setTimeout(() => syncNav(), 0); if (runtime.vortrag) vtApply(); }
 function initFue() {
   $('#btnFue').onclick = () => ($('#fueOv').hidden ? openFue() : closeFue()); $('#fueClose').onclick = closeFue;
@@ -5450,13 +5482,15 @@ function initTileCacheUi() {
 function syncNav() {
   const on = (a, v) => { const n = document.querySelector('#tabs [data-act="' + a + '"]'); if (n) n.classList.toggle('on', !!v); };
   const open = id => { const n = $(id); return !!n && !n.hidden; };
-  on('map', $('#app').classList.contains('collapsed') && !open('#unitOv') && !open('#fueOv')); on('wand', open('#unitOv')); on('fue', open('#fueOv'));
-  document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('dim', open('#unitOv') || open('#fueOv') || $('#app').classList.contains('collapsed')));
+  on('map', !open('#unitOv') && !open('#fueOv')); on('wand', open('#unitOv')); on('fue', open('#fueOv'));
+  { const mv = !open('#unitOv') && !open('#fueOv'); if (runtime.mapSeen === false && mv) setTimeout(promptDrawSection, 450); runtime.mapSeen = mv; }
+  document.body.classList.toggle('dual', open('#unitOv') && open('#fueOv') && !runtime.vortrag);
+  document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('dim', $('#app').classList.contains('collapsed')));
 }
 function initNavActs() {
   document.querySelectorAll('#tabs [data-act]').forEach(b => b.addEventListener('click', () => {
     const a = b.dataset.act;
-    if (a === 'map') { closeUnitOverview(); closeFue(); setPanel(false); }
+    if (a === 'map') { if (!$('#unitOv').hidden || !$('#fueOv').hidden) { closeUnitOverview(); closeFue(); } else setPanel($('#app').classList.contains('collapsed')); }
     else if (a === 'wand') { if (!$('#unitOv').hidden) closeUnitOverview(); else { $('#ovGroup').value = 'wand'; openUnitOverview(); } }
     else if (a === 'fue') { if (!$('#fueOv').hidden) closeFue(); else openFue(); }
     syncNav();
@@ -5737,11 +5771,12 @@ function openTab(name) {
   document.querySelectorAll('#tabs button').forEach(x => x.setAttribute('aria-selected', String(x.dataset.tab === name)));
   document.querySelectorAll('.tabpane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
 }
-document.querySelectorAll('#tabs button[data-tab]').forEach(b => b.addEventListener('click', () => { openTab(b.dataset.tab); if ($('#app').classList.contains('collapsed')) setPanel(true); }));
+document.querySelectorAll('#tabs button[data-tab]').forEach(b => b.addEventListener('click', () => { const app = $('#app'); if (b.getAttribute('aria-selected') === 'true' && !app.classList.contains('collapsed')) { setPanel(false); return; } openTab(b.dataset.tab); if (app.classList.contains('collapsed')) setPanel(true); }));
 $('#btnPoly').onclick = e => startDraw('polygon', 'area', e.currentTarget);
 $('#btnRect').onclick = e => startDraw('rectangle', 'area', e.currentTarget);
 $('#btnCircle').onclick = startCircleMode;
 $('#btnLoad').onclick = () => { Object.keys(runtime.sector).forEach(k => { if (runtime.sector[k].s === 'error') queryAreas().forEach(a => LAYERS.filter(l => l.sector === k).forEach(l => { if (state.loaded[a.id]) delete state.loaded[a.id][l.id]; })); }); loadObjects(); };
+$('#btnEaGebiet').onclick = () => { $('#secPop').hidden = false; $('#secName').focus(); };
 $('#btnSecPoly').onclick = e => { $('#secPop').hidden = true; startDraw('polygon', 'section', e.currentTarget); };
 $('#btnSecLine').onclick = e => { $('#secPop').hidden = true; startDraw('polyline', 'section', e.currentTarget); };
 $('#btnJ').onclick = () => { const t = $('#jText').value.trim(); if (t) { addJournal(t); $('#jText').value = ''; } };
