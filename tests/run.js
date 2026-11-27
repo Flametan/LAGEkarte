@@ -204,6 +204,23 @@ async function seite(b, q, w, h) {
     assert.strictEqual(r.a, 'A'); assert.strictEqual(r.b2, 'B'); assert.strictEqual(r.c, 'A');
     assert.ok(r.lat > 51.50 && r.lat < 51.52 && r.lng > 7.40 && r.lng < 7.42, 'Einheit liegt wieder in EA A: ' + r.lat + ' ' + r.lng); await p.close();
   });
+  await t('Beamer-Fenster: folgen dem Hauptfenster, Festhalten friert Ausschnitt und Inhalte ein', async () => {
+    const ctx = await b.newContext({ viewport: { width: 1500, height: 800 } }); const url = 'file://' + require('path').resolve(__dirname, '../src/public/kritis-lage-einzeldatei.html');
+    const main = await ctx.newPage(); await main.goto(url); await main.waitForTimeout(1200);
+    await main.evaluate(() => { const L = window.__lage, s = L.state; s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'EA A', color: '#2563eb', pts: [] }]; s.units = [{ id: 'u1', name: 'LF Eins', call: '', sym: null, f: 1, u: 1, h: 4, status: 'einsatz', sectionId: 'A', task: '', note: '', lat: 51.51, lng: 7.41, time: new Date().toISOString() }]; L.map.setView([51.51, 7.41], 14); });
+    const mk = async v => { const p = await ctx.newPage(); await p.goto(url + '?beamer=' + v); await p.waitForTimeout(1500); return p; };
+    const karte = await mk('karte'), wand = await mk('wand'), fue = await mk('fue');
+    assert.ok(await wand.evaluate(() => document.body.innerText.includes('LF Eins')), 'Wand zeigt die Einheit'); assert.ok(await fue.evaluate(() => !document.querySelector('#fueOv').hidden));
+    assert.ok(await wand.evaluate(() => !document.querySelector('#unitOv .ovtools').offsetParent), 'keine Bedienelemente im Beamer');
+    await main.evaluate(() => { const L = window.__lage; L.state.units[0].name = 'LF Zwei'; L.assignUnit(L.state.units[0], 'A'); L.state.units[0].name = 'LF Zwei'; L.map.setView([52.0, 8.0], 12); window.__lage.state.units[0].time = new Date().toISOString(); }); await main.evaluate(() => document.querySelector('#btnBeamer').click()); await main.waitForTimeout(2800);
+    const cen = await karte.evaluate(() => { const c = window.__lage.map.getCenter(); return [c.lat, c.lng]; }); assert.ok(Math.abs(cen[0] - 52.0) < 0.3, 'Karten-Beamer folgt dem Ausschnitt: ' + cen);
+    await main.evaluate(() => document.querySelectorAll('#bmRows .bmrow')[2].querySelectorAll('button')[1].click()); await main.waitForTimeout(400);
+    await main.evaluate(() => { const L = window.__lage; L.map.setView([48.0, 11.0], 12); L.state.units[0].name = 'LF Drei'; L.assignUnit(L.state.units[0], null); }); await main.waitForTimeout(1000);
+    const cen2 = await karte.evaluate(() => { const c = window.__lage.map.getCenter(); return c.lat; }); assert.ok(Math.abs(cen2 - 52.0) < 0.3, 'Karte festgehalten: ' + cen2);
+    await main.evaluate(() => document.querySelectorAll('#bmRows .bmrow')[2].querySelectorAll('button')[1].click()); await main.waitForTimeout(1000);
+    const cen3 = await karte.evaluate(() => window.__lage.map.getCenter().lat); assert.ok(Math.abs(cen3 - 48.0) < 0.3, 'nach Freigabe wieder live: ' + cen3);
+    await ctx.close();
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));

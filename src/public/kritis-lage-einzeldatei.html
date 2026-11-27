@@ -1695,6 +1695,15 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
 @media (max-width: 1500px) { #mapBar .mb { padding: 5px 7px; font-size: 13px; } #placeSearch { width: 170px !important; } #mapBar .mb-t { font-size: 18px; } }
 #app > header h1 .logo { background: none; padding: 0; margin: 0 10px 0 12px; display: flex; align-items: center; }
 #app > header h1 .logo svg { width: 46px; height: 46px; display: block; }
+
+/* Beamer-Fenster */
+.bmcard { width: min(560px, 94vw); } .bmcard h3 { margin-top: 0; }
+.bmrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; }
+.bmrow .bmn { flex: 1 1 160px; display: flex; flex-direction: column; } .bmst { font-size: 12px; color: var(--muted); } .bmst.on { color: #15803d; font-weight: 700; }
+#bmFrozen { position: fixed; right: 10px; bottom: 8px; z-index: 5000; font-size: 11px; color: rgba(100, 116, 139, .75); background: rgba(255, 255, 255, .6); border-radius: 4px; padding: 1px 6px; pointer-events: none; }
+body.viewer #app > header #btnMore, body.viewer #app > header #btnUndo { }
+body.beamerwin #unitOv .ovtools, body.beamerwin #fueOv .ovtools, body.beamerwin #app > header #btnMore, body.beamerwin #app > header #btnTheme, body.beamerwin #app > header #btnVortrag, body.beamerwin #app > header .qb, body.beamerwin #mapBar, body.beamerwin #placeSearch, body.beamerwin #panelToggle, body.beamerwin #reviewSlider { display: none !important; }
+body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
 </style>
 </head>
 <body>
@@ -1722,6 +1731,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
     <div id="hdrMore"><button id="btnMore" aria-label="Menü" aria-haspopup="menu" aria-expanded="false" title="Weitere Funktionen"><i></i><i></i><i></i></button>
     <div id="hdrMenu" role="menu" aria-hidden="true">
       <button id="btnSetup" title="Name und Uhr der Übung oder des Einsatzes einstellen">Einsatz einrichten</button>
+      <button id="btnBeamer" title="Fenster für Beamer öffnen, festhalten und freigeben">Beamer-Fenster</button>
       <button id="btnUnits" title="Alle Einheiten auf einen Blick, zum Beispiel für den Lagevortrag">Einheiten</button>
       <button id="btnFue" title="Führungsstruktur nach FwDV 100 mit Kommunikationsplan">Führungsstruktur</button>
       <button id="btnAddPoi" title="KRITIS-Objekt per Mausklick auf der Karte setzen">+ Objekt</button>
@@ -2581,9 +2591,11 @@ function freshState() {
 let state = freshState();
 const runtime = { sector: {}, mode: null, placing: null, drawPurpose: null, drawHandler: null, vis: new Set() };
 const qs = new URLSearchParams(location.search);
-runtime.viewer = qs.has('ansicht'); runtime.beamer = qs.has('beamer');
+runtime.beamerView = ['karte', 'wand', 'fue'].includes(qs.get('beamer')) ? qs.get('beamer') : null;   // Beamer-Fenster auf demselben Rechner
+runtime.viewer = qs.has('ansicht') || !!runtime.beamerView; runtime.beamer = qs.has('beamer');
 if (runtime.viewer) document.body.classList.add('viewer');
 if (runtime.beamer) document.body.classList.add('beamer');
+if (runtime.beamerView) document.body.classList.add('beamerwin');
 const PAL = ['#2563eb', '#dc2626', '#16a34a', '#d97706', '#7c3aed', '#0891b2', '#db2777', '#475569'];
 const safeColor = (c, d) => /^#[0-9a-f]{6}$/i.test(c || '') ? c : (d || PAL[0]);
 
@@ -2738,6 +2750,7 @@ function persist() {
   if (runtime.viewer) return;                 // Ansicht schreibt nie in den Browserspeicher
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveNow, 300);
+  if (typeof scheduleBc === 'function') scheduleBc();
   if (runtime.live) schedulePush();
 }
 // save('Bezeichnung') legt einen Rückgängig-Schritt an, save() sichert nur im Browser.
@@ -4147,13 +4160,88 @@ function lockViewer(root) {
   root.querySelectorAll('button').forEach(b => { if (/Löschen|Ort setzen|Entfernen|Versorgt|melden/.test(b.textContent)) b.disabled = true; });
 }
 map.on('popupopen', e => { if (runtime.viewer) lockViewer(e.popup.getElement()); });
+
+/* ------------------------------------------------------------------ */
+/* Beamer-Fenster: mehrere Fenster im selben Browser auf einem Rechner */
+/* ------------------------------------------------------------------ */
+const BEAMER_VIEWS = [['wand', 'Einsatzübersicht'], ['fue', 'Führungsstruktur'], ['karte', 'Lagekarte']];
+const bcast = (() => { let ch = null; try { ch = new BroadcastChannel('lagekarte-beamer'); } catch (e) { /* nicht verfügbar */ } return { ok: !!ch, send: m => { try { if (ch) ch.postMessage(m); } catch (e) { /* zu groß o. Ä. */ } }, on: f => { if (ch) ch.onmessage = e => f(e.data); } }; })();
+let bcTimer = 0;
+const viewBox = () => { const b = map.getBounds(); return [[b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]]; };
+function bcSendState() { if (runtime.viewer) return; bcast.send({ t: 'state', state: shareState(), view: viewBox() }); }
+function scheduleBc() { if (runtime.viewer || !bcast.ok) return; clearTimeout(bcTimer); bcTimer = setTimeout(bcSendState, 250); }
+function beamerApply(m) {
+  const bv = runtime.beamerView;
+  if (m.state) applyRemote(m.state);
+  if (bv === 'wand' && $('#unitOv').hidden) { $('#ovGroup').value = 'wand'; openUnitOverview(); }
+  if (bv === 'fue' && $('#fueOv').hidden) openFue();
+  if (bv === 'karte' && m.view) map.fitBounds(L.latLngBounds(m.view), { animate: false });
+  if (bv === 'fue') renderFue(); if (bv === 'wand') renderUnitOverview();
+  runtime.beamerStand = Date.now();
+}
+function beamerShowFrozen() {
+  let b = $('#bmFrozen'); if (!runtime.beamerFrozen) { if (b) b.remove(); return; }
+  if (!b) { b = el('div', { id: 'bmFrozen' }); document.body.append(b); }
+  b.textContent = 'Stand festgehalten ' + fmtHM(runtime.beamerStand || Date.now());
+}
+function beamerStart() {
+  const bv = runtime.beamerView; document.title = 'Beamer: ' + BEAMER_VIEWS.find(x => x[0] === bv)[1];
+  runtime.beamerFrozen = false; runtime.beamerPending = null;
+  bcast.on(m => {
+    if (m.t === 'state') { if (runtime.beamerFrozen) runtime.beamerPending = m; else beamerApply(m); }
+    else if (m.t === 'ctl' && (m.target === bv || m.target === '*')) {
+      if (m.freeze === true) { runtime.beamerFrozen = true; runtime.beamerStand = runtime.beamerStand || Date.now(); }
+      else if (m.freeze === false) { runtime.beamerFrozen = false; if (runtime.beamerPending) { beamerApply(runtime.beamerPending); runtime.beamerPending = null; } }
+      if (m.refresh) { if (runtime.beamerPending) { beamerApply(runtime.beamerPending); runtime.beamerPending = null; } else bcast.send({ t: 'hello', view: bv }); }
+      beamerShowFrozen();
+    }
+  });
+  const beat = () => bcast.send({ t: 'beat', view: bv, frozen: !!runtime.beamerFrozen, pending: !!runtime.beamerPending });
+  bcast.send({ t: 'hello', view: bv }); setInterval(beat, 2000); beat();
+  if (!bcast.ok) say('Dieser Browser kann keine Beamer-Fenster abgleichen.', 8000);
+  else say('Warte auf das Hauptfenster… (muss im selben Browser offen sein)', 4000);
+}
+function beamerMainStart() {
+  runtime.beamers = {};
+  bcast.on(m => {
+    if (m.t === 'hello') bcSendState();
+    else if (m.t === 'beat') { runtime.beamers[m.view] = { time: Date.now(), frozen: m.frozen, pending: m.pending }; if ($('#bmDlg')) renderBeamerDlg(); }
+  });
+  map.on('moveend', () => { clearTimeout(runtime.bcView); runtime.bcView = setTimeout(() => { if (!runtime.viewer) bcast.send({ t: 'view', view: viewBox() }); }, 250); });
+  setInterval(() => { if ($('#bmDlg')) renderBeamerDlg(); }, 2500);
+}
+const beamerAlive = v => runtime.beamers && runtime.beamers[v] && Date.now() - runtime.beamers[v].time < 6000;
+function beamerCtl(target, o) { bcast.send(Object.assign({ t: 'ctl', target }, o)); if (target !== '*' && runtime.beamers[target]) { if (o.freeze !== undefined) runtime.beamers[target].frozen = o.freeze; } renderBeamerDlg(); }
+function beamerToggleKarte() { const v = 'karte'; if (!beamerAlive(v)) { say('Der Karten-Beamer ist nicht geöffnet. Menü, Beamer.', 4000); return; } const fr = !runtime.beamers[v].frozen; beamerCtl(v, { freeze: fr }); say('Karten-Beamer ' + (fr ? 'festgehalten: Ausschnitt und Inhalte bleiben stehen.' : 'freigegeben: folgt wieder dem Hauptfenster.'), 4000); }
+function renderBeamerDlg() {
+  const box = $('#bmRows'); if (!box) return; box.replaceChildren();
+  BEAMER_VIEWS.forEach(([v, name]) => {
+    const st = runtime.beamers[v], alive = beamerAlive(v);
+    box.append(el('div', { class: 'bmrow' }, el('div', { class: 'bmn' }, el('b', { text: name }), el('span', { class: 'bmst' + (alive ? ' on' : ''), text: alive ? (st.frozen ? 'verbunden, festgehalten' : 'verbunden, live') : 'nicht geöffnet' })),
+      el('button', { class: 'btn small', text: alive ? 'Fenster nach vorn' : 'Fenster öffnen', onclick: () => { const u = location.href.split('#')[0].split('?')[0] + '?beamer=' + v; const w = window.open(u, 'lage-beamer-' + v); if (!w) say('Der Browser hat das Fenster blockiert. Pop-ups für diese Seite erlauben.', 5000); else w.focus(); } }),
+      el('button', { class: 'btn small' + (alive && st.frozen ? ' primary' : ''), text: alive && st.frozen ? 'Freigeben' : 'Festhalten', disabled: alive ? null : 'disabled', title: 'Festgehalten: Ausschnitt und Inhalte bleiben auf dem Beamer stehen', onclick: () => beamerCtl(v, { freeze: !st.frozen }) }),
+      el('button', { class: 'btn small', text: 'Jetzt aktualisieren', disabled: alive && st.frozen ? null : 'disabled', title: 'Nur bei festgehaltenem Beamer: einmal den aktuellen Stand zeigen', onclick: () => beamerCtl(v, { refresh: true }) })));
+  });
+}
+function openBeamerDlg() {
+  if ($('#bmDlg')) return;
+  const dlg = el('div', { id: 'bmDlg', class: 'dlg', role: 'dialog', 'aria-modal': 'true' }, el('div', { class: 'bmcard' },
+    el('h3', { text: 'Beamer-Fenster' }), el('div', { class: 'hint', text: 'Jedes Fenster zeigt immer seine Ansicht und folgt diesem Hauptfenster. Fenster auf den jeweiligen Beamer ziehen und dort F11 für Vollbild drücken. Alle Fenster müssen in diesem Browser laufen.' }),
+    el('div', { id: 'bmRows' }), el('div', { class: 'hint', text: 'Festhalten friert Ausschnitt und Inhalte auf dem Beamer ein, während Sie hier weiterarbeiten. Taste H schaltet den Karten-Beamer um.' }),
+    el('div', { class: 'row' }, el('button', { class: 'btn primary', style: 'flex:1;justify-content:center', text: 'Schließen', onclick: () => dlg.remove() }))));
+  dlg.addEventListener('mousedown', e => { if (e.target === dlg) dlg.remove(); }); dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); dlg.remove(); } });
+  document.body.append(dlg); renderBeamerDlg(); bcSendState();
+}
 let pushTimer = null;
 function schedulePush() { clearTimeout(pushTimer); pushTimer = setTimeout(pushLive, 700); }
-async function pushLive() {
-  if (!runtime.live) return;
+function shareState() {
   recomputeVisible();
   const vis = {}; visiblePois().forEach(p => { if (p.manual || state.layerOn[p.layer]) vis[p.id] = p; });
-  const share = Object.assign({}, state, { pois: vis, loaded: {}, journal: state.journal.slice(0, 300) });
+  return Object.assign({}, state, { pois: vis, loaded: {}, journal: state.journal.slice(0, 300) });
+}
+async function pushLive() {
+  if (!runtime.live) return;
+  const share = shareState();
   try {
     const r = await fetch('/api/state', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ state: share }) });
     runtime.live.ok = r.ok; if (r.ok) runtime.live.rev = (await r.json()).rev;
@@ -4168,6 +4256,8 @@ function updateBadge() {
   b.textContent = runtime.live.ok === false ? 'Freigabe getrennt' : 'Freigabe aktiv · ' + (runtime.live.viewers || 0) + ' Zuschauer'; b.title = b.textContent;
 }
 async function liveInit() {
+  if (runtime.beamerView) { beamerStart(); return; }
+  if (!runtime.viewer) beamerMainStart();
   if (!/^https?:$/.test(location.protocol)) { if (runtime.viewer) { runtime.connected = false; updateBadge(); say('Ansicht braucht den Lagekarten-Server (Link aus dem QR-Code).', 8000); } return; }
   try {
     const j = await (await fetch('/api/info', { cache: 'no-store' })).json(); if (!j.server) return;
@@ -6267,7 +6357,7 @@ function openGuidedMeeting() {
 }
 /* ---- Einweisung (Rundgang) und Tastenkürzel ---- */
 const SHORTCUTS = [
-  ['?', 'Diese Übersicht'], ['U', 'Einheiten'], ['F', 'Führungsstruktur'], ['V', 'Lagevortrag starten oder beenden'], ['D', 'Dunkelmodus umschalten'],
+  ['?', 'Diese Übersicht'], ['U', 'Einheiten'], ['F', 'Führungsstruktur'], ['H', 'Karten-Beamer festhalten oder freigeben'], ['V', 'Lagevortrag starten oder beenden'], ['D', 'Dunkelmodus umschalten'],
   ['K', 'Reiter Kräfte'], ['B', 'Reiter Behandlungsplatz'], ['T', 'Reiter Tagebuch'], ['M', 'Reiter Meldungen'], ['P', 'Reiter Probleme'], ['Z', 'Reiter Zahlen'], ['W', 'Reiter Wetter'], ['G', 'Reiter Gefahrstoff'],
   ['N', 'Neue Einheit'], ['J', 'Journaleintrag'], ['/', 'Ortssuche'], ['Strg+Z, Strg+Y', 'Rückgängig, Wiederholen'], ['Umschalt+P', 'Seitenleiste ein- oder ausklappen'], ['Esc', 'Schließen, Abbrechen']
 ];
@@ -6294,6 +6384,7 @@ document.addEventListener('keydown', e => {
   if (k === '?') { e.preventDefault(); showShortcuts(); }
   else if (k === 'u') { e.preventDefault(); $('#btnUnits').click(); }
   else if (k === 'f') { e.preventDefault(); $('#btnFue').click(); }
+  else if (k === 'h' && !runtime.viewer) { e.preventDefault(); beamerToggleKarte(); }
   else if (k === 'v') { e.preventDefault(); runtime.vortrag ? endVortrag() : startVortrag(); }
   else if (k === 'd') { e.preventDefault(); $('#btnTheme').click(); }
   else if (tabs[k] && !runtime.vortrag) { e.preventDefault(); goTab(tabs[k]); }
@@ -6341,7 +6432,7 @@ function maybeTour() {
   runTour();
 }
 function initRoles() {
-  $('#btnExport').onclick = () => exportRole(false); $('#btnHelp').onclick = showShortcuts; $('#btnSetup').onclick = openSetup; { const ht = $('#hdrTitle'); if (ht) { ht.onclick = openSetup; ht.title = 'Name und Uhr einstellen'; ht.style.cursor = 'pointer'; } }
+  $('#btnExport').onclick = () => exportRole(false); $('#btnHelp').onclick = showShortcuts; $('#btnSetup').onclick = openSetup; $('#btnBeamer').onclick = openBeamerDlg; { const ht = $('#hdrTitle'); if (ht) { ht.onclick = openSetup; ht.title = 'Name und Uhr einstellen'; ht.style.cursor = 'pointer'; } }
   setTimeout(() => { let seen = false; try { seen = !!localStorage.getItem('kritis-setup'); } catch (e) { /* egal */ } if (!seen && !runtime.viewer && !navigator.webdriver && !(state.exercise && state.exercise.name)) { try { localStorage.setItem('kritis-setup', '1'); } catch (e) { /* egal */ } openSetup(); } }, 700);
   setTimeout(maybeTour, 1800);
   $('#mtGuided').onclick = openGuidedMeeting; $('#lvShow').onclick = showLagevortrag; $('#expMine').onclick = () => exportRole(false); $('#expAll').onclick = () => exportRole(true); $('#impOthers').onclick = importDlg;
