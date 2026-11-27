@@ -1016,6 +1016,7 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
   #chemBand { bottom: 62px; }
   #hdrMenu { right: 6px; max-width: 92vw; }
 }
+.walblock { margin-bottom: 8px; min-height: 70px; } .wal-add { padding: 6px 8px 0; }
 </style>
 </head>
 <body>
@@ -1075,7 +1076,7 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
       <button role="tab" data-tab="bhp" aria-selected="false" title="Behandlungsplatz: Sichtungskategorien, Transport, Kliniken"><span>Behandlungsplatz</span></button>
       <button role="tab" data-tab="keule" aria-selected="false" title="Wetter, Wind und Keule"><span>Wetter und Keule</span></button>
       <button role="tab" data-tab="chem" aria-selected="false" title="Gefahrstoffe: Datenblatt, Absperrzonen, Betroffene, Keule"><span>Gefahrstoff</span></button>
-      <button role="tab" data-tab="lage" aria-selected="false"><span>Lage</span></button>
+      <button role="tab" data-tab="lage" aria-selected="false"><span>Schadenslage</span></button>
       <button role="tab" data-tab="staende" class="navhid" aria-selected="false"><span>Lagestände</span></button>
       <button role="tab" data-tab="daten" aria-selected="false"><span>Daten</span></button>
       <div id="navSaved" class="nav-saved">Noch nicht gespeichert</div>
@@ -1341,12 +1342,12 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
     </section>
 
     <section class="tabpane" id="tab-lage">
-      <h2>Taktische Zeichen</h2>
+      <h2>Schadensereignisse</h2>
       <div class="row">
         <select id="symCat"></select>
         <input type="search" id="symQ" placeholder="Suchen">
       </div>
-      <div class="hint" id="symHint">Zeichen wählen, dann auf die Karte klicken. Esc bricht ab.</div>
+      <div class="hint" id="symHint">Schadensereignisse und Gefahren auf der Karte markieren: Zeichen wählen, dann auf die Karte klicken. Esc bricht ab. Einheiten legen Sie über „+ Einsatzkräfte“ an, Personenzahlen im Reiter Zahlen.</div>
       <div id="symGrid"></div>
 
       <h2>Abhängigkeiten</h2>
@@ -2479,8 +2480,8 @@ function buildPalette() {
     $('#symHint').textContent = 'Zeichenvorrat nicht gefunden. Die Datei muss im Ordner src/public liegen (images/symbols).'; sel.hidden = $('#symQ').hidden = true; return;
   }
   sel.append(el('option', { value: '', text: 'alle Kategorien' }));
-  symCats().forEach(c => sel.append(el('option', { value: c.id, text: c.name })));
-  sel.value = String(symCats()[0].id);
+  symCats().filter(c => c.id === 5).forEach(c => sel.append(el('option', { value: c.id, text: c.name })));
+  sel.value = '5'; sel.hidden = true;   // Schadenslage: nur Gefahren und Maßnahmen, Einheiten legt man über + Einsatzkräfte an
   const draw = () => {
     const q = $('#symQ').value.trim().toLowerCase(), cat = sel.value, grid = $('#symGrid'); grid.replaceChildren();
     symSort(symbolProperties.symbols.filter(s => (!cat || String(s.category) === cat) && (!q || (s.title + ' ' + s.name).toLowerCase().includes(q)))).forEach(s => {
@@ -5143,7 +5144,7 @@ function wandCard(sx, sums) {
 }
 function wandBlock(sx, units) {
   const sums = wandSums(sx ? sx.id : null), ids = new Set(sx ? [sx.id, ...state.sections.filter(x => x.parentId === sx.id).map(x => x.id)] : []);
-  const list = units.filter(u => sx ? ids.has(u.sectionId) : (!u.sectionId || !state.sections.some(x => x.id === u.sectionId)));
+  const list = units.filter(u => sx ? ids.has(u.sectionId) : ((!u.sectionId || !state.sections.some(x => x.id === u.sectionId)) && u.status !== ST_ANF));
   const body = el('div', { class: 'wtiles' }, ...list.slice().sort((p, q) => (p.name || '').localeCompare(q.name || '', 'de')).map(wTile));
   if (!list.length) body.append(el('div', { class: 'ovempty', text: ro('units') ? 'leer' : 'Kacheln hierher ziehen' }));
   return el('div', { class: 'ovcol wblock', 'data-drop': 'sec:' + (sx ? sx.id : '') }, sx ? wandCard(sx, sums) : el('div', { class: 'wnone' }, el('b', { text: 'Ohne Abschnitt' }), el('span', { text: 'nicht zugeordnete Einheiten („weiße Einheiten“)' })), body);
@@ -5164,11 +5165,15 @@ function wandTable(secs) {
       el('tbody', {}, ...rows.map(tr), el('tr', { class: 'sig' }, el('th', { text: 'Σ' }), el('td', { text: String(tot('anf')) }), el('td', { text: String(tot('vor')) }), el('td', { text: String(tot('abg')) })))),
     el('textarea', { class: 'kt-note', rows: '1', placeholder: 'Anmerkung, zum Beispiel: davon 560 „weiße Einheiten“', disabled: ro('kraefte') ? 'disabled' : null, onchange: e => { state.kraefte.note = e.target.value; save('Kräfteübersicht: Anmerkung'); } }));
 }
-function wandAlarm() {
+function wandAlarm(units) {
   const vw = ro('kraefte'), box = el('div', { class: 'wal' });
+  const list = (units || []).filter(u => u.status === ST_ANF && (!u.sectionId || !state.sections.some(x => x.id === u.sectionId)));
+  const tiles = el('div', { class: 'wtiles' }, ...list.slice().sort((p, q) => (p.name || '').localeCompare(q.name || '', 'de')).map(wTile));
+  if (!list.length) tiles.append(el('div', { class: 'ovempty', text: ro('units') ? 'leer' : 'Kacheln hierher ziehen' }));
+  const block = el('div', { class: 'ovcol wblock walblock', 'data-drop': 'alarm' }, ro('units') ? null : el('div', { class: 'wal-add' }, el('button', { class: 'btn small wedit primary', text: '+ Einheit', title: 'Alarmierte Einheit anlegen, sie steht auf Anfahrt und wird einem Abschnitt zugeteilt, wenn sie ankommt', onclick: () => addUnitDialog({ status: ST_ANF }) })), tiles);
   state.kraefte.alarmiert.forEach(a => box.append(el('div', { class: 'wal-r' }, el('input', { type: 'text', value: a.text, disabled: vw ? 'disabled' : null, 'aria-label': 'Alarmiert oder auf Marsch', onchange: e => { a.text = e.target.value.trim(); state.kraefte.standIso = nowIso(); save('Alarmiert: ' + a.text); } }), vw ? null : el('button', { class: 'btn small danger', text: '×', 'aria-label': 'Zeile entfernen', onclick: () => { state.kraefte.alarmiert = state.kraefte.alarmiert.filter(x => x !== a); renderUnitOverview(); save('Alarmiert entfernt'); } }))));
   if (!vw) box.append(el('button', { class: 'btn small', text: '+ Zeile', onclick: () => { state.kraefte.alarmiert.push({ id: uid(), text: '' }); renderUnitOverview(); const i = $('#ovCols .wal-r:last-of-type input'); if (i) i.focus(); } }));
-  return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Alarmiert, auf Marsch' }), box);
+  return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Alarmiert, auf Marsch' }), block, box);
 }
 /* Aufträge, Ergänzungen und Notizen der Stabswand */
 function addAuftrag(d) {
@@ -5220,7 +5225,7 @@ function wandNotizen() {
   const sum = r => (r.sk1 || 0) + (r.sk2 || 0) + (r.sk3 || 0) + (r.tot || 0) + (r.vm || 0);
   const tr = (r, isLive) => el('tr', { class: isLive ? 'live' : '' }, el('td', { text: isLive ? 'jetzt' : fmtTac(Date.parse(r.iso)).slice(2) }), ...['sk1', 'sk2', 'sk3', 'tot', 'vm'].map(k => el('td', { text: String(r[k] || 0) })), el('td', { text: String(sum(r)) }),
     isLive || vw ? el('td') : el('td', {}, el('button', { class: 'btn small danger', 'aria-label': 'Zeile löschen', text: '×', onclick: () => { state.kraefte.rows = rows.filter(x => x !== r); renderUnitOverview(); save('Betroffenenzeile gelöscht'); } })));
-  const tbl = el('table', { class: 'vt' }, el('thead', {}, el('tr', {}, el('th', { text: 'Zeit' }), el('th', { class: 'r', text: 'SK I' }), el('th', { class: 'g', text: 'SK II' }), el('th', { class: 'gr', text: 'SK III' }), el('th', { text: 'Tot' }), el('th', { text: 'Vm' }), el('th', { class: 'bl', text: 'Σ' }), el('th'))),
+  const tbl = el('table', { class: 'vt' }, el('thead', {}, el('tr', {}, el('th', { text: 'Zeit' }), el('th', { class: 'r', text: 'SK I' }), el('th', { class: 'g', text: 'SK II' }), el('th', { class: 'gr', text: 'SK III' }), el('th', { text: 'Schwarz' }), el('th', { text: 'Vm' }), el('th', { class: 'bl', text: 'Σ' }), el('th'))),
     el('tbody', {}, ...rows.map(r => tr(r, false)), tr(live, true)));
   return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Notizen' }), el('div', { class: 'card wc' }, el('h4', { text: 'Betroffene nach Zeit' }), tbl,
     vw ? null : el('button', { class: 'btn small', text: 'Stand festhalten', title: 'Die aktuellen Zahlen aus dem Reiter Zahlen als neue Zeile speichern', onclick: () => { state.kraefte.rows.push(Object.assign({ id: uid(), iso: nowIso() }, live)); addJournal('Betroffene festgehalten: SK I ' + live.sk1 + ', SK II ' + live.sk2 + ', SK III ' + live.sk3 + ', Tote ' + live.tot + ', Vermisste ' + live.vm, true); renderUnitOverview(); save('Betroffene festgehalten'); } }),
@@ -5231,7 +5236,7 @@ function renderWand(cols, units) {
   const secs = state.sections.filter(x => x.kind !== 'line' && !x.parentId), brs = secs.filter(x => wandKind(x) === 'br'), eas = secs.filter(x => wandKind(x) !== 'br');
   const addBtn = (typ, txt) => ro('sections') ? null : el('button', { class: 'btn small', text: txt, onclick: () => editSectionDialog({ typ }) });
   const wall = el('div', { class: 'wall' },
-    el('div', { class: 'wcol' }, wandAlarm(), el('span', { class: 'lbl', text: 'Bereitstellungsräume' }), ...brs.map(x => wandBlock(x, units)), addBtn('br', '+ Bereitstellungsraum')),
+    el('div', { class: 'wcol' }, wandAlarm(units), el('span', { class: 'lbl', text: 'Bereitstellungsräume' }), ...brs.map(x => wandBlock(x, units)), addBtn('br', '+ Bereitstellungsraum')),
     el('div', { class: 'wcol wide' }, el('span', { class: 'lbl', text: 'Einsatzabschnitte' }), ...eas.map(x => wandBlock(x, units)), wandBlock(null, units), addBtn('ea', '+ Einsatzabschnitt')));
   cols.append(wandTable(secs), wall, el('div', { class: 'wall2' }, wandAuftraege(), wandErgaenzung(), wandNotizen()));
   const ta = cols.querySelector('.kt-note'); if (ta) ta.value = state.kraefte.note || ''; const tb = cols.querySelector('.kt-note2'); if (tb) tb.value = state.kraefte.notiz || '';
@@ -5287,7 +5292,7 @@ function ovDragEnd(apply) {
   document.querySelectorAll('#ovCols .ovcol.over').forEach(c => c.classList.remove('over'));
   if (d.on && apply && d.target) {
     const u = state.units.find(x => x.id === d.id), key = d.target.dataset.drop; if (!u) return;
-    if (key.startsWith('sec:')) assignUnit(u, key.slice(4) || null); else setUnitStatus(u, key.slice(3));
+    if (key === 'alarm') { assignUnit(u, null); setUnitStatus(u, ST_ANF); } else if (key.startsWith('sec:')) assignUnit(u, key.slice(4) || null); else setUnitStatus(u, key.slice(3));
   } else if (d.on) renderUnitOverview();
 }
 function initOvDrag() {

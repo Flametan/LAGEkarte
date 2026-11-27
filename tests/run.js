@@ -260,6 +260,22 @@ async function seite(b, q, w, h) {
     await p.tap('#tabs [data-act="map"]'); await p.waitForTimeout(500); assert.ok(await p.locator('#fueOv').isHidden(), 'Lagekarte schließt die Ansicht'); assert.ok((await over()) <= 1);
     await p.tap('#btnMore'); await p.waitForTimeout(500); const m = await p.locator('#hdrMenu').boundingBox(); assert.ok(m.x >= 0 && m.x + m.width <= 390 + 1, 'Menü passt auf den Bildschirm'); await c.close();
   });
+  await t('Schadenslage: nur Schadensereignisse und Gefahren, Betroffenentabelle sagt Schwarz', async () => {
+    const p = await seite(b, '', 1700, 1300); await p.evaluate(() => document.querySelector('#tabs [data-tab=lage]').click()); await p.waitForTimeout(300);
+    assert.ok(!(await p.locator('#symCat').isVisible()), 'keine Kategorienwahl'); const titles = await p.$$eval('#symGrid button', x => x.map(b => b.title)); assert.ok(titles.length > 5, 'Zeichen vorhanden');
+    assert.ok(!titles.some(x => /HLF|LF 20|RTW|GW-/.test(x)), 'keine Einsatzkräfte in der Schadenslage: ' + titles.slice(0, 8).join('|'));
+    await p.keyboard.press('u'); await p.waitForTimeout(500); assert.ok(await p.locator('.vt th', { hasText: 'Schwarz' }).count() > 0 && !(await p.locator('.vt th', { hasText: /^Tot$/ }).count()), 'Schwarz statt Tot'); await p.close();
+  });
+  await t('Alarmiert, auf Marsch: Einheit anlegen wie beim EA, Ziehen zwischen Block und Abschnitt', async () => {
+    const p = await seite(b, '', 1700, 1300); await p.evaluate(() => { const s = window.__lage.state; s.sections = [{ id: 'ea1', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [] }]; s.units = []; });
+    await p.keyboard.press('u'); await p.waitForTimeout(500); await p.evaluate(() => document.querySelector('#ovStat').dispatchEvent(new Event('change'))); await p.waitForTimeout(300);
+    await p.locator('.walblock button', { hasText: '+ Einheit' }).click(); await p.waitForTimeout(300); await p.locator('.dlg input').first().fill('HLF Alarm'); await p.locator('.dlg button.primary').first().click(); await p.waitForTimeout(500);
+    const u = await p.evaluate(() => window.__lage.state.units[0]); assert.ok(u && u.status === 'anfahrt' && !u.sectionId, 'Einheit steht auf Anfahrt ohne Abschnitt');
+    assert.strictEqual(await p.locator('.walblock .wt').count(), 1, 'Kachel im Block Alarmiert'); assert.strictEqual(await p.locator('.wblock[data-drop="sec:"] .wt').count(), 0, 'nicht doppelt bei ohne Abschnitt');
+    const from = await p.locator('.walblock .wt').boundingBox(), to = await p.locator('.wblock[data-drop="sec:ea1"]').boundingBox();
+    await p.mouse.move(from.x + 30, from.y + 30); await p.mouse.down(); await p.mouse.move(from.x + 60, from.y + 10, { steps: 4 }); await p.mouse.move(to.x + 60, to.y + 40, { steps: 8 }); await p.mouse.up(); await p.waitForTimeout(600);
+    assert.strictEqual(await p.evaluate(() => window.__lage.state.units[0].sectionId), 'ea1', 'Ziehen in den Abschnitt'); await p.close();
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));
