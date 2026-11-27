@@ -972,6 +972,10 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
 .synccard .warn { background: #fff7e6; color: #5b3d00; border: 1px solid #f0c36d; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; margin: 12px 0; } :root[data-theme="dark"] .synccard .warn { background: #3a2c10; color: #f5d68a; }
 .synccard input { width: 100%; } .synccode { font: 700 18px 'Courier New', monospace !important; letter-spacing: .06em; text-align: center; }
 #syncChip { cursor: pointer; font-weight: 700; } #app > header #syncChip.sync-ok { background: #15803d !important; border-color: #15803d !important; } #app > header #syncChip.sync-warn { background: #d97706 !important; border-color: #d97706 !important; } #app > header #syncChip.sync-bad { background: #7f1111 !important; }
+/* Menü oben rechts: dunkle Schrift auf hellem Grund, nicht die weiße Schrift der Kopfzeile */
+#app > header #hdrMenu button { background: none !important; border: 0 !important; border-radius: 0 !important; color: var(--ink) !important; box-shadow: none !important; }
+#app > header #hdrMenu button:hover:not(:disabled) { background: rgba(30, 64, 175, .12) !important; }
+#app > header #hdrMenu button:disabled { opacity: .45; }
 </style>
 </head>
 <body>
