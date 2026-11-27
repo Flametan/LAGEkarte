@@ -1,30 +1,37 @@
-# LAGEskizze
+# LAGEkarte
 
-LAGEskizze is the adaption of an incident sketch which is used as a central draft of an accident, a fire, or a disaster in the Incident Management System of the federal state of North Rhine-Westphalia, Germany, ([Lagedarstellungssystem NRW](http://www.idf.nrw.de/service/downloads/downloads_lagedarstellungssystem_nrw.php)) delivered by the Institute of Fire Services NRW.
+Lagekarte für den operativ-taktischen Stab (FwDV 100, Sachgebiete S1 bis S6). Sie läuft im Browser, auf dem Rechner genauso wie auf dem Handy, und lässt sich auch als einzelne HTML-Datei ohne Installation verwenden.
 
-It is a javascript based position visualisation system that aims to support a consistent and structured management within fire brigade operations. It implements service regulations of the fire brigades in Germany conform to the Fire Service Regulation 100 (Feuerwehr-Dienstvorschrift 100).
+**[Zur LAGEkarte: flametan.github.io/LAGEkarte](https://flametan.github.io/LAGEkarte/)**
 
-The application is written using node.js and AngularJS. For desktop use in command support units, it is encapsulated in an easy to use Electron container. Most recent builds for Windows operation systems can be downloaded from the [EFTAS homepage](http://www.eftas.de/upload/LAGEskizze-win32-x64_10_11_2016.zip).
+Die Daten bleiben im Browser des Geräts. Kartenkacheln, Ortssuche und die Abfrage der KRITIS-Objekte brauchen Internet. Für das gemeinsame Bearbeiten eines Einsatzes braucht es zusätzlich einen eigenen Server, siehe unten.
 
-As base maps the recent version is using the open data WMS of the NRW-Atlas of the federal state NRW (ATKIS, ALKIS) - the relevant copyrights for the service are hold by the federal state. The tactical signs are conform to the German recommendation "Empfehlung für Taktische Zeichen im Bevölkerungsschutz" (Ständige Konferenz für Katastrophenvorsorge im Bevölkerungsschutz) of 2010.
+## Was sie kann
 
-**Credits**:
-Base work was done by Saphir El-Kaiy (functional requirements and specification) and Sebastian Niklasch (first software implementation) in their bachelor thesis. The tactical signs where mostly drawn by Sebastian Ramrath, Fire Brigade Much.
+Die Navigation links (auf dem Handy unten) führt durch die Bereiche. Die Knöpfe "+ EA", "+ Einsatzkräfte" und "+ Objekt" stehen oben rechts in der Kopfzeile.
 
-## LAGEkarte für Stäbe
+- **Lagekarte** mit Einsatzabschnitten (EA), Untereinsatzabschnitten, Bereitstellungsräumen und Einsatzkräften als taktische Zeichen. Einheiten lassen sich auf der Karte in einen Abschnitt ziehen und werden ihm zugeordnet. Überdecken sich Zeichen, geht aus dem Abschnitt ein Strich zum Kartenrand, und die Einheiten stehen dort in einem Fenster. Aus diesem Fenster lassen sie sich auf die Karte zurückziehen.
+- **Kräfte (Stabswand):** Kräfteübersicht, aufgeteilt nach Rot (Feuerwehr), Weiß (Rettungsdienst) und Blau (THW), Alarmiert und auf Marsch, Bereitstellungsräume, Einsatzabschnitte mit Kopfkarte, Aufträge, Wetter, Gefahrstoffraute und die Betroffenentabelle. Kacheln lassen sich ziehen, Doppelklick oder die Taste A setzt sie auf Anfahrt.
+- **Führungsstruktur** nach FwDV 100: Einsatzleiter, Führungsstab, Leitstelle, Fachberater und Abschnitte mit Funkgruppen auf den Linien. Abschnitte lassen sich per Ziehen verschieben, Einheiten pro Abschnitt ausblenden.
+- **Weitere Bereiche:** Einsatztagebuch, KRITIS-Ebenen, Objekte, Zahlen, Behandlungsplatz, Wetter und Keule, Gefahrstoffe mit Absperrzonen, Schadenslage und Datensicherung.
+- **Beamer-Fenster:** Einsatzübersicht, Führungsstruktur und Karte laufen in eigenen Fenstern im selben Browser und folgen dem Hauptfenster. Ein Beamer lässt sich festhalten, damit sich sein Bild nicht mehr ändert (Taste H für die Karte).
+- **Handy:** Navigation unten, Seitenleiste als Blatt über der Karte. Der Rechner bleibt unverändert, die Seite ist nicht für das Handy zuerst gebaut.
 
-Im Ordner `src/public` liegt `kritis-lage.html`, eine eigenständige Lagekarte für einen operativ-taktischen Stab (Gebiete, KRITIS-Objekte, Kräfte, Abschnitte, Meldungen, Tagebuch, Lagestände, Wind und Keule). `python3 tools/build_offline.py` baut daraus die Einzeldatei `kritis-lage-einzeldatei.html`, die ohne weitere Dateien läuft. Kartenkacheln, Ortssuche und die Abfrage der KRITIS-Objekte brauchen Internet. Hinweise zur Live-Freigabe und zu den Lizenzen der Zeichen: `tools/README.md`, `src/public/images/LICENSES-symbole.md`.
+## Gemeinsamer Einsatz
 
-### Bedienung im Stab
+Menü oben rechts, "Gemeinsamer Einsatz". "Teilen" legt den Einsatz verschlüsselt auf dem Server ab und gibt einen Code aus. Wer den Code unter "Beitreten" eingibt, arbeitet am selben Einsatz mit. Änderungen kommen nach ein bis zwei Sekunden bei den anderen an, auch wenn zwei Personen gleichzeitig verschiedene Dinge ändern.
 
-Die LAGEkarte kennt keine Funktionswahl mehr. Der S2 bedient das Programm und kann alles bearbeiten. Die anderen Funktionen arbeiten mit Meldungen und lassen sich vom S2 in die Karte eintragen. Die Lage lässt sich im Reiter Daten als JSON-Datei speichern und wieder einlesen.
+**Nur ansehen:** Im selben Dialog erzeugt "QR-Code zum Ansehen" einen QR-Code und einen Link. Wer ihn öffnet, sieht den Einsatz live, kann aber nichts ändern, und es wird auf dem Gerät nichts gespeichert. Der Zugang zum Ansehen enthält kein Schreibrecht, der Server weist Änderungen mit dem Lesezugang ab.
 
-Im Reiter Einheiten (Taste U) liegt die Stabswand: Kräfteübersicht mit Zahlen aus den Kacheln, Bereitstellungsräume, Einsatzabschnitte mit Kopfkarte, Aufträge, Ergänzungen (Wetter, Gefahrstoffraute) und Notizen mit der Betroffenentabelle. Kacheln lassen sich ziehen, Doppelklick oder A setzt „auf Anfahrt“. Die Wandoptik schaltet das Menü ein und aus.
+Der Server liegt im Ordner [`sync-server`](sync-server/README.md). Er speichert nur verschlüsselte Daten, die Schlüssel entstehen im Browser aus dem Code. Die Anleitung zum Einrichten mit Docker steht dort. Die Adresse des Servers ist in der Seite voreingestellt (im Dialog unter "Server" änderbar). Wer die LAGEkarte selbst betreibt, trägt dort die eigene Adresse ein und ändert die Voreinstellung im Quelltext (`SYNC_SERVER` in `src/public/kritis-lage.html`).
 
-## Gemeinsamer Einsatz und Beamer-Fenster
+Rückgängig (Strg+Z) ist im gemeinsamen Einsatz abgeschaltet, weil es sonst Änderungen der anderen zurücknehmen würde.
 
-- **Beamer-Fenster:** Menü, "Beamer-Fenster". Einsatzübersicht, Führungsstruktur und Lagekarte laufen in eigenen Fenstern im selben Browser auf einem Rechner und folgen dem Hauptfenster. "Festhalten" friert Ausschnitt und Inhalte ein, die Taste H schaltet den Karten-Beamer um.
-- **Gemeinsamer Einsatz:** Menü, "Gemeinsamer Einsatz". Mehrere Personen bearbeiten über einen Code denselben Einsatz, jede Änderung kommt nach ein, zwei Sekunden bei den anderen an. Dafür läuft ein eigener Server (`sync-server/`, Anleitung dort), die App liegt weiter auf GitHub Pages.
+## Einzeldatei und Veröffentlichung
+
+Quelle ist `src/public/kritis-lage.html`. `python3 tools/build_offline.py` baut daraus die Einzeldatei `src/public/kritis-lage-einzeldatei.html`, die ohne weitere Dateien läuft. Beim Bauen wird Internet gebraucht. Ein Push auf `main` veröffentlicht die Einzeldatei über GitHub Pages (`.github/workflows/pages.yml`).
+
+Hinweise zur Live-Freigabe im lokalen Netz und zu den Lizenzen der Zeichen: `tools/README.md`, `src/public/images/LICENSES-symbole.md`.
 
 ## Tests
 
@@ -37,3 +44,12 @@ Die Ende-zu-Ende-Tests liegen in `tests/run.js` und laufen mit Playwright gegen 
 Geprüft werden unter anderem Start, Burger-Menü, Lagevortrag, alle Gefahrstoffe (keine Fehlertexte), die ERG-Distanzen für Chlor und Ammoniak, die Rechtsklick-Menüs, die Stabswand, Tastenkürzel, Einweisung, Fristen, Evakuierungsplanung und Rückgängig. Bei jedem Push startet dieselbe Prüfung über GitHub Actions (`.github/workflows/tests.yml`).
 
 Nach Änderungen an `src/public/kritis-lage.html` muss die Einzeldatei neu gebaut werden (`python3 tools/build_offline.py`), sonst prüfen die Tests den alten Stand.
+
+## Herkunft und Lizenzen
+
+Die LAGEkarte baut auf LAGEskizze auf, einer Lagedarstellung für den Einsatz der Feuerwehr in Nordrhein-Westfalen (Lagedarstellungssystem NRW, Institut der Feuerwehr NRW). Die Taktischen Zeichen entsprechen der "Empfehlung für Taktische Zeichen im Bevölkerungsschutz" (Ständige Konferenz für Katastrophenvorsorge im Bevölkerungsschutz, 2010).
+
+**Credits**:
+Base work was done by Saphir El-Kaiy (functional requirements and specification) and Sebastian Niklasch (first software implementation) in their bachelor thesis. The tactical signs where mostly drawn by Sebastian Ramrath, Fire Brigade Much.
+
+Lizenz: MIT, siehe `LICENSE`. Die Lizenzen der Zeichen stehen in `src/public/images/LICENSES-symbole.md`.

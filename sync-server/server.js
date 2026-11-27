@@ -8,7 +8,10 @@
  *   GET    /v1/room/<id>/ops?since=N&wait=S -> { seq, snapSeq, snapshot?, ops:[{s,d}], online }   (X-Sync-Token)
  *   POST   /v1/room/<id>/ops                -> { seq }       Body { ops:[verschlüsselter Block] } (legt den Einsatz an, wenn neu)
  *   PUT    /v1/room/<id>/snapshot           -> { snapSeq }   Body { seq, data }  ersetzt alle Blöcke bis seq
+ *   PUT    /v1/room/<id>/readtoken          -> { ok }        Body { readToken }  legt den Lesezugriff fest (nur mit Schreibtoken)
  *   DELETE /v1/room/<id>                    -> 204
+ *
+ * Lesen geht mit dem Schreibtoken oder dem Lesetoken, Schreiben und Löschen nur mit dem Schreibtoken.
  */
 const http = require('http');
 const fs = require('fs');
@@ -50,8 +53,8 @@ function createServer(cfg) {
       try { const tmp = file(r.id) + '.tmp'; await fsp.writeFile(tmp, JSON.stringify(plain)); await fsp.rename(tmp, file(r.id)); } catch (e) { console.error('Speichern fehlgeschlagen:', e.message); }
     }, 400);
   }
-  function create(id, token) {
-    const r = { id, tokenHash: sha(token), seq: 0, snapSeq: 0, snapshot: null, ops: [], updatedAt: Date.now(), waiters: [], tags: new Map(), timer: null };
+  function create(id, token, readToken) {
+    const r = { id, tokenHash: sha(token), readHash: readToken && TOKEN_RE.test(readToken) ? sha(readToken) : null, seq: 0, snapSeq: 0, snapshot: null, ops: [], updatedAt: Date.now(), waiters: [], tags: new Map(), timer: null };
     rooms.set(id, r); known.add(id); save(r); return r;
   }
   const online = r => { const now = Date.now(); let n = 0; r.tags.forEach((t, k) => { if (now - t < 20000) n++; else r.tags.delete(k); }); return n; };
@@ -76,17 +79,18 @@ function createServer(cfg) {
     const url = new URL(req.url, 'http://x');
     if (req.method === 'OPTIONS') return send(req, res, 204);
     if (url.pathname === '/health') return send(req, res, 200, 'ok');
-    const m = /^\/v1\/room\/([a-f0-9]{32})(\/ops|\/snapshot)?$/.exec(url.pathname);
+    const m = /^\/v1\/room\/([a-f0-9]{32})(\/ops|\/snapshot|\/readtoken)?$/.exec(url.pathname);
     if (!m) return send(req, res, 404, { error: 'nicht gefunden' });
     if (limited(req, false)) return send(req, res, 429, { error: 'zu viele Anfragen' });
     const id = m[1], sub = m[2] || '', token = String(req.headers['x-sync-token'] || '');
     if (!TOKEN_RE.test(token)) return send(req, res, 401, { error: 'Token fehlt' });
     let r = await load(id);
-    const auth = () => { if (!eqHex(r.tokenHash, sha(token))) { limited(req, true); send(req, res, 403, { error: 'Zugriff verweigert' }); return false; } return true; };
+    const authW = () => { if (!eqHex(r.tokenHash, sha(token))) { limited(req, true); send(req, res, 403, { error: 'Zugriff verweigert' }); return false; } return true; };
+    const authR = () => { const h = sha(token); if (eqHex(r.tokenHash, h) || (r.readHash && eqHex(r.readHash, h))) return true; limited(req, true); send(req, res, 403, { error: 'Zugriff verweigert' }); return false; };
     try {
       if (req.method === 'GET' && sub === '/ops') {
         if (!r) { limited(req, true); return send(req, res, 404, { error: 'Einsatz unbekannt' }); }
-        if (!auth()) return;
+        if (!authR()) return;
         const since = Math.max(0, parseInt(url.searchParams.get('since') || '0', 10) || 0), tag = (url.searchParams.get('c') || '').slice(0, 16);
         const wait = Math.min(cfg.maxWait, Math.max(0, parseInt(url.searchParams.get('wait') || '0', 10) || 0));
         if (tag) r.tags.set(tag, Date.now());
@@ -103,8 +107,8 @@ function createServer(cfg) {
       if (req.method === 'POST' && sub === '/ops') {
         const b = await readBody(req, cfg.maxBody);
         if (!Array.isArray(b.ops) || !b.ops.length || b.ops.some(o => typeof o !== 'string' || o.length > 4 * 1024 * 1024)) return send(req, res, 400, { error: 'ungültige Daten' });
-        if (!r) { if (known.size >= cfg.maxRooms) return send(req, res, 507, { error: 'Server voll' }); r = create(id, token); }
-        else if (!auth()) return;
+        if (!r) { if (known.size >= cfg.maxRooms) return send(req, res, 507, { error: 'Server voll' }); r = create(id, token, b.readToken); }
+        else if (!authW()) return;
         if (r.ops.length + b.ops.length > cfg.maxOps) return send(req, res, 413, { error: 'Gesamtstand nötig' });
         b.ops.forEach(d => { r.seq++; r.ops.push({ s: r.seq, d }); });
         r.updatedAt = Date.now(); save(r); wake(r); return send(req, res, 200, { seq: r.seq });
@@ -112,15 +116,20 @@ function createServer(cfg) {
       if (req.method === 'PUT' && sub === '/snapshot') {
         const b = await readBody(req, cfg.maxBody);
         if (typeof b.data !== 'string' || !Number.isInteger(b.seq) || b.seq < 0) return send(req, res, 400, { error: 'ungültige Daten' });
-        if (!r) { if (known.size >= cfg.maxRooms) return send(req, res, 507, { error: 'Server voll' }); r = create(id, token); }
-        else if (!auth()) return;
+        if (!r) { if (known.size >= cfg.maxRooms) return send(req, res, 507, { error: 'Server voll' }); r = create(id, token, b.readToken); }
+        else if (!authW()) return;
         if (b.seq > r.seq) return send(req, res, 409, { error: 'Stand zu neu', seq: r.seq });
         if (b.seq >= r.snapSeq) { r.snapshot = b.data; r.snapSeq = b.seq; r.ops = r.ops.filter(o => o.s > b.seq); }
         r.updatedAt = Date.now(); save(r); wake(r); return send(req, res, 200, { snapSeq: r.snapSeq, seq: r.seq });
       }
+      if (req.method === 'PUT' && sub === '/readtoken') {
+        if (!r) return send(req, res, 404, { error: 'Einsatz unbekannt' }); if (!authW()) return;
+        const b = await readBody(req, 4096); if (typeof b.readToken !== 'string' || !TOKEN_RE.test(b.readToken)) return send(req, res, 400, { error: 'ungültiges Lesetoken' });
+        r.readHash = sha(b.readToken); save(r); return send(req, res, 200, { ok: true });
+      }
       if (req.method === 'DELETE' && sub === '') {
         if (!r) return send(req, res, 204);
-        if (!auth()) return;
+        if (!authW()) return;
         rooms.delete(id); known.delete(id); wake(r); fsp.unlink(file(id)).catch(() => {}); return send(req, res, 204);
       }
       return send(req, res, 405, { error: 'nicht erlaubt' });

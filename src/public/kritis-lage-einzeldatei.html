@@ -1775,13 +1775,43 @@ body.viewer #mapActs, body.beamerwin #mapActs, body.vortrag #mapActs, body.print
 .vt th.bk { width: 54px; padding: 3px 4px; font-size: 11.5px; white-space: nowrap; }
 
 #clusterLines { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 850; pointer-events: none; }
-#clusterPanel { position: absolute; right: 10px; top: 130px; bottom: 36px; width: 200px; z-index: 860; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; } #clusterPanel[hidden] { display: none; }
+.clpanel { position: absolute; top: 130px; bottom: 36px; width: 210px; z-index: 860; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; } .clpanel[hidden] { display: none; }
+#clusterPanelR { right: 10px; } #clusterPanelL { left: 56px; top: 270px; }
 .cl-card { background: var(--panel, #fff); border: 1px solid var(--line); border-left: 6px solid var(--c); border-radius: 8px; box-shadow: 0 2px 8px rgba(15, 23, 42, .25); padding: 4px 6px 6px; flex: none; }
-.cl-h { display: flex; justify-content: space-between; align-items: baseline; width: 100%; border: 0; background: none; font: inherit; color: var(--ink); cursor: pointer; padding: 2px 2px 4px; text-align: left; } .cl-h b { font-size: 13px; } .cl-h span { font-size: 11px; color: var(--muted); }
-.cl-u { display: flex; align-items: center; gap: 6px; width: 100%; border: 0; border-top: 1px solid var(--line); background: none; padding: 3px 2px; font: inherit; color: var(--ink); cursor: pointer; text-align: left; border-left: 3px solid var(--sc, transparent); padding-left: 5px; } .cl-u:hover { background: rgba(30, 64, 175, .1); }
-.cl-u img { width: 30px; height: 24px; object-fit: contain; flex: none; } .cl-n { flex: 1; min-width: 0; font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .cl-u small { font-size: 10.5px; color: var(--muted); }
-body.printing #clusterPanel, body.printing #clusterLines { display: none; }
-@media (max-width: 700px) { #clusterPanel { width: 150px; top: 110px; bottom: 70px; } .cl-u small { display: none; } }
+.cl-h { display: flex; justify-content: space-between; align-items: baseline; width: 100%; border: 0; background: none; font: inherit; color: var(--ink); cursor: pointer; padding: 2px 2px 4px; text-align: left; gap: 6px; } .cl-h b { font-size: 13px; } .cl-h span { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.cl-u { display: flex; align-items: center; gap: 6px; width: 100%; border: 0; border-top: 1px solid var(--line); background: none; padding: 3px 2px 3px 5px; font: inherit; color: var(--ink); cursor: grab; text-align: left; border-left: 3px solid var(--sc, transparent); touch-action: none; user-select: none; } .cl-u:hover { background: rgba(30, 64, 175, .1); } .cl-src { opacity: .35; }
+.cl-ghost { position: fixed; z-index: 4000; pointer-events: none; background: var(--panel, #fff); box-shadow: 0 6px 18px rgba(0,0,0,.4); border-radius: 6px; opacity: .92; }
+.cl-u img { width: 30px; height: 24px; object-fit: contain; flex: none; pointer-events: none; } .cl-n { flex: 1; min-width: 0; font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .cl-u small { font-size: 10.5px; color: var(--muted); }
+body.printing .clpanel, body.printing #clusterLines { display: none; }
+@media (max-width: 700px) { .clpanel { width: 150px; top: 110px; bottom: 70px; } #clusterPanelL { left: 8px; top: 110px; } .cl-u small { display: none; } }
+.qrwrap { text-align: center; } .qrimg { width: 220px; height: 220px; image-rendering: pixelated; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 4px; }
+
+/* Handy: Kräfte (Stabswand) lesbar */
+@media (max-width: 700px) {
+  #unitOv { padding: 8px 8px 70px !important; font-size: 14px; }
+  #unitOv .ovhead { position: static !important; display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 0 !important; margin: 0 0 8px; background: none !important; border: 0 !important; }
+  #unitOv .ovhead h2, #ovGroup, #ovStat, #ovSmall, #ovBig, #ovMap { display: none !important; }
+  #unitOv .ovhead, #unitOv .ovtools { min-width: 0; max-width: 100%; box-sizing: border-box; }
+  #ovSum { min-width: 0; max-width: 100%; display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 6px; scrollbar-width: none; } #ovSum::-webkit-scrollbar { display: none; } #ovSum .chip { flex: none; font-size: 12px; padding: 2px 8px; }
+  #unitOv .ovtools { display: flex; gap: 8px; } #unitOv .ovtools .btn { flex: 1; justify-content: center; min-height: 40px; }
+  /* Kräfteübersicht: Tabelle passt in die Breite */
+  .kt { padding: 8px 8px 10px; border-width: 1px; border-radius: 8px; margin-bottom: 10px; max-width: none; }
+  .kt-h .lbl { font-size: 13px; padding: 3px 8px; border-width: 1px; }
+  .kt-t { table-layout: fixed; font-size: 13px; } .kt-t th { padding: 4px 3px; font-size: 11px; line-height: 1.15; border-bottom-width: 2px; } .kt-t tbody th { font-size: 13px; width: 27%; overflow-wrap: anywhere; }
+  .kt-t td { padding: 3px 2px; font-size: 16px; } .kt-t td small { display: block; margin: 0; font-size: 10px; }
+  .kc { width: 100%; font-size: 16px; padding: 4px 4px; border: 1px solid var(--line); background: var(--panel, #fff); }
+  .kgrp { flex-wrap: wrap; gap: 4px 6px; font-size: 10.5px; } .kt-t tr.grp th { font-size: 11px; } .kt-t tr.grp td { font-size: 11px; }
+  .kt-note { rows: 1; }
+  /* Stabswand: alles untereinander, Kopfkarten kompakt */
+  #ovCols.wand .wall, #ovCols.wand .wall2, .wall, .wall2 { display: block !important; } .wcol { margin-bottom: 12px; min-width: 0; }
+  .wcol > .lbl { display: block; font-size: 12px; padding: 4px 8px; border-width: 1px; margin: 4px 0; text-align: left; }
+  .ea.wcard { grid-template-columns: 52px 1fr; font-size: 12.5px; } .ea.wcard .s { grid-column: 1 / -1; border-top: 1px solid #aaa; display: flex; flex-wrap: wrap; gap: 2px 12px; } .ea.wcard .m { border-right: 0; }
+  .ea.wcard .wbtns { width: 100%; }
+  .ea.wcard .m > div:has(> b:empty), .ea.wcard .s > div:has(> b:empty) { display: none; }
+  .wblock { padding: 6px; } .wtiles { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ovunit.wt { width: calc(33.33% - 4px) !important; min-width: 92px; }
+  .wal-r input { font-size: 16px; }
+}
 </style>
 </head>
 <body>
@@ -2671,7 +2701,8 @@ let state = freshState();
 const runtime = { sector: {}, mode: null, placing: null, drawPurpose: null, drawHandler: null, vis: new Set() };
 const qs = new URLSearchParams(location.search);
 runtime.beamerView = ['karte', 'wand', 'fue'].includes(qs.get('beamer')) ? qs.get('beamer') : null;   // Beamer-Fenster auf demselben Rechner
-runtime.viewer = qs.has('ansicht') || !!runtime.beamerView; runtime.beamer = qs.has('beamer');
+runtime.viewOnly = /[#&]ansehen=/.test(location.hash);   // nur ansehen über den QR-Code des gemeinsamen Einsatzes
+runtime.viewer = qs.has('ansicht') || !!runtime.beamerView || runtime.viewOnly; runtime.beamer = qs.has('beamer');
 if (runtime.viewer) document.body.classList.add('viewer');
 if (runtime.beamer) document.body.classList.add('beamer');
 if (runtime.beamerView) document.body.classList.add('beamerwin');
@@ -2843,7 +2874,7 @@ function save(label) {
   if (label) commit(label);
 }
 function saveNow() {
-  saveTimer = 0;
+  saveTimer = 0; if (runtime.viewer) return;   // Ansicht und Beamer-Fenster schreiben nie in den Browserspeicher
   {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); runtime.storeWarn = ''; const ns = document.getElementById('navSaved'); if (ns) ns.textContent = 'Gespeichert ' + new Date().toLocaleTimeString('de-DE'); }
     catch (e) { runtime.storeWarn = 'gekürzt'; try { const s = Object.assign({}, state, { pois: Object.fromEntries(Object.entries(state.pois).filter(([, q]) => q.manual)), loaded: {} }); localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e2) { runtime.storeWarn = 'voll'; } }
@@ -3633,7 +3664,7 @@ function renderCas() {
   });
   if (runtime.viewer) lockViewer(list);
   casLayer.clearLayers();
-  state.casualties.filter(c => c.lat != null).forEach(c => {
+  state.casualties.filter(c => c.lat != null && !clusterCur.hiddenC.has(c.id)).forEach(c => {
     const m = L.marker([c.lat, c.lng], { icon: L.divIcon({ className: '', iconSize: casIcon(c.cat) ? [74, 26] : [34, 24], iconAnchor: casIcon(c.cat) ? [37, 13] : [17, 12], html: el('div', { class: 'cas', style: '--c:' + CAS[c.cat].color }, casIcon(c.cat) ? el('img', { src: casIcon(c.cat), alt: '', style: 'height:18px;vertical-align:-4px;margin-right:3px' }) : null, CAS[c.cat].short + ' ' + c.n) }), draggable: true });
     m.on('dragend', () => { const ll = m.getLatLng(); c.lat = ll.lat; c.lng = ll.lng; renderCas(); save('Zahl verschoben'); });
     m.bindTooltip(el('span', { text: CAS[c.cat].label + ': ' + c.n + (c.note ? ', ' + c.note : '') }));
@@ -4332,7 +4363,8 @@ const SYNC = (() => {
     const k0 = await crypto.subtle.importKey('raw', ENC.encode(norm(code)), 'HKDF', false, ['deriveBits', 'deriveKey']);
     const bits = async (info, n) => new Uint8Array(await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt: ENC.encode('lagekarte-sync-v1'), info: ENC.encode(info) }, k0, n * 8));
     const key = await crypto.subtle.deriveKey({ name: 'HKDF', hash: 'SHA-256', salt: ENC.encode('lagekarte-sync-v1'), info: ENC.encode('key') }, k0, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
-    return { id: hex(await bits('id', 16)), token: b64u(await bits('token', 32)), key };
+    const idB = await bits('id', 16), rtB = await bits('rtoken', 32), keyRaw = await bits('key', 32);
+    return { id: hex(idB), token: b64u(await bits('token', 32)), key, idB, rtB, rtoken: b64u(rtB), keyRaw };
   }
   async function seal(obj) { const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, S.creds.key, ENC.encode(JSON.stringify(obj)))); const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12); return b64(out); }
   async function open(str) { const raw = unb64(str); return JSON.parse(DEC.decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(0, 12) }, S.creds.key, raw.slice(12)))); }
@@ -4398,7 +4430,7 @@ const SYNC = (() => {
     const cur = S.reg.get(p); if (cur && cur.t >= t) return false; seeT(t);
     S.reg.set(p, { v: x ? null : v, t, x: !!x }); const seg = p.split('/'), e = entOf(p);
     if (e && !p.endsWith('/@del') && tomb(seg[0], seg[1])) return false;           // gelöschte Einträge bleiben gelöscht
-    if (applyOne(state, { p, v, x })) { if (x) S.base.leaf.delete(p); else S.base.leaf.set(p, v); if (p.endsWith('/@del')) { S.base.ents.delete(e); [...S.base.leaf.keys()].forEach(k => { if (k.startsWith(e + '/')) S.base.leaf.delete(k); }); } else if (e) S.base.ents.add(e); return true; }
+    if (applyOne(state, { p, v, x })) { if (!S.base) return true; if (x) S.base.leaf.delete(p); else S.base.leaf.set(p, v); if (p.endsWith('/@del')) { S.base.ents.delete(e); [...S.base.leaf.keys()].forEach(k => { if (k.startsWith(e + '/')) S.base.leaf.delete(k); }); } else if (e) S.base.ents.add(e); return true; }
     return false;
   }
   function renderRemote() {
@@ -4423,7 +4455,7 @@ const SYNC = (() => {
     const c = $('#syncChip'); if (!c) return; if (!S.active) { c.hidden = true; return; } c.hidden = false;
     const lab = 'Einsatz ' + norm(S.code).slice(0, 4);
     c.className = 'chip sync-' + (S.status === 'ok' ? 'ok' : S.status === 'denied' ? 'bad' : 'warn');
-    c.textContent = lab + ' · ' + (S.status === 'ok' ? (S.online || 1) + ' online' : S.status === 'denied' ? 'kein Zugriff' : 'getrennt'); c.title = S.msg || 'Gemeinsamer Einsatz: Klicken für Einzelheiten';
+    c.textContent = S.readOnly ? 'Ansicht · ' + (S.status === 'ok' ? 'live' : S.status === 'denied' ? 'kein Zugriff' : 'getrennt') : lab + ' · ' + (S.status === 'ok' ? (S.online || 1) + ' online' : S.status === 'denied' ? 'kein Zugriff' : 'getrennt'); c.title = S.msg || 'Gemeinsamer Einsatz: Klicken für Einzelheiten';
     if (typeof updateUndoButtons === 'function') updateUndoButtons(); const d = $('#syncDlg'); if (d && d.refresh) d.refresh();
   }
   async function loadFull(r) {            // Gesamtstand und Blöcke -> Register
@@ -4446,7 +4478,7 @@ const SYNC = (() => {
   const regEntries = () => { const out = []; S.reg.forEach((r, p) => out.push([p, r.v, r.t, r.x ? 1 : 0])); return out; };
   async function putSnapshot(seq) { const r = await api('/snapshot', { method: 'PUT', body: JSON.stringify({ seq, data: await seal(regEntries()) }) }); if (!r.ok) throw Object.assign(new Error('Server ' + r.status), { status: r.status }); const j = await r.json(); S.snapSeq = j.snapSeq; return j; }
   async function push() {
-    S.pushT = 0; if (!S.active || !S.creds || !S.base) return; const cur = flatten(), ops = diff(cur); if (!ops.length) return;
+    S.pushT = 0; if (!S.active || !S.creds || !S.base || S.readOnly) return; const cur = flatten(), ops = diff(cur); if (!ops.length) return;
     ops.forEach(o => { o.t = nextT(); S.reg.set(o.p, { v: o.v, t: o.t, x: !!o.x }); });
     try {
       const r = await api('/ops', { method: 'POST', body: JSON.stringify({ ops: [await seal(ops)] }) });
@@ -4457,7 +4489,7 @@ const SYNC = (() => {
       setStatus('ok');
     } catch (e) { setStatus(e.status === 403 ? 'denied' : 'warn', 'Änderungen werden nachgeholt (' + e.message + ')'); S.pushT = setTimeout(push, 4000); }
   }
-  function schedulePush() { if (!S.active || !S.base) return; clearTimeout(S.pushT); S.pushT = setTimeout(push, 400); }
+  function schedulePush() { if (!S.active || !S.base || S.readOnly) return; clearTimeout(S.pushT); S.pushT = setTimeout(push, 400); }
   async function loop(id) {
     let fail = 0;
     while (S.active && S.loopId === id) {
@@ -4481,7 +4513,7 @@ const SYNC = (() => {
 
   async function create(url) {
     const code = newCode(); await creds(code, url); S.reg = new Map(); await pushAll();
-    const r = await api('/snapshot', { method: 'PUT', body: JSON.stringify({ seq: 0, data: await seal(regEntries()) }) }); if (!r.ok) throw new Error(r.status === 507 ? 'Der Server ist voll.' : 'Der Server hat abgelehnt (' + r.status + ').');
+    const r = await api('/snapshot', { method: 'PUT', body: JSON.stringify({ seq: 0, data: await seal(regEntries()), readToken: S.creds.rtoken }) }); if (!r.ok) throw new Error(r.status === 507 ? 'Der Server ist voll.' : 'Der Server hat abgelehnt (' + r.status + ').');
     S.seq = 0; S.snapSeq = 0; keep(); addJournal('Einsatz geteilt: gemeinsamer Einsatz ' + pretty(code).slice(0, 4), true); start(); return pretty(code);
   }
   async function join(code, url, resume) {
@@ -4492,18 +4524,32 @@ const SYNC = (() => {
     if (local) { local.leaf.forEach((v, p) => { const e = entOf(p); if (!S.reg.has(p) && !(e && S.reg.has(e + '/@del')) && !p.endsWith('/#o')) S.reg.set(p, { v, t: nextT() }); }); }
     materialize(); rebuildAll(!resume); keep(); start(); if (local) schedulePush(); if (!resume) addJournal('Gemeinsamem Einsatz beigetreten', true); save();
   }
+  const unb64u = t => unb64(t.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((t.length + 3) % 4));
+  async function viewLink() {              // Link und QR-Code zum Ansehen: enthält Kennung, Lesetoken und Schlüssel, aber nicht das Schreibtoken
+    if (!S.active || S.readOnly) throw new Error('Nur im geteilten Einsatz möglich.');
+    const r = await api('/readtoken', { method: 'PUT', body: JSON.stringify({ readToken: S.creds.rtoken }) }); if (!r.ok) throw new Error('Der Server hat den Lesezugriff abgelehnt (' + r.status + ').');
+    const raw = new Uint8Array(80); raw.set(S.creds.idB, 0); raw.set(S.creds.rtB, 16); raw.set(S.creds.keyRaw, 48);
+    return location.href.split('#')[0].split('?')[0] + '#ansehen=' + b64u(raw) + (S.url !== SYNC_SERVER ? '&server=' + encodeURIComponent(S.url) : '');
+  }
+  async function joinView(code, url) {      // nur ansehen: kein Schreibtoken, nichts wird gespeichert
+    let raw; try { raw = unb64u(code); } catch (e) { throw new Error('Der Link ist unvollständig.'); } if (raw.length !== 80) throw new Error('Der Link ist unvollständig.');
+    S.readOnly = true; S.url = String(url || SYNC_SERVER).trim().replace(/\/+$/, ''); S.code = 'ANSICHT';
+    S.creds = { id: hex(raw.slice(0, 16)), token: b64u(raw.slice(16, 48)), key: await crypto.subtle.importKey('raw', raw.slice(48, 80), 'AES-GCM', false, ['decrypt']) };
+    const r = await api('/ops?since=0'); if (r.status === 404 || r.status === 403) throw new Error('Dieser Einsatz ist nicht (mehr) freigegeben.'); if (!r.ok) throw new Error('Der Server antwortet nicht richtig (' + r.status + ').');
+    await loadFull(await r.json()); materialize(); rebuildAll(true); start();
+  }
   function leave() { S.active = false; S.loopId++; try { S.ac && S.ac.abort(); } catch (e) { /* weg */ } ls.del(K.code); S.status = 'off'; updateChip(); addJournal('Gemeinsamen Einsatz verlassen', true); save(); }
   async function resume() { const c = ls.get(K.code), u = ls.get(K.url) || SYNC_SERVER; if (!c || runtime.viewer || runtime.beamerView) return; try { await join(c, u, true); } catch (e) { S.code = norm(c); S.url = u; S.active = true; try { S.creds = await derive(c); } catch (x) { return; } setStatus('warn', e.message); S.loopId++; const id = S.loopId; (async () => { while (S.active && S.loopId === id) { await sleep(5000); try { await join(c, u, true); return; } catch (x) { setStatus(/verweigert|nicht/.test(x.message) ? 'denied' : 'warn', x.message); } } })(); } }
   function downloadBackup() {
     const blob = new Blob([JSON.stringify({ gesichert: new Date().toISOString(), hinweis: 'Stand vor dem Beitritt zu einem gemeinsamen Einsatz', state: shareState() })], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'lagekarte-vor-beitritt-' + new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-') + '.json'; document.body.append(a); a.click(); setTimeout(() => { a.remove(); URL.revokeObjectURL(a.href); }, 500);
   }
-  return { S, K, ls, DEFAULT: SYNC_SERVER, pretty, norm, valid, create, join, leave, resume, schedulePush, derive, flatten, get active() { return S.active; }, updateChip };
+  return { S, K, ls, DEFAULT: SYNC_SERVER, viewLink, joinView, pretty, norm, valid, create, join, leave, resume, schedulePush, derive, flatten, get active() { return S.active; }, updateChip };
 })();
 
 function openSyncDlg(tab, pre) {
   if ($('#syncDlg') || runtime.viewer) return;
-  let mode = SYNC.active && !tab ? 'teilen' : (tab || 'teilen'); const busy = { v: false };
+  let mode = SYNC.active && !tab ? 'teilen' : (tab || 'teilen'); const busy = { v: false }; let viewUrl = '';
   const urlIn = el('input', { type: 'url', placeholder: 'https://ihr-server.example', value: (pre && pre.server) || SYNC.ls.get(SYNC.K.url) || SYNC.DEFAULT, 'aria-label': 'Adresse des Servers' });
   const srvBox = () => el('details', { class: 'advsrv', open: urlIn.value !== SYNC.DEFAULT ? 'open' : null }, el('summary', { text: 'Server (voreingestellt)' }), urlIn);
   const codeIn = el('input', { type: 'text', class: 'synccode', placeholder: 'XXXX-XXXX-XXXX-XXXX-XXXX', value: (pre && pre.code) || '', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Code' });
@@ -4523,6 +4569,9 @@ function openSyncDlg(tab, pre) {
         el('div', { class: 'line' }, el('button', { class: 'btn', text: 'Code kopieren', onclick: () => copy(pc, 'Code') }), el('button', { class: 'btn', text: 'Link kopieren', onclick: () => copy(link(), 'Link') })),
         el('div', { class: 'slb2', text: 'Verbunden' }), el('div', { class: 'who' }, el('i', { class: 'dot' + (S.status === 'ok' ? '' : ' off') }), el('b', { text: 'Dieses Fenster' }), el('span', { class: 'hint', style: 'margin-left:auto', text: S.status === 'ok' ? 'verbunden' : (S.msg || 'getrennt') })),
         el('div', { class: 'who' }, el('i', { class: 'dot' + (S.online > 1 ? '' : ' off') }), el('b', { text: 'Weitere Geräte' }), el('span', { class: 'hint', style: 'margin-left:auto', text: S.online > 1 ? (S.online - 1) + ' online' : 'keines online' })),
+        el('div', { class: 'slb2', text: 'Nur ansehen' }),
+        viewUrl ? el('div', { class: 'qrwrap' }, (() => { const q = qrcode(0, 'M'); q.addData(viewUrl); q.make(); return el('img', { class: 'qrimg', alt: 'QR-Code zum Ansehen des Einsatzes', src: q.createDataURL(5, 8) }); })(), el('div', { class: 'hint', text: 'Wer den QR-Code scannt, sieht den Einsatz live, kann aber nichts ändern.' }), el('div', { class: 'line' }, el('button', { class: 'btn', text: 'Ansichtslink kopieren', onclick: () => copy(viewUrl, 'Ansichtslink') }), el('button', { class: 'btn', text: 'QR-Code ausblenden', onclick: () => { viewUrl = ''; render(); } })))
+          : el('div', { class: 'line', style: 'margin-top:4px' }, el('button', { class: 'btn', text: 'QR-Code zum Ansehen', title: 'Für Zuschauer: nur lesen, nichts ändern', onclick: () => go(async () => { viewUrl = await SYNC.viewLink(); }) })),
         el('div', { class: 'warn', text: 'Wer den Code kennt, kann den Einsatz lesen und bearbeiten. Die Daten sind auf dem Gerät verschlüsselt, der Server sieht nur unlesbare Daten. Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.' }), err,
         el('div', { class: 'line' }, el('button', { class: 'btn', style: 'color:#b71c1c', text: 'Einsatz verlassen', onclick: async () => { if (await askYesNo('Gemeinsamen Einsatz verlassen?', 'Sie behalten Ihre Kopie auf diesem Gerät. Änderungen der anderen kommen nicht mehr an.', 'Verlassen')) { SYNC.leave(); render(); } } }), el('button', { class: 'btn primary', text: 'Fertig', onclick: close })));
     } else if (mode === 'teilen') {
@@ -4539,7 +4588,10 @@ function openSyncDlg(tab, pre) {
   dlg.addEventListener('mousedown', e => { if (e.target === dlg) close(); }); dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
   render(); document.body.append(dlg);
 }
-function syncFromHash() { const m = /[#&]einsatz=([A-Z0-9]{20})(?:&server=([^&]+))?/i.exec(location.hash || ''); if (!m || runtime.viewer) return; setTimeout(() => openSyncDlg('beitreten', { code: SYNC.pretty(m[1]), server: m[2] ? decodeURIComponent(m[2]) : '' }), 800); }
+function syncFromHash() {
+  const v = /[#&]ansehen=([A-Za-z0-9_-]+)(?:&server=([^&]+))?/.exec(location.hash || '');
+  if (v) { SYNC.joinView(v[1], v[2] ? decodeURIComponent(v[2]) : '').then(() => say('Ansicht des gemeinsamen Einsatzes, nur lesen.', 4000)).catch(e => say(e.message, 9000)); return; }
+  const m = /[#&]einsatz=([A-Z0-9]{20})(?:&server=([^&]+))?/i.exec(location.hash || ''); if (!m || runtime.viewer) return; setTimeout(() => openSyncDlg('beitreten', { code: SYNC.pretty(m[1]), server: m[2] ? decodeURIComponent(m[2]) : '' }), 800); }
 let pushTimer = null;
 function schedulePush() { clearTimeout(pushTimer); pushTimer = setTimeout(pushLive, 700); }
 function shareState() {
@@ -5868,57 +5920,82 @@ function unitMarkerIcon(u) {
   const node = el('div', { class: 'umk ring' + (fl.out ? ' out' : fl.due ? ' due' : ''), style: '--sc:' + safeColor(st.color) }, img, fl.out ? el('span', { class: 'ustrike' }) : null, el('span', { class: 'usb', style: 'background:' + safeColor(st.color), text: st.short || (st.label || '?').charAt(0).toUpperCase() }), el('span', { class: 'ulb', text: u.name || 'Einheit' }));
   return L.divIcon({ className: '', html: node, iconSize: [Math.max(w, 60), 52], iconAnchor: [Math.max(w, 60) / 2, 22] });
 }
-/* Viele Einheiten übereinander: Aus dem Abschnitt geht ein Strich zum Kartenrand, dort stehen die Einheiten als Liste.
-   Das gilt nur, solange der Abschnitt im Bild ist und die Einheiten sich überdecken. */
-const CLUSTER_MIN = 3, CLUSTER_PX = 34;
-let clusterSig = '', clusterCur = new Map();
-function clusterSections() {
-  const out = new Map(), taken = new Set(); if (!map._loaded || !map.getSize().x) return out; const view = map.getBounds();
-  const secs = state.sections.filter(x => x.kind !== 'line' && x.pts && x.pts.length > 2).sort((a, b) => (a.parentId ? 1 : 0) - (b.parentId ? 1 : 0));
-  secs.forEach(sx => {
-    if (!view.intersects(L.latLngBounds(sx.pts))) return;
-    const ids = new Set([sx.id, ...state.sections.filter(c => c.parentId === sx.id).map(c => c.id)]);
-    const us = state.units.filter(u => u.lat != null && ids.has(u.sectionId) && !taken.has(u.id)); if (us.length < CLUSTER_MIN) return;
-    const pts = us.map(u => map.latLngToContainerPoint([u.lat, u.lng]));
-    const near = us.filter((u, i) => pts.some((p, j) => j !== i && Math.abs(p.x - pts[i].x) < CLUSTER_PX && Math.abs(p.y - pts[i].y) < CLUSTER_PX));
-    if (near.length >= CLUSTER_MIN) { out.set(sx.id, us); us.forEach(u => taken.add(u.id)); }
+/* Überlappen sich Zeichen von Einheiten oder verletzten Personen, gehen aus dem Abschnitt Striche zum Kartenrand und die Einheiten stehen dort in einem Fenster.
+   Abschnitte links im Bild bekommen es links, Abschnitte rechts im Bild rechts. Das gilt nur, solange der Abschnitt im Bild ist. */
+const CLUSTER_PX = 38;
+let clusterSig = '', clusterCur = { secs: new Map(), hiddenU: new Set(), hiddenC: new Set() };
+function clusterCompute() {
+  const out = { secs: new Map(), hiddenU: new Set(), hiddenC: new Set() }; if (!map._loaded || !map.getSize().x) return out;
+  const size = map.getSize(), view = map.getBounds(), items = [];
+  state.units.forEach(u => { if (u.lat != null) items.push({ k: 'u', ref: u, sec: u.sectionId || null, p: map.latLngToContainerPoint([u.lat, u.lng]) }); });
+  state.casualties.forEach(c => { if (c.lat != null) { const sx = sectionAt(c.lat, c.lng); items.push({ k: 'c', ref: c, sec: sx ? sx.id : null, p: map.latLngToContainerPoint([c.lat, c.lng]) }); } });
+  const over = new Set(); items.forEach((a, i) => { for (let j = i + 1; j < items.length; j++) { const b2 = items[j]; if (Math.abs(a.p.x - b2.p.x) < CLUSTER_PX && Math.abs(a.p.y - b2.p.y) < CLUSTER_PX) { over.add(a); over.add(b2); a.nb = a.nb || []; a.nb.push(b2); b2.nb = b2.nb || []; b2.nb.push(a); } } });
+  items.forEach(it => { if (it.k === 'c' && !it.sec && over.has(it)) { const u = (it.nb || []).find(n => n.k === 'u' && n.sec); if (u) it.sec = u.sec; } });
+  const ids = new Set(); items.forEach(it => { if (over.has(it) && it.sec && it.k === 'u') ids.add(it.sec); });
+  items.forEach(it => { if (over.has(it) && it.sec && it.k === 'c') ids.add(it.sec); });
+  ids.forEach(id => {
+    const sx = state.sections.find(x => x.id === id); if (!sx || sx.kind === 'line') return;
+    const mem = items.filter(it => it.sec === id); if (!mem.length) return;
+    const poly = sx.pts && sx.pts.length > 2, shown = poly ? view.intersects(L.latLngBounds(sx.pts)) : mem.some(it => it.p.x >= 0 && it.p.y >= 0 && it.p.x <= size.x && it.p.y <= size.y); if (!shown) return;
+    out.secs.set(id, mem); mem.forEach(it => (it.k === 'u' ? out.hiddenU : out.hiddenC).add(it.ref.id));
   });
   return out;
 }
-function clusterAnchor(sx) {
-  let c = L.latLngBounds(sx.pts).getCenter(); if (!secInside(sx, c.lat, c.lng)) { const m = L.latLng(sx.pts.reduce((a, q) => a + q[0], 0) / sx.pts.length, sx.pts.reduce((a, q) => a + q[1], 0) / sx.pts.length); if (secInside(sx, m.lat, m.lng)) c = m; }
-  const p = map.latLngToContainerPoint(c), sz = map.getSize(); return L.point(Math.min(Math.max(p.x, 10), sz.x - 10), Math.min(Math.max(p.y, 10), sz.y - 10));
+function clusterAnchor(sx, mem) {
+  const sz = map.getSize(); let p;
+  if (sx.pts && sx.pts.length > 2) { let c = L.latLngBounds(sx.pts).getCenter(); if (!secInside(sx, c.lat, c.lng)) { const m = L.latLng(sx.pts.reduce((a, q) => a + q[0], 0) / sx.pts.length, sx.pts.reduce((a, q) => a + q[1], 0) / sx.pts.length); if (secInside(sx, m.lat, m.lng)) c = m; } p = map.latLngToContainerPoint(c); }
+  else p = L.point(mem.reduce((a, it) => a + it.p.x, 0) / mem.length, mem.reduce((a, it) => a + it.p.y, 0) / mem.length);
+  return L.point(Math.min(Math.max(p.x, 10), sz.x - 10), Math.min(Math.max(p.y, 10), sz.y - 10));
 }
 function renderClusterLines() {
-  const panel = $('#clusterPanel'), svg = $('#clusterLines'); if (!panel || !svg) return; svg.replaceChildren(); if (panel.hidden) return;
-  const base = $('#mapWrap').getBoundingClientRect(), pr = panel.getBoundingClientRect(), NS = 'http://www.w3.org/2000/svg';
-  panel.querySelectorAll('.cl-card').forEach(card => {
-    const sx = state.sections.find(x => x.id === card.dataset.sid); if (!sx) return; const r = card.getBoundingClientRect(), a = clusterAnchor(sx);
-    const ey = Math.min(Math.max(r.top + 18, pr.top + 6), pr.bottom - 6) - base.top, ex = r.left - base.left, col = safeColor(sx.color, '#2563eb');
-    const line = document.createElementNS(NS, 'path'); line.setAttribute('d', 'M' + a.x + ' ' + a.y + ' L' + (ex - 14) + ' ' + ey + ' L' + ex + ' ' + ey); line.setAttribute('stroke', col); line.setAttribute('stroke-width', '3'); line.setAttribute('fill', 'none'); line.setAttribute('stroke-linejoin', 'round');
-    const dot = document.createElementNS(NS, 'circle'); dot.setAttribute('cx', a.x); dot.setAttribute('cy', a.y); dot.setAttribute('r', '6'); dot.setAttribute('fill', col); dot.setAttribute('stroke', '#fff'); dot.setAttribute('stroke-width', '2');
-    svg.append(line, dot);
-  });
+  const svg = $('#clusterLines'); if (!svg) return; svg.replaceChildren(); const base = $('#mapWrap').getBoundingClientRect(), NS = 'http://www.w3.org/2000/svg';
+  document.querySelectorAll('.clpanel:not([hidden])').forEach(panel => { const pr = panel.getBoundingClientRect(), left = panel.id === 'clusterPanelL';
+    panel.querySelectorAll('.cl-card').forEach(card => {
+      const sx = state.sections.find(x => x.id === card.dataset.sid), mem = clusterCur.secs.get(card.dataset.sid); if (!sx || !mem) return; const r = card.getBoundingClientRect(), a = clusterAnchor(sx, mem);
+      const ey = Math.min(Math.max(r.top + 18, pr.top + 6), pr.bottom - 6) - base.top, ex = (left ? r.right : r.left) - base.left, col = safeColor(sx.color, '#2563eb');
+      const line = document.createElementNS(NS, 'path'); line.setAttribute('d', 'M' + a.x + ' ' + a.y + ' L' + (ex + (left ? 14 : -14)) + ' ' + ey + ' L' + ex + ' ' + ey); line.setAttribute('stroke', col); line.setAttribute('stroke-width', '3'); line.setAttribute('fill', 'none'); line.setAttribute('stroke-linejoin', 'round');
+      const dot = document.createElementNS(NS, 'circle'); dot.setAttribute('cx', a.x); dot.setAttribute('cy', a.y); dot.setAttribute('r', '6'); dot.setAttribute('fill', col); dot.setAttribute('stroke', '#fff'); dot.setAttribute('stroke-width', '2'); svg.append(line, dot);
+    }); });
+}
+function clusterDrag(ev, kind, ref, open) {   // Eintrag aus dem Fenster auf die Karte ziehen
+  if (ev.button > 0 || runtime.viewer) { if (!runtime.viewer) return; open(); return; } ev.preventDefault();
+  const x0 = ev.clientX, y0 = ev.clientY, row = ev.currentTarget; let ghost = null;
+  const mv = e => { if (!ghost) { if (Math.hypot(e.clientX - x0, e.clientY - y0) < 6) return; ghost = row.cloneNode(true); ghost.classList.add('cl-ghost'); ghost.style.width = row.offsetWidth + 'px'; document.body.append(ghost); row.classList.add('cl-src'); } ghost.style.left = e.clientX - 20 + 'px'; ghost.style.top = e.clientY - 12 + 'px'; };
+  const up = e => {
+    document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
+    if (!ghost) { open(); return; } ghost.remove(); row.classList.remove('cl-src');
+    const r = map.getContainer().getBoundingClientRect(), hit = document.elementFromPoint(e.clientX, e.clientY);
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom || (hit && hit.closest('.clpanel, #mapBar, .leaflet-control'))) return;
+    const ll = map.containerPointToLatLng([e.clientX - r.left, e.clientY - r.top]);
+    if (kind === 'u') unitMovedOnMap(ref, ll.lat, ll.lng); else { ref.lat = ll.lat; ref.lng = ll.lng; renderCas(); save('Zahl verschoben'); }
+    clusterSig = ''; updateCluster();
+  };
+  document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
 }
 function renderClusterPanel(cl) {
-  let panel = $('#clusterPanel'); if (!panel) { const w = $('#mapWrap'); panel = el('div', { id: 'clusterPanel', hidden: 'hidden' }); const sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.id = 'clusterLines'; w.append(sv, panel); panel.addEventListener('scroll', renderClusterLines); }
-  panel.replaceChildren(); panel.hidden = !cl.size; if (!cl.size) { renderClusterLines(); return; }
-  [...cl.entries()].map(([id, us]) => [state.sections.find(x => x.id === id), us]).filter(p => p[0]).sort((a, b) => clusterAnchor(a[0]).y - clusterAnchor(b[0]).y).forEach(([sx, us]) => {
-    panel.append(el('div', { class: 'cl-card', 'data-sid': sx.id, style: '--c:' + safeColor(sx.color, '#2563eb') },
-      el('button', { class: 'cl-h', title: 'Zum Abschnitt zoomen', onclick: () => map.fitBounds(L.latLngBounds(sx.pts).pad(0.3)) }, el('b', { text: sx.name }), el('span', { text: us.length + ' Einh.' })),
-      ...us.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', 'de')).map(u => el('button', { class: 'cl-u', title: (u.name || 'Einheit') + ' · ' + ustat(u.status).label, style: '--sc:' + safeColor(ustat(u.status).color), onclick: () => openUnitCard(u, can('logi') && !can('units')) },
-        el('img', { src: unitSym(u).url, alt: '' }), el('span', { class: 'cl-n', text: u.name || 'Einheit' }), el('small', { text: fmtStr(u) })))));
+  let L1 = $('#clusterPanelL'), R1 = $('#clusterPanelR');
+  if (!L1) { const w = $('#mapWrap'), sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.id = 'clusterLines'; L1 = el('div', { id: 'clusterPanelL', class: 'clpanel', hidden: 'hidden' }); R1 = el('div', { id: 'clusterPanelR', class: 'clpanel', hidden: 'hidden' }); w.append(sv, L1, R1); [L1, R1].forEach(p => p.addEventListener('scroll', renderClusterLines)); }
+  L1.replaceChildren(); R1.replaceChildren(); const sz = map.getSize();
+  [...cl.secs.entries()].map(([id, mem]) => { const sx = state.sections.find(x => x.id === id); return sx ? [sx, mem, clusterAnchor(sx, mem)] : null; }).filter(Boolean).sort((a, b) => a[2].y - b[2].y).forEach(([sx, mem, anc]) => {
+    const us = mem.filter(m => m.k === 'u').map(m => m.ref).sort((a, b) => (a.name || '').localeCompare(b.name || '', 'de')), cs = mem.filter(m => m.k === 'c').map(m => m.ref);
+    const card = el('div', { class: 'cl-card', 'data-sid': sx.id, style: '--c:' + safeColor(sx.color, '#2563eb') },
+      el('button', { class: 'cl-h', title: 'Zum Abschnitt zoomen', onclick: () => { if (sx.pts && sx.pts.length > 2) map.fitBounds(L.latLngBounds(sx.pts).pad(0.3)); } }, el('b', { text: sx.name }), el('span', { text: us.length + ' Einh.' + (cs.length ? ', ' + cs.reduce((a, c) => a + (c.n || 0), 0) + ' Pers.' : '') })),
+      ...us.map(u => el('div', { class: 'cl-u', role: 'button', tabindex: '0', title: (u.name || 'Einheit') + ' · ' + ustat(u.status).label + ' · auf die Karte ziehen, um sie zu verschieben', style: '--sc:' + safeColor(ustat(u.status).color), onpointerdown: e => clusterDrag(e, 'u', u, () => openUnitCard(u, can('logi') && !can('units'))) },
+        el('img', { src: unitSym(u).url, alt: '', draggable: 'false' }), el('span', { class: 'cl-n', text: u.name || 'Einheit' }), el('small', { text: fmtStr(u) }))),
+      ...cs.map(c => el('div', { class: 'cl-u cl-c', role: 'button', tabindex: '0', title: CAS[c.cat].label + ' · auf die Karte ziehen, um sie zu verschieben', style: '--sc:' + CAS[c.cat].color, onpointerdown: e => clusterDrag(e, 'c', c, () => map.setView([c.lat, c.lng], Math.max(map.getZoom(), 17))) },
+        casMark(c.cat, 24), el('span', { class: 'cl-n', text: CAS[c.cat].label }), el('small', { text: String(c.n || 0) }))));
+    (anc.x < sz.x / 2 ? L1 : R1).append(card);
   });
-  renderClusterLines();
+  L1.hidden = !L1.children.length; R1.hidden = !R1.children.length; renderClusterLines();
 }
 function updateCluster() {
-  const cl = clusterSections(), sig = [...cl.keys()].sort().join('|') + '#' + [...cl.values()].map(u => u.length).join(',');
-  if (sig !== clusterSig) { clusterSig = sig; renderUnitMarkers(); } else renderClusterLines();
+  const cl = clusterCompute(), sig = [...cl.secs.entries()].map(([k, v]) => k + ':' + v.map(m => m.ref.id).sort().join(',')).sort().join('|');
+  if (sig !== clusterSig) { clusterSig = sig; renderUnitMarkers(); renderCas(); } else { clusterCur = cl; renderClusterLines(); }
 }
-map.on('zoomend moveend', updateCluster); map.on('move', () => { if (clusterSig && clusterSig !== '#') requestAnimationFrame(renderClusterLines); });
+map.on('zoomend moveend', updateCluster); map.on('move', () => { if (clusterSig) requestAnimationFrame(renderClusterLines); });
 function renderUnitMarkers() {
-  unitLayer.clearLayers(); clusterCur = clusterSections(); clusterSig = [...clusterCur.keys()].sort().join('|') + '#' + [...clusterCur.values()].map(u => u.length).join(',');
-  const hidden = new Set(); clusterCur.forEach(us => us.forEach(u => hidden.add(u.id))); renderClusterPanel(clusterCur);
+  unitLayer.clearLayers(); clusterCur = clusterCompute(); clusterSig = [...clusterCur.secs.entries()].map(([k, v]) => k + ':' + v.map(m => m.ref.id).sort().join(',')).sort().join('|');
+  const hidden = clusterCur.hiddenU; renderClusterPanel(clusterCur);
   state.units.filter(u => u.lat != null && !hidden.has(u.id)).forEach(u => {
     const m = L.marker([u.lat, u.lng], { icon: unitMarkerIcon(u), draggable: true });
     m.bindTooltip(el('span', { text: (u.name || 'Einheit') + ' · ' + fmtStr(u) + ' · ' + ustat(u.status).label + ' · ' + sectionName(u.sectionId) + (unitFlags(u).text ? ' · ' + unitFlags(u).text : '') }));
