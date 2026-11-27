@@ -221,6 +221,10 @@ async function seite(b, q, w, h) {
     const cen3 = await karte.evaluate(() => window.__lage.map.getCenter().lat); assert.ok(Math.abs(cen3 - 48.0) < 0.3, 'nach Freigabe wieder live: ' + cen3);
     await ctx.close();
   });
+  await t('Gemeinsamer Einsatz: Server ist voreingestellt und muss nicht eingetragen werden', async () => {
+    const p = await seite(b, ''); await p.evaluate(() => document.querySelector('#btnSync').click()); await p.waitForTimeout(400);
+    assert.strictEqual(await p.$eval('#syncDlg input[type=url]', e => e.value), 'https://umbrel.taile733cb.ts.net:8443'); assert.ok(!(await p.locator('#syncDlg input[type=url]').isVisible()), 'Feld ist eingeklappt'); await p.close();
+  });
   await t('Gemeinsamer Einsatz: Server, zwei Geräte, gleichzeitige Änderungen, Löschen, Zeichnen bleibt', async () => {
     const { spawn } = require('child_process'), os = require('os'), fs = require('fs'), path = require('path'), dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ls-'));
     const srv = spawn('node', ['sync-server/server.js'], { env: Object.assign({}, process.env, { PORT: '18788', DATA_DIR: dir, ALLOW_ORIGINS: '*' }), cwd: path.resolve(__dirname, '..') });
