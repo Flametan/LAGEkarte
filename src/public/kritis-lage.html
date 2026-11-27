@@ -211,6 +211,30 @@ body.beamer #placeSearch { display: none; }
 [data-theme="dark"] .ovunit.wt { background: #e8edf5; color: #111; } [data-theme="dark"] .ea .k { background: #22314d; border-color: #4a6fd1; } [data-theme="dark"] .ea b { color: #9fc0ff; }
 [data-theme="dark"] .kt-t th, [data-theme="dark"] .kt-t td { color: var(--ink); border-color: #3a4a63; } [data-theme="dark"] .kt-t tr.sig th, [data-theme="dark"] .kt-t tr.sig td { background: #2a1a1a; }
 [data-theme="dark"] .kc:hover, [data-theme="dark"] .kc:focus { background: #0f1b2e; }
+.wall2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; margin-top: 18px; }
+.auf-list { display: flex; flex-direction: column; gap: 6px; }
+.auf { display: flex; gap: 8px; align-items: flex-start; background: #fff; border: 1px solid #888; border-left: 7px solid #b91c1c; padding: 6px 8px; border-radius: 3px; } .auf.done { opacity: .55; border-left-color: #15803d; } .auf.dover { outline: 3px dashed var(--accent); }
+.auf > input[type=checkbox] { margin-top: 5px; } .auf-b { flex: 1; min-width: 0; } .auf-t { width: 100%; font-weight: 700; font-size: 14px; border: 1px solid transparent; background: transparent; } .auf-t:hover, .auf-t:focus { border-color: #94a3b8; background: #fff; }
+.auf-m { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 12px; color: #444; } .auf-m select, .auf-m input { font-size: 12px; } .auf-bt { display: flex; flex-direction: column; gap: 2px; }
+.wc { background: #fff; border: 1px solid #888; padding: 8px 10px; font-size: 13px; border-radius: 3px; margin-bottom: 8px; } .wc h4 { margin: 0 0 6px; font-size: 14px; border-bottom: 2px solid #111; }
+.nfpa { display: flex; justify-content: center; padding: 6px 0; }
+.vt { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; } .vt th { font-size: 10.5px; padding: 3px; border: 1px solid #999; } .vt th.r { background: #dc2626; color: #fff; } .vt th.g { background: #eab308; } .vt th.gr { background: #16a34a; color: #fff; } .vt th.bl { background: #2563eb; color: #fff; }
+.vt td { border: 1px solid #bbb; padding: 3px 4px; text-align: center; font-weight: 700; } .vt tr.live td { background: #fef9c3; }
+.kt-note2 { width: 100%; font: inherit; font-size: 13px; }
+[data-theme="dark"] .auf, [data-theme="dark"] .wc, [data-theme="dark"] .vt { background: #17233a; color: var(--ink); } [data-theme="dark"] .vt td { border-color: #3a4a63; } [data-theme="dark"] .vt tr.live td { background: #3a3414; } [data-theme="dark"] .vt th { color: inherit; border-color: #3a4a63; } [data-theme="dark"] .vt th.g { color: #111; }
+/* Wandoptik: weißer Grund, schwarze Etiketten, eckige Karten wie an der Stabswand (umschaltbar im Menü) */
+body.wandlook { background: #eceee9; }
+body.wandlook #panel, body.wandlook #tabs, body.wandlook #unitOv { background: #f3f4f0; }
+body.wandlook .tabpane h2, body.wandlook #unitOv .ovhead h2 { display: inline-block; background: #fff; color: #111; border: 3px solid #111; border-radius: 3px; font-weight: 800; font-size: 15px; text-transform: none; letter-spacing: 0; padding: 3px 12px; }
+body.wandlook .card, body.wandlook .wc, body.wandlook .kt, body.wandlook .wblock, body.wandlook .ovcol { border-radius: 3px; border-width: 2px; border-color: #444; }
+body.wandlook .btn, body.wandlook .chip { border-width: 2px; border-color: #333; border-radius: 3px; }
+body.wandlook .btn.primary { background: #111; border-color: #111; color: #fff; }
+body.wandlook .ovunit.wt { border: 2px solid #333; border-radius: 2px; box-shadow: 1px 2px 3px rgba(0,0,0,.35); }
+body.wandlook .wt-in img { background: #fff; }
+body.wandlook .lbl { background: #fff; }
+[data-theme="dark"] body.wandlook, :root[data-theme="dark"] body.wandlook { background: #0b1220; }
+:root[data-theme="dark"] body.wandlook #panel, :root[data-theme="dark"] body.wandlook #tabs, :root[data-theme="dark"] body.wandlook #unitOv { background: #0e1625; }
+:root[data-theme="dark"] body.wandlook .tabpane h2, :root[data-theme="dark"] body.wandlook #unitOv .ovhead h2 { background: #17233a; color: var(--ink); border-color: #4a6fd1; }
 @media (max-width: 900px) { .wall { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .ovunit.wt { transition: none; } }
 .bhpm { display: flex; align-items: center; gap: 2px; background: #fff; border: 2px solid #b91c1c; border-radius: 6px; padding: 2px 3px; box-shadow: 0 1px 4px rgba(0,0,0,.4); font: 700 13px Inter, sans-serif; }
@@ -794,6 +818,7 @@ body.vortrag .leaflet-top.leaflet-right { margin-right: var(--vtR, 436px); margi
       <button id="btnAddPoi" title="KRITIS-Objekt per Mausklick auf der Karte setzen">+ Objekt</button>
       <button id="btnPrint" title="Karte drucken oder als PDF speichern">Drucken</button>
       <button id="btnExport" title="Ihre Daten als JSON-Datei speichern" hidden>Export</button>
+      <button id="btnLook" title="Darstellung wie an der Stabswand: weißer Grund, schwarze Etiketten">Wandoptik: aus</button>
       <button id="btnHelp" title="Einweisung und Tastenkürzel">Einweisung und Tastenkürzel</button>
     </div></div>
     </div>
@@ -1115,10 +1140,10 @@ body.vortrag .leaflet-top.leaflet-right { margin-right: var(--vtR, 436px); margi
       <div class="row"><button class="btn" id="tcPre">Sichtbaren Ausschnitt vorladen</button><button class="btn danger" id="tcClr">Kartenspeicher leeren</button></div>
       <div class="hint" id="tcInfo"></div>
       <h2>Zusammenarbeit</h2>
-      <div class="row"><button class="btn primary" id="expMine">Meine Daten exportieren (JSON)</button></div>
+      <div class="row"><button class="btn primary" id="expMine">Lage speichern (JSON)</button></div>
       <div class="row"><button class="btn" id="mtGuided">Lagebesprechung führen (5 Schritte)</button><button class="btn" id="lvShow">Lagevortrag zeigen (Karte groß)</button></div>
-      <div class="row"><button class="btn" id="impOthers">Daten der anderen einlesen (nur S2)</button><button class="btn" id="expAll">Gesamtstand speichern</button></div>
-      <div class="hint">Jede Funktion speichert nur ihren Bereich. Der S2 liest alle Dateien ein, seine Karte wird aktualisiert. Ihre Funktion wechseln Sie oben über den Namen.</div>
+      <div class="row"><button class="btn" id="impOthers">Gespeicherte Lage einlesen</button><button class="btn" id="expAll">Gesamtstand speichern</button></div>
+      <div class="hint">Das Programm sichert nicht automatisch. Speichern Sie die Lage regelmäßig als Datei. Beim Einlesen werden die Tagebucheinträge nach Uhrzeit einsortiert.</div>
       <h2>Zurücksetzen</h2>
       <div class="row"><button class="btn danger" id="btnReset">Gesamte Lage löschen</button></div>
       <h2>Bevölkerungsdaten</h2>
@@ -2361,6 +2386,7 @@ function renderProblems() {
       el('div', { class: 'row' },
         el('span', { class: 'hint', text: fmtTime(x.time) + (x.poiName ? ' · ' + x.poiName : '') + (x.lat == null ? ' · ohne Ort' : '') }),
         x.lat != null ? el('button', { class: 'btn small', text: 'Karte', onclick: () => map.setView([x.lat, x.lng], Math.max(map.getZoom(), 16)) }) : null,
+        el('button', { class: 'btn small', text: 'Als Auftrag', title: 'Als Auftragsstreifen an die Stabswand übernehmen', onclick: () => addAuftrag({ title: x.title, prio: x.prio, due: x.due || '', by: '' }) }),
         el('button', { class: 'btn small', text: 'Ort setzen', onclick: () => { stopDraw(); runtime.mode = { type: 'probloc', id: x.id }; map.getContainer().style.cursor = 'crosshair'; say('Ort für das Problem anklicken. Esc bricht ab.'); } }),
         el('button', { class: 'btn small danger', text: 'Löschen', onclick: () => { state.problems = state.problems.filter(y => y !== x); renderProblems(); renderCounts(); save('Problem gelöscht: ' + x.title); } })));
     card.querySelector('textarea').value = x.text || '';
@@ -3035,6 +3061,7 @@ function fristItems() {
   const out = [];
   state.problems.forEach(p => { if (p.due && p.status !== 'erledigt') out.push({ key: 'p' + p.id, t: Date.parse(p.due), text: p.title || 'Problem', tab: 'probleme' }); });
   state.units.forEach(u => { const l = state.logi[u.id]; if (l && l.req && l.eta) out.push({ key: 'l' + u.id + l.eta, t: Date.parse(l.eta), text: 'Nachforderung ' + (u.name || 'Einheit') + ': ' + l.req, tab: 'kraefte' }); });
+  (state.auftraege || []).forEach(a => { if (a.due && !a.done) out.push({ key: 'u' + a.id + a.due, t: Date.parse(a.due), text: 'Auftrag: ' + (a.title || '') + (a.by ? ' (' + a.by + ')' : ''), tab: 'wand' }); });
   return out.filter(x => isFinite(x.t)).sort((a, b) => a.t - b.t);
 }
 const fristSeen = new Set();
@@ -3332,7 +3359,7 @@ const ghsUrl = c => imgUrl('ghs/' + c);
 const ghsImg = (c, h) => el('img', { class: 'ghs', src: ghsUrl(c), alt: GHS_INFO[c] || c, title: c + ': ' + (GHS_INFO[c] || ''), style: 'height:' + (h || 44) + 'px' });
 const SUBSTANCES = {
   benzol: {
-    id: 'benzol', gestis: [['010060','Benzol']], name: 'Benzol', formula: 'C6H6', cas: '71-43-2', un: '1114', kemler: '33', klasse: '3', vg: 'II', molMass: 78.11,
+    id: 'benzol', nfpa: [2, 3, 0, ''], gestis: [['010060','Benzol']], name: 'Benzol', formula: 'C6H6', cas: '71-43-2', un: '1114', kemler: '33', klasse: '3', vg: 'II', molMass: 78.11,
     erg: { guide: '130', title: 'Entzündbare Flüssigkeiten (nicht mit Wasser mischbar, gesundheitsschädlich)', isolate: 50, spillDownwind: 300, fire: 800 },
     ghs: ['GHS02', 'GHS08', 'GHS07'], signal: 'Gefahr',
     h: [['H225', 'Flüssigkeit und Dampf leicht entzündbar.'], ['H304', 'Kann bei Verschlucken und Eindringen in die Atemwege tödlich sein.'], ['H315', 'Verursacht Hautreizungen.'], ['H319', 'Verursacht schwere Augenreizung.'],
@@ -3361,7 +3388,7 @@ const SUBSTANCES = {
     ]
   },
   aceton: {
-    id: 'aceton', gestis: [['011230','Aceton']], name: 'Aceton', formula: 'C3H6O', cas: '67-64-1', un: '1090', kemler: '33', klasse: '3', vg: 'II', molMass: 58.08,
+    id: 'aceton', nfpa: [1, 3, 0, ''], gestis: [['011230','Aceton']], name: 'Aceton', formula: 'C3H6O', cas: '67-64-1', un: '1090', kemler: '33', klasse: '3', vg: 'II', molMass: 58.08,
     erg: { guide: '127', title: 'Entzündbare Flüssigkeiten (mit Wasser mischbar)', isolate: 50, spillDownwind: 300, fire: 800 },
     ghs: ['GHS02', 'GHS07'], signal: 'Gefahr',
     h: [['H225', 'Flüssigkeit und Dampf leicht entzündbar.'], ['H319', 'Verursacht schwere Augenreizung.'], ['H336', 'Kann Schläfrigkeit und Benommenheit verursachen.']],
@@ -3388,7 +3415,7 @@ const SUBSTANCES = {
     ]
   },
   ethanol: {
-    id: 'ethanol', gestis: [['010420','Ethanol']], name: 'Ethanol', formula: 'C2H6O', cas: '64-17-5', un: '1170', kemler: '33', klasse: '3', vg: 'II (Lösungen auch III)', molMass: 46.07,
+    id: 'ethanol', nfpa: [2, 3, 0, ''], gestis: [['010420','Ethanol']], name: 'Ethanol', formula: 'C2H6O', cas: '64-17-5', un: '1170', kemler: '33', klasse: '3', vg: 'II (Lösungen auch III)', molMass: 46.07,
     erg: { guide: '127', title: 'Entzündbare Flüssigkeiten (mit Wasser mischbar)', isolate: 50, spillDownwind: 300, fire: 800 },
     ghs: ['GHS02', 'GHS07'], signal: 'Gefahr',
     h: [['H225', 'Flüssigkeit und Dampf leicht entzündbar.'], ['H319', 'Verursacht schwere Augenreizung.']],
@@ -3416,7 +3443,7 @@ const SUBSTANCES = {
     ]
   },
   benzin: {
-    id: 'benzin', gestis: [['531390','Ottokraftstoff']], name: 'Ottokraftstoff (Benzin)', formula: 'Gemisch', cas: '86290-81-5', un: '1203', kemler: '33', klasse: '3', vg: 'II', molMass: 110,
+    id: 'benzin', nfpa: [1, 3, 0, ''], gestis: [['531390','Ottokraftstoff']], name: 'Ottokraftstoff (Benzin)', formula: 'Gemisch', cas: '86290-81-5', un: '1203', kemler: '33', klasse: '3', vg: 'II', molMass: 110,
     erg: { guide: '128', title: 'Entzündbare Flüssigkeiten (nicht mit Wasser mischbar)', isolate: 50, spillDownwind: 300, fire: 800 },
     ghs: ['GHS02', 'GHS08', 'GHS07', 'GHS09'], signal: 'Gefahr',
     h: [['H224', 'Flüssigkeit und Dampf extrem entzündbar.'], ['H304', 'Kann bei Verschlucken und Eindringen in die Atemwege tödlich sein.'], ['H315', 'Verursacht Hautreizungen.'], ['H350', 'Kann Krebs erzeugen.'], ['H361fd', 'Kann vermutlich die Fruchtbarkeit beeinträchtigen und das Kind im Mutterleib schädigen.'], ['H411', 'Giftig für Wasserorganismen, mit langfristiger Wirkung.']],
@@ -3446,7 +3473,7 @@ const SUBSTANCES = {
     ]
   },
   diesel: {
-    id: 'diesel', gestis: [['536303','Dieselkraftstoff']], name: 'Dieselkraftstoff / Heizöl EL', formula: 'Gemisch', cas: '68334-30-5', un: '1202', kemler: '30', klasse: '3', vg: 'III', molMass: null,
+    id: 'diesel', nfpa: [1, 2, 0, ''], gestis: [['536303','Dieselkraftstoff']], name: 'Dieselkraftstoff / Heizöl EL', formula: 'Gemisch', cas: '68334-30-5', un: '1202', kemler: '30', klasse: '3', vg: 'III', molMass: null,
     erg: { guide: '128', title: 'Entzündbare Flüssigkeiten (nicht mit Wasser mischbar)', isolate: 50, spillDownwind: 300, fire: 800 },
     ghs: ['GHS02', 'GHS08', 'GHS07'], signal: 'Gefahr',
     h: [['H226', 'Flüssigkeit und Dampf entzündbar.'], ['H304', 'Kann bei Verschlucken und Eindringen in die Atemwege tödlich sein.'], ['H315', 'Verursacht Hautreizungen.'], ['H332', 'Gesundheitsschädlich bei Einatmen.'], ['H351', 'Kann vermutlich Krebs erzeugen.'], ['H373', 'Kann die Organe bei längerer oder wiederholter Exposition schädigen.']],
@@ -3477,7 +3504,7 @@ const SUBSTANCES = {
     ]
   },
   hcl: {
-    id: 'hcl', gestis: [['520030','Salzsäure (36 %)'], ['001050','Chlorwasserstoff, wasserfrei']], name: 'Salzsäure (konzentriert, 32 bis 37 %)', formula: 'HCl (wässrig)', cas: '7647-01-0', un: '1789', kemler: '80', klasse: '8', vg: 'II', molMass: 36.46,
+    id: 'hcl', nfpa: [3, 0, 1, ''], gestis: [['520030','Salzsäure (36 %)'], ['001050','Chlorwasserstoff, wasserfrei']], name: 'Salzsäure (konzentriert, 32 bis 37 %)', formula: 'HCl (wässrig)', cas: '7647-01-0', un: '1789', kemler: '80', klasse: '8', vg: 'II', molMass: 36.46,
     erg: { guide: '157', title: 'Giftige und/oder ätzende Stoffe (nicht brennbar, wasserempfindlich)', isolate: 50, spillDownwind: null, fire: 800 },
     ghs: ['GHS05', 'GHS07'], signal: 'Gefahr',
     h: [['H290', 'Kann gegenüber Metallen korrosiv sein.'], ['H314', 'Verursacht schwere Verätzungen der Haut und schwere Augenschäden.'], ['H335', 'Kann die Atemwege reizen.']],
@@ -3505,7 +3532,7 @@ const SUBSTANCES = {
     ]
   },
   h2so4: {
-    id: 'h2so4', gestis: [['001160','Schwefelsäure']], name: 'Schwefelsäure (konzentriert, über 51 %)', formula: 'H2SO4', cas: '7664-93-9', un: '1830', kemler: '80', klasse: '8', vg: 'II', molMass: 98.08,
+    id: 'h2so4', nfpa: [3, 0, 2, 'W'], gestis: [['001160','Schwefelsäure']], name: 'Schwefelsäure (konzentriert, über 51 %)', formula: 'H2SO4', cas: '7664-93-9', un: '1830', kemler: '80', klasse: '8', vg: 'II', molMass: 98.08,
     erg: { guide: '137', title: 'Ätzende und/oder giftige Stoffe (wasserreaktiv)', isolate: 50, spillDownwind: null, fire: 800 },
     ghs: ['GHS05'], signal: 'Gefahr',
     h: [['H290', 'Kann gegenüber Metallen korrosiv sein.'], ['H314', 'Verursacht schwere Verätzungen der Haut und schwere Augenschäden.']],
@@ -3534,7 +3561,7 @@ const SUBSTANCES = {
     ]
   },
   propan: {
-    id: 'propan', gestis: [['','Propan']], name: 'Propan', formula: 'C3H8', cas: '74-98-6', un: '1978', kemler: '23', klasse: '2.1', vg: 'ohne', molMass: 44.09,
+    id: 'propan', nfpa: [2, 4, 0, ''], gestis: [['','Propan']], name: 'Propan', formula: 'C3H8', cas: '74-98-6', un: '1978', kemler: '23', klasse: '2.1', vg: 'ohne', molMass: 44.09,
     erg: { guide: '115', title: 'Entzündbare Gase (auch tiefkalt verflüssigt)', isolate: 100, spillDownwind: 800, fire: 1600 },
     ghs: ['GHS02', 'GHS04'], signal: 'Gefahr',
     h: [['H220', 'Extrem entzündbares Gas.'], ['H280', 'Enthält Gas unter Druck, kann bei Erwärmung explodieren.']],
@@ -3562,7 +3589,7 @@ const SUBSTANCES = {
     ]
   },
   ammoniak: {
-    id: 'ammoniak', gestis: [['001100','Ammoniak, wasserfrei']], name: 'Ammoniak, wasserfrei', formula: 'NH3', cas: '7664-41-7', un: '1005', kemler: '268', klasse: '2.3 (8)', vg: 'ohne', molMass: 17.03,
+    id: 'ammoniak', nfpa: [3, 1, 0, ''], gestis: [['001100','Ammoniak, wasserfrei']], name: 'Ammoniak, wasserfrei', formula: 'NH3', cas: '7664-41-7', un: '1005', kemler: '268', klasse: '2.3 (8)', vg: 'ohne', molMass: 17.03,
     erg: { guide: '125', title: 'Giftige und/oder ätzende Gase', isolate: 100, spillDownwind: null, fire: 1600 },
     tih: {
       defCont: 'strasse', note: 'ERG 2024, Tabelle 1 und 3 (Ammoniak, wasserfrei). Kleines Leck: bis 208 l aus kleiner Packung oder kleinem Leck. Großes Leck: größere Packung oder viele kleine Packungen.',
@@ -3601,7 +3628,7 @@ const SUBSTANCES = {
     ]
   },
   chlor: {
-    id: 'chlor', gestis: [['007170','Chlor']], name: 'Chlor', formula: 'Cl2', cas: '7782-50-5', un: '1017', kemler: '265', klasse: '2.3 (5.1, 8)', vg: 'ohne', molMass: 70.91,
+    id: 'chlor', nfpa: [4, 0, 0, 'OX'], gestis: [['007170','Chlor']], name: 'Chlor', formula: 'Cl2', cas: '7782-50-5', un: '1017', kemler: '265', klasse: '2.3 (5.1, 8)', vg: 'ohne', molMass: 70.91,
     erg: { guide: '124', title: 'Giftige und/oder ätzende Gase (oxidierend)', isolate: 100, spillDownwind: null, fire: 800 },
     tih: {
       defCont: 'strasse', note: 'ERG 2024, Tabelle 1 und 3 (Chlor). Kleines Leck: bis 208 l aus kleiner Packung oder kleinem Leck. Großes Leck: größere Packung oder viele kleine Packungen.',
@@ -3641,7 +3668,7 @@ const SUBSTANCES = {
     ]
   },
   methanol: {
-    id: 'methanol', gestis: [['011240','Methanol']], name: 'Methanol', formula: 'CH4O', cas: '67-56-1', un: '1230', kemler: '336', klasse: '3 (6.1)', vg: 'II', molMass: 32.04,
+    id: 'methanol', nfpa: [1, 3, 0, ''], gestis: [['011240','Methanol']], name: 'Methanol', formula: 'CH4O', cas: '67-56-1', un: '1230', kemler: '336', klasse: '3 (6.1)', vg: 'II', molMass: 32.04,
     erg: { guide: '131', title: 'Entzündbare Flüssigkeiten, giftig', isolate: 50, spillDownwind: null, fire: 800 },
     ghs: ['GHS02', 'GHS06', 'GHS08'], signal: 'Gefahr',
     h: [['H225', 'Flüssigkeit und Dampf leicht entzündbar.'], ['H301', 'Giftig bei Verschlucken.'], ['H311', 'Giftig bei Hautkontakt.'], ['H331', 'Giftig bei Einatmen.'], ['H370', 'Schädigt die Organe (Augen, Zentralnervensystem).']],
@@ -3669,7 +3696,7 @@ const SUBSTANCES = {
     ]
   },
   natronlauge: {
-    id: 'natronlauge', gestis: [['001270','Natriumhydroxid (Feststoff, Lösungen siehe dort)']], name: 'Natronlauge (ca. 32 %)', formula: 'NaOH (wässrig)', cas: '1310-73-2', un: '1824', kemler: '80', klasse: '8', vg: 'II', molMass: 40,
+    id: 'natronlauge', nfpa: [3, 0, 1, ''], gestis: [['001270','Natriumhydroxid (Feststoff, Lösungen siehe dort)']], name: 'Natronlauge (ca. 32 %)', formula: 'NaOH (wässrig)', cas: '1310-73-2', un: '1824', kemler: '80', klasse: '8', vg: 'II', molMass: 40,
     erg: { guide: '154', title: 'Giftige und/oder ätzende Stoffe (nicht brennbar)', isolate: 50, spillDownwind: null, fire: 800 },
     ghs: ['GHS05'], signal: 'Gefahr',
     h: [['H290', 'Kann gegenüber Metallen korrosiv sein.'], ['H314', 'Verursacht schwere Verätzungen der Haut und schwere Augenschäden.']],
@@ -3697,7 +3724,7 @@ const SUBSTANCES = {
     ]
   },
   hno3: {
-    id: 'hno3', gestis: [['001370','Salpetersäure']], name: 'Salpetersäure (65 bis 70 %)', formula: 'HNO3 (wässrig)', cas: '7697-37-2', un: '2031', kemler: '85', klasse: '8 (5.1)', vg: 'II', molMass: 63,
+    id: 'hno3', nfpa: [4, 0, 0, 'OX'], gestis: [['001370','Salpetersäure']], name: 'Salpetersäure (65 bis 70 %)', formula: 'HNO3 (wässrig)', cas: '7697-37-2', un: '2031', kemler: '85', klasse: '8 (5.1)', vg: 'II', molMass: 63,
     erg: { guide: '157', title: 'Giftige und/oder ätzende Stoffe (nicht brennbar, wasserempfindlich)', isolate: 50, spillDownwind: null, fire: 800 },
     ghs: ['GHS03', 'GHS05'], signal: 'Gefahr',
     h: [['H272', 'Kann Brand verstärken, Oxidationsmittel.'], ['H290', 'Kann gegenüber Metallen korrosiv sein.'], ['H314', 'Verursacht schwere Verätzungen der Haut und schwere Augenschäden.']],
@@ -3724,7 +3751,7 @@ const SUBSTANCES = {
     ]
   },
   h2o2: {
-    id: 'h2o2', gestis: [['536372','Wasserstoffperoxid 8 bis unter 35 %'], ['536373','Wasserstoffperoxid 35 bis unter 50 %'], ['536374','Wasserstoffperoxid 50 bis unter 60 %']], name: 'Wasserstoffperoxid (20 bis 60 %)', formula: 'H2O2 (wässrig)', cas: '7722-84-1', un: '2014', kemler: '58', klasse: '5.1 (8)', vg: 'II', molMass: 34.02,
+    id: 'h2o2', nfpa: [3, 0, 1, 'OX'], gestis: [['536372','Wasserstoffperoxid 8 bis unter 35 %'], ['536373','Wasserstoffperoxid 35 bis unter 50 %'], ['536374','Wasserstoffperoxid 50 bis unter 60 %']], name: 'Wasserstoffperoxid (20 bis 60 %)', formula: 'H2O2 (wässrig)', cas: '7722-84-1', un: '2014', kemler: '58', klasse: '5.1 (8)', vg: 'II', molMass: 34.02,
     erg: { guide: '140', title: 'Oxidationsmittel', isolate: 50, spillDownwind: 100, fire: 800 },
     ghs: ['GHS05', 'GHS07'], signal: 'Gefahr',
     h: [['H302', 'Gesundheitsschädlich bei Verschlucken.'], ['H318', 'Verursacht schwere Augenschäden.'], ['H332', 'Gesundheitsschädlich bei Einatmen.']],
@@ -3752,7 +3779,7 @@ const SUBSTANCES = {
     ]
   },
   co: {
-    id: 'co', gestis: [['001110','Kohlenmonoxid']], name: 'Kohlenmonoxid (verdichtet)', formula: 'CO', cas: '630-08-0', un: '1016', kemler: '263', klasse: '2.3 (2.1)', vg: 'ohne', molMass: 28,
+    id: 'co', nfpa: [3, 4, 0, ''], gestis: [['001110','Kohlenmonoxid']], name: 'Kohlenmonoxid (verdichtet)', formula: 'CO', cas: '630-08-0', un: '1016', kemler: '263', klasse: '2.3 (2.1)', vg: 'ohne', molMass: 28,
     erg: { guide: '119', title: 'Giftige und entzündbare Gase', isolate: 100, spillDownwind: null, fire: 1600 },
     tih: { note: 'ERG 2024, Tabelle 1 (Kohlenmonoxid, verdichtet). Kleines Leck: bis 208 l aus kleiner Packung oder kleinem Leck. Großes Leck: größere Packung oder viele kleine Packungen. Für Kohlenmonoxid gibt es keine Tabelle 3.',
       small: { isolate: 30, day: 100, night: 200 }, large: { isolate: 200, day: 1200, night: 3900 } },
@@ -3783,7 +3810,7 @@ const SUBSTANCES = {
     ]
   },
   ammoniumnitrat: {
-    id: 'ammoniumnitrat', gestis: [['', 'Ammoniumnitrat']], name: 'Ammoniumnitrat (fest, UN 1942)', formula: 'NH4NO3', cas: '6484-52-2', un: '1942', kemler: '50', klasse: '5.1', vg: 'III', molMass: 80.05,
+    id: 'ammoniumnitrat', nfpa: [0, 0, 3, 'OX'], gestis: [['', 'Ammoniumnitrat']], name: 'Ammoniumnitrat (fest, UN 1942)', formula: 'NH4NO3', cas: '6484-52-2', un: '1942', kemler: '50', klasse: '5.1', vg: 'III', molMass: 80.05,
     erg: { guide: '140', title: 'Oxidationsmittel', isolate: 25, spillDownwind: 100, fire: 1600 },
     ghs: ['GHS03', 'GHS07'], signal: 'Achtung',
     h: [['H272', 'Kann Brand verstärken, Oxidationsmittel.'], ['H319', 'Verursacht schwere Augenreizung.']],
@@ -4523,14 +4550,71 @@ function wandAlarm() {
   if (!vw) box.append(el('button', { class: 'btn small', text: '+ Zeile', onclick: () => { state.kraefte.alarmiert.push({ id: uid(), text: '' }); renderUnitOverview(); const i = $('#ovCols .wal-r:last-of-type input'); if (i) i.focus(); } }));
   return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Alarmiert, auf Marsch' }), box);
 }
+/* Aufträge, Ergänzungen und Notizen der Stabswand */
+function addAuftrag(d) {
+  const a = Object.assign({ id: uid(), title: '', prio: 2, by: '', due: '', done: false, doneAt: '' }, d); state.auftraege.push(a);
+  addJournal('Auftrag erteilt: ' + (a.title || '–') + (a.by ? ' an ' + a.by : ''), true); renderUnitOverview(); save('Auftrag: ' + a.title); say('Auftrag angelegt, zu sehen in der Stabswand (Einheiten).', 3500); return a;
+}
+function auftragOrder() { return [...state.auftraege.filter(a => !a.done), ...state.auftraege.filter(a => a.done)]; }
+function moveAuftrag(a, d) {
+  const list = auftragOrder().filter(x => !!x.done === !!a.done), i = list.indexOf(a), j = i + d; if (j < 0 || j >= list.length) return;
+  const ia = state.auftraege.indexOf(a), ib = state.auftraege.indexOf(list[j]); [state.auftraege[ia], state.auftraege[ib]] = [state.auftraege[ib], state.auftraege[ia]]; renderUnitOverview(); save('Aufträge sortiert');
+}
+function wandAuftraege() {
+  const vw = ro('auftraege'), box = el('div', { class: 'auf-list' }); let drag = null;
+  auftragOrder().forEach(a => {
+    const row = el('div', { class: 'auf' + (a.done ? ' done' : ''), 'data-aid': a.id, draggable: vw ? null : 'true' },
+      el('input', { type: 'checkbox', checked: a.done ? 'checked' : null, disabled: vw ? 'disabled' : null, 'aria-label': 'Auftrag erledigt', onchange: e => { a.done = e.target.checked; a.doneAt = a.done ? nowIso() : ''; if (a.done) addJournal('Auftrag erledigt: ' + (a.title || '–') + (a.by ? ' (' + a.by + ')' : ''), true); renderUnitOverview(); save('Auftrag ' + (a.done ? 'erledigt' : 'wieder offen') + ': ' + a.title); updateFristChip(); } }),
+      el('div', { class: 'auf-b' }, el('input', { type: 'text', class: 'auf-t', value: a.title, placeholder: 'Auftrag', disabled: vw ? 'disabled' : null, onchange: e => { a.title = e.target.value.trim(); save('Auftrag bearbeitet'); } }),
+        el('div', { class: 'auf-m' }, el('label', {}, 'Prio ', el('input', { type: 'number', min: '1', value: a.prio, disabled: vw ? 'disabled' : null, style: 'width:46px', onchange: e => { a.prio = prioNum(e.target.value); save('Auftrag Priorität'); } })),
+          el('label', {}, 'durch ', el('select', { disabled: vw ? 'disabled' : null, onchange: e => { a.by = e.target.value; updateFristChip(); save('Auftrag zugewiesen: ' + a.by); } }, el('option', { value: '', text: '–' }), ...state.roles.map(r => el('option', { value: r.id, text: r.id, selected: a.by === r.id ? 'selected' : null })))),
+          el('label', {}, 'bis ', el('input', { type: 'time', value: a.due ? fmtHM2(Date.parse(a.due)) : '', disabled: vw ? 'disabled' : null, onchange: e => { a.due = e.target.value ? toIsoToday(e.target.value) : ''; updateFristChip(); save('Auftrag Frist'); } })),
+          a.done && a.doneAt ? el('span', { class: 'hint', text: 'erledigt ' + fmtHM2(Date.parse(a.doneAt)) }) : null)),
+      vw ? null : el('div', { class: 'auf-bt' }, el('button', { class: 'btn small', 'aria-label': 'Nach oben', text: '▲', onclick: () => moveAuftrag(a, -1) }), el('button', { class: 'btn small', 'aria-label': 'Nach unten', text: '▼', onclick: () => moveAuftrag(a, 1) }), el('button', { class: 'btn small danger', 'aria-label': 'Auftrag löschen', text: '×', onclick: () => { state.auftraege = state.auftraege.filter(x => x !== a); renderUnitOverview(); save('Auftrag gelöscht'); } })));
+    row.addEventListener('dragstart', e => { drag = a; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', a.id); } catch (x) { /* egal */ } });
+    row.addEventListener('dragover', e => { if (drag && drag !== a && !!drag.done === !!a.done) { e.preventDefault(); row.classList.add('dover'); } });
+    row.addEventListener('dragleave', () => row.classList.remove('dover'));
+    row.addEventListener('drop', e => { e.preventDefault(); row.classList.remove('dover'); if (!drag || drag === a || !!drag.done !== !!a.done) return; const from = state.auftraege.indexOf(drag); state.auftraege.splice(from, 1); state.auftraege.splice(state.auftraege.indexOf(a), 0, drag); drag = null; renderUnitOverview(); save('Aufträge sortiert'); });
+    box.append(row);
+  });
+  if (!state.auftraege.length) box.append(el('div', { class: 'hint', text: 'Noch kein Auftrag. Die Funktionen melden „erledigt“ per Meldung, der S2 hakt ab.' }));
+  return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Aufträge' }), box, vw ? null : el('button', { class: 'btn small', text: '+ Auftrag', onclick: () => { addAuftrag({}); const i = $('#ovCols .auf:not(.done):last-of-type .auf-t'); if (i) i.focus(); } }));
+}
+function nfpaSvg(v) {
+  const [h, f, i, sp] = v, c = (x, y, t, fill, col) => '<text x="' + x + '" y="' + y + '" text-anchor="middle" font-size="26" font-weight="800" fill="' + col + '" font-family="Inter,Arial">' + t + '</text>';
+  const q = (pts, fill) => '<polygon points="' + pts + '" fill="' + fill + '" stroke="#111" stroke-width="2"/>';
+  const spec = sp === 'W' ? '<text x="60" y="108" text-anchor="middle" font-size="24" font-weight="800" fill="#111" font-family="Inter,Arial">W</text><line x1="48" y1="86" x2="72" y2="110" stroke="#111" stroke-width="2.5"/><line x1="72" y1="86" x2="48" y2="110" stroke="#111" stroke-width="2.5"/>' : sp ? '<text x="60" y="108" text-anchor="middle" font-size="20" font-weight="800" fill="#111" font-family="Inter,Arial">' + sp + '</text>' : '';
+  return '<svg viewBox="0 0 120 128" width="120" height="128" role="img" aria-label="NFPA 704: Gesundheit ' + h + ', Brennbarkeit ' + f + ', Instabilität ' + i + (sp ? ', ' + sp : '') + '">' + q('60,4 90,34 60,64 30,34', '#dc2626') + q('30,34 60,64 30,94 0,64', '#2563eb') + q('90,34 120,64 90,94 60,64', '#facc15') + q('60,64 90,94 60,124 30,94', '#fff') + c(60, 43, f, '', '#fff') + c(30, 73, h, '', '#fff') + c(90, 73, i, '', '#111') + spec + '</svg>';
+}
+function wandErgaenzung() {
+  const w = state.wind, ca = chemActive(), cs = ca && chemSub(ca.sid), ew = effWind({ follow: true }), bf = w.speed != null ? 'Bft ' + beaufort(w.speed) : '';
+  const wet = el('div', { class: 'card wc' }, el('h4', { text: 'Wetterdaten' }), el('div', {}, w.dir != null ? 'Wind aus ' + Math.round(w.dir) + ' Grad (' + compassName(w.dir) + ')' + (w.speed != null ? ', ' + w.speed + ' m/s, ' + bf : '') : 'Wind nicht gesetzt'), el('div', {}, 'Wetterlage: ' + (COND[w.cond] || w.cond)), el('div', {}, 'Ausbreitungsklasse ' + ew.cls + (w.time ? ' · Stand ' + fmtHM2(Date.parse(w.time)) + ' Uhr' : '')),
+    el('button', { class: 'btn small', text: 'Im Reiter Wetter ändern', onclick: () => { closeUnitOverview(); goTab('keule'); } }));
+  const gef = el('div', { class: 'card wc' }, el('h4', { text: cs ? 'Gefahrstoff ' + cs.name : 'Gefahrstoff' }));
+  if (cs && cs.nfpa) { const d = el('div', { class: 'nfpa' }); d.innerHTML = nfpaSvg(cs.nfpa); gef.append(d, el('div', { class: 'hint', style: 'text-align:center', text: 'UN ' + cs.un + ' · Kemler ' + cs.kemler + ' · Absperrung ' + chemM(chemErg(cs, ca).isolate) }), el('div', { class: 'hint', style: 'text-align:center', text: 'NFPA 704 laut CAMEO Chemicals (NOAA): Gesundheit blau, Brennbarkeit rot, Instabilität gelb, Sonderhinweis weiß' })); }
+  else gef.append(el('div', { class: 'hint', text: cs ? 'Für diesen Stoff liegt keine NFPA-Raute vor.' : 'Kein Gefahrstoff gemeldet. Im Reiter Gefahrstoff einen Stoff setzen.' }));
+  return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Ergänzungen' }), wet, gef);
+}
+function wandNotizen() {
+  const vw = ro('kraefte'), rows = state.kraefte.rows, t = casTotals().t, live = { sk1: t.sk1 || 0, sk2: t.sk2 || 0, sk3: t.sk3 || 0, tot: t.tot || 0, vm: t.vermisst || 0 };
+  const sum = r => (r.sk1 || 0) + (r.sk2 || 0) + (r.sk3 || 0) + (r.tot || 0) + (r.vm || 0);
+  const tr = (r, isLive) => el('tr', { class: isLive ? 'live' : '' }, el('td', { text: isLive ? 'jetzt' : fmtTac(Date.parse(r.iso)).slice(2) }), ...['sk1', 'sk2', 'sk3', 'tot', 'vm'].map(k => el('td', { text: String(r[k] || 0) })), el('td', { text: String(sum(r)) }),
+    isLive || vw ? el('td') : el('td', {}, el('button', { class: 'btn small danger', 'aria-label': 'Zeile löschen', text: '×', onclick: () => { state.kraefte.rows = rows.filter(x => x !== r); renderUnitOverview(); save('Betroffenenzeile gelöscht'); } })));
+  const tbl = el('table', { class: 'vt' }, el('thead', {}, el('tr', {}, el('th', { text: 'Zeit' }), el('th', { class: 'r', text: 'SK I' }), el('th', { class: 'g', text: 'SK II' }), el('th', { class: 'gr', text: 'SK III' }), el('th', { text: 'Tot' }), el('th', { text: 'Vm' }), el('th', { class: 'bl', text: 'Σ' }), el('th'))),
+    el('tbody', {}, ...rows.map(r => tr(r, false)), tr(live, true)));
+  return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Notizen' }), el('div', { class: 'card wc' }, el('h4', { text: 'Betroffene nach Zeit' }), tbl,
+    vw ? null : el('button', { class: 'btn small', text: 'Stand festhalten', title: 'Die aktuellen Zahlen aus dem Reiter Zahlen als neue Zeile speichern', onclick: () => { state.kraefte.rows.push(Object.assign({ id: uid(), iso: nowIso() }, live)); addJournal('Betroffene festgehalten: SK I ' + live.sk1 + ', SK II ' + live.sk2 + ', SK III ' + live.sk3 + ', Tote ' + live.tot + ', Vermisste ' + live.vm, true); renderUnitOverview(); save('Betroffene festgehalten'); } }),
+    el('div', { class: 'hint', text: 'Die Zahlen kommen aus dem Reiter Zahlen. „Stand festhalten“ speichert sie mit Uhrzeit.' })),
+    el('div', { class: 'card wc' }, el('h4', { text: 'Notiz' }), el('textarea', { rows: '4', class: 'kt-note2', placeholder: 'Freie Notizen, zum Beispiel Wind, Absprachen', disabled: vw ? 'disabled' : null, onchange: e => { state.kraefte.notiz = e.target.value; save('Notiz'); } })));
+}
 function renderWand(cols, units) {
   const secs = state.sections.filter(x => x.kind !== 'line' && !x.parentId), brs = secs.filter(x => wandKind(x) === 'br'), eas = secs.filter(x => wandKind(x) !== 'br');
   const addBtn = (typ, txt) => ro('sections') ? null : el('button', { class: 'btn small', text: txt, onclick: () => editSectionDialog({ typ }) });
   const wall = el('div', { class: 'wall' },
     el('div', { class: 'wcol' }, wandAlarm(), el('span', { class: 'lbl', text: 'Bereitstellungsräume' }), ...brs.map(x => wandBlock(x, units)), addBtn('br', '+ Bereitstellungsraum')),
     el('div', { class: 'wcol wide' }, el('span', { class: 'lbl', text: 'Einsatzabschnitte' }), ...eas.map(x => wandBlock(x, units)), wandBlock(null, units), addBtn('ea', '+ Einsatzabschnitt')));
-  cols.append(wandTable(secs), wall);
-  const ta = cols.querySelector('.kt-note'); if (ta) ta.value = state.kraefte.note || '';
+  cols.append(wandTable(secs), wall, el('div', { class: 'wall2' }, wandAuftraege(), wandErgaenzung(), wandNotizen()));
+  const ta = cols.querySelector('.kt-note'); if (ta) ta.value = state.kraefte.note || ''; const tb = cols.querySelector('.kt-note2'); if (tb) tb.value = state.kraefte.notiz || '';
 }
 /* Gesamtübersicht der Einheiten (Lagevortrag) */
 function ovTile(u, mode) {
@@ -5183,6 +5267,11 @@ function initTileCacheUi() {
   };
   show();
 }
+/* Wandoptik schalten */
+function initLook() {
+  const b = $('#btnLook'); if (!b) return; const set = on => { document.body.classList.toggle('wandlook', on); b.textContent = 'Wandoptik: ' + (on ? 'ein' : 'aus'); try { localStorage.setItem('kritis-look', on ? '1' : '0'); } catch (e) { /* egal */ } };
+  let on = false; try { on = localStorage.getItem('kritis-look') === '1'; } catch (e) { /* egal */ } set(on); b.onclick = () => set(!document.body.classList.contains('wandlook'));
+}
 function initMsgTpl() {
   const sel = $('#mTpl'); if (!sel) return; sel.append(el('option', { value: '', text: 'Vordruck wählen (füllt Zahlen aus der Lage vor)' }), ...MSG_TPL.map(t => el('option', { value: t[0], text: t[1] })));
   sel.addEventListener('change', () => {
@@ -5194,7 +5283,7 @@ function initMsgTpl() {
 function initMeldungen() {
   $('#mKind').append(...MSG_KINDS.map(k => el('option', { value: k, text: k }))); $('#mWay').append(...MSG_WAY.map(w => el('option', { value: w, text: w || '– Weg –' })));
   $('#mExtraOn').addEventListener('change', e => { state.msgExtra = e.target.checked; $('#mExtra').hidden = !e.target.checked; persist(); });
-  initMsgTpl(); initTileCacheUi(); initBhp();
+  initMsgTpl(); initTileCacheUi(); initBhp(); initLook();
   $('#mAdd').onclick = () => {
     const text = $('#mText').value.trim(); if (!text) { $('#mText').focus(); return; }
     addMessage({ dir: $('#mDir').value, kind: $('#mKind').value, from: $('#mFrom').value.trim(), to: $('#mTo').value.trim(), text, prio: prioNum($('#mPrio').value), ref: $('#mRef').value,
@@ -5500,7 +5589,7 @@ function setPanel(open, remember) {
 }
 function togglePanel() { setPanel($('#app').classList.contains('collapsed')); }
 $('#panelToggle').onclick = togglePanel;
-$('#fristChip').onclick = () => { setPanel(true); openTab($('#fristChip').dataset.tab || 'probleme'); };
+$('#fristChip').onclick = () => { const t = $('#fristChip').dataset.tab || 'probleme'; if (t === 'wand') { openUnitOverview(); return; } setPanel(true); openTab(t); };
 $('#btnTheme').onclick = () => { const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); try { localStorage.setItem('kritis-theme', t); } catch (e) { /* ohne Speicher */ } };
 try { if (localStorage.getItem('kritis-panel') === '0') { $('#app').classList.add('collapsed'); $('#panelToggle').innerHTML = panelGlyph(false); $('#panelToggle').setAttribute('aria-expanded', 'false'); setTimeout(() => map.invalidateSize(), 0); } } catch (e) { /* egal */ }
 

@@ -139,6 +139,26 @@ async function seite(b, q, w, h) {
     await p.fill('.kt-t tbody tr:first-child td:nth-child(3) input', '99'); await p.press('.kt-t tbody tr:first-child td:nth-child(3) input', 'Tab'); await p.waitForTimeout(400);
     assert.ok((await sums())[1] >= 99); await p.close();
   });
+  await t('Stabswand: Aufträge (Haken, Tagebuch, Frist), NFPA-Raute, Betroffenentabelle', async () => {
+    const p = await seite(b, '', 1700, 1300); await p.evaluate(() => { const L = window.__lage; L.state.wind = { dir: 157, speed: 3, cond: 'bedeckt', stab: '', terrain: 'stadt', time: new Date().toISOString() }; L.map.setView([50.929, 6.938], 15, { animate: false }); });
+    await p.click('[data-tab="chem"]'); await p.selectOption('#chemSel', 'benzol'); await p.click('#chemPlace'); await p.mouse.click(900, 450); await p.waitForTimeout(800);
+    await p.evaluate(() => { const L = window.__lage; L.state.casualties.push({ id: 'c1', cat: 'sk1', n: 4, note: '', time: new Date().toISOString() }); });
+    await p.keyboard.press('Escape'); await p.keyboard.press('u'); await p.waitForTimeout(500); await p.evaluate(() => document.querySelector('#ovStat').dispatchEvent(new Event('change'))); await p.waitForTimeout(400);
+    const nf = await p.evaluate(() => [...document.querySelectorAll('.nfpa svg text')].map(t => [t.getAttribute('x'), t.textContent]));
+    assert.deepStrictEqual(nf.slice(0, 3), [['60', '3'], ['30', '2'], ['90', '0']], JSON.stringify(nf));
+    await p.click('.wcol:has(.auf-list) button:has-text("+ Auftrag")'); await p.waitForTimeout(300);
+    await p.fill('.auf .auf-t', 'Benzol: Auswirkungen'); await p.press('.auf .auf-t', 'Tab'); await p.fill('.auf input[type=time]', '23:59'); await p.press('.auf input[type=time]', 'Tab'); await p.waitForTimeout(300);
+    assert.ok(/Auftrag: Benzol/.test(await p.evaluate(() => document.querySelector('#fristChip').title)), 'Frist fehlt');
+    await p.click('.auf input[type=checkbox]'); await p.waitForTimeout(300);
+    assert.ok(await p.evaluate(() => window.__lage.state.journal.some(j => /Auftrag erledigt: Benzol/.test(j.text)))); assert.ok(await p.evaluate(() => document.querySelector('#fristChip').hidden));
+    await p.click('.wcol:has(.vt) button:has-text("Stand festhalten")'); await p.waitForTimeout(300);
+    assert.strictEqual(await p.evaluate(() => window.__lage.state.kraefte.rows[0].sk1), 4); await p.close();
+  });
+  await t('Wandoptik schaltbar und gemerkt', async () => {
+    const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
+    await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));
+    await p.reload(); await p.waitForFunction(() => window.__lage); await p.waitForTimeout(500); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook'))); await p.close();
+  });
   await b.close();
   console.log('\n' + ok + ' bestanden, ' + fail + ' fehlgeschlagen'); if (errs.length) { console.log('Skriptfehler im Browser:', [...new Set(errs)]); fail++; }
   process.exit(fail ? 1 : 0);

@@ -15,11 +15,11 @@ Base work was done by Saphir El-Kaiy (functional requirements and specification)
 
 Im Ordner `src/public` liegt `kritis-lage.html`, eine eigenständige Lagekarte für einen operativ-taktischen Stab (Gebiete, KRITIS-Objekte, Kräfte, Abschnitte, Meldungen, Tagebuch, Lagestände, Wind und Keule). `python3 tools/build_offline.py` baut daraus die Einzeldatei `kritis-lage-einzeldatei.html`, die ohne weitere Dateien läuft. Kartenkacheln, Ortssuche und die Abfrage der KRITIS-Objekte brauchen Internet. Hinweise zur Live-Freigabe und zu den Lizenzen der Zeichen: `tools/README.md`, `src/public/images/LICENSES-symbole.md`.
 
-### Funktionen (Rollen)
+### Bedienung im Stab
 
-Beim ersten Start fragt die LAGEkarte, wer Sie sind (EL, S1 bis S6). Danach sehen Sie nur Ihre Aufgaben, der S2 sieht und bearbeitet alles.
-Jede Funktion speichert über „Meine Daten (JSON)“ nur ihren Bereich. Der S2 liest alle Dateien ein (Reiter Daten oder Start), seine Karte wird aktualisiert.
-Mit `?rolle=S3` im Link wird eine Funktion fest vorgewählt, mit `?rolle=fragen` wird die Auswahl erzwungen.
+Die LAGEkarte kennt keine Funktionswahl mehr. Der S2 bedient das Programm und kann alles bearbeiten. Die anderen Funktionen arbeiten mit Meldungen und lassen sich vom S2 in die Karte eintragen. Die Lage lässt sich im Reiter Daten als JSON-Datei speichern und wieder einlesen.
+
+Im Reiter Einheiten (Taste U) liegt die Stabswand: Kräfteübersicht mit Zahlen aus den Kacheln, Bereitstellungsräume, Einsatzabschnitte mit Kopfkarte, Aufträge, Ergänzungen (Wetter, Gefahrstoffraute) und Notizen mit der Betroffenentabelle. Kacheln lassen sich ziehen, Doppelklick oder A setzt „auf Anfahrt“. Die Wandoptik schaltet das Menü ein und aus.
 
 ## Tests
 
@@ -29,6 +29,6 @@ Die Ende-zu-Ende-Tests liegen in `tests/run.js` und laufen mit Playwright gegen 
     npx playwright install chromium
     npm test
 
-Geprüft werden unter anderem Start, Burger-Menü, Lagevortrag, alle Gefahrstoffe (keine Fehlertexte), die ERG-Distanzen für Chlor und Ammoniak, die Rechtsklick-Menüs je Funktion, Tastenkürzel, Einweisung, Fristen, Evakuierungsplanung und Rückgängig. Bei jedem Push startet dieselbe Prüfung über GitHub Actions (`.github/workflows/tests.yml`).
+Geprüft werden unter anderem Start, Burger-Menü, Lagevortrag, alle Gefahrstoffe (keine Fehlertexte), die ERG-Distanzen für Chlor und Ammoniak, die Rechtsklick-Menüs, die Stabswand, Tastenkürzel, Einweisung, Fristen, Evakuierungsplanung und Rückgängig. Bei jedem Push startet dieselbe Prüfung über GitHub Actions (`.github/workflows/tests.yml`).
 
 Nach Änderungen an `src/public/kritis-lage.html` muss die Einzeldatei neu gebaut werden (`python3 tools/build_offline.py`), sonst prüfen die Tests den alten Stand.
