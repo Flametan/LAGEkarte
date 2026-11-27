@@ -19,8 +19,8 @@ async function seite(b, q, w, h) {
   });
   await t('Burger-Menü öffnet und schließt, Lagevortrag und Dunkelmodus liegen in der Kopfzeile', async () => {
     const p = await seite(b, '?rolle=S2'); assert.ok(await p.locator('#btnVortrag').isVisible()); assert.ok(await p.locator('#btnTheme').isVisible());
-    await p.click('#btnMore'); await p.waitForTimeout(500); assert.ok(await p.locator('#btnUnits').isVisible()); assert.ok(await p.locator('#btnSync').isVisible()); assert.notStrictEqual(await p.$eval('#btnSync', e => getComputedStyle(e).color), 'rgb(255, 255, 255)', 'Menüschrift ist nicht weiß auf hellem Grund');
-    await p.keyboard.press('Escape'); await p.waitForTimeout(500); assert.ok(!(await p.locator('#btnUnits').isVisible())); await p.close();
+    await p.click('#btnMore'); await p.waitForTimeout(500); assert.ok(await p.locator('#btnSetup').isVisible()); assert.ok(!(await p.locator('#btnUnits').isVisible()) && !(await p.locator('#btnFue').isVisible()) && !(await p.locator('#btnAddPoi').isVisible()), 'Einheiten, Führungsstruktur, + Objekt nicht im Menü'); assert.ok(await p.locator('#btnSync').isVisible()); assert.notStrictEqual(await p.$eval('#btnSync', e => getComputedStyle(e).color), 'rgb(255, 255, 255)', 'Menüschrift ist nicht weiß auf hellem Grund');
+    await p.keyboard.press('Escape'); await p.waitForTimeout(500); assert.ok(!(await p.locator('#btnSetup').isVisible())); await p.close();
   });
   await t('Lagevortrag starten und beenden', async () => {
     const p = await seite(b, '?rolle=S2'); await p.click('#btnVortrag'); await p.waitForTimeout(700);
@@ -159,7 +159,7 @@ async function seite(b, q, w, h) {
       s.sections = [{ id: 'ea1', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [] }, { id: 'ea2', kind: 'poly', typ: 'ea', name: 'EA Süd', color: '#16a34a', pts: [] }];
       s.units = [{ id: 'a', name: 'LF 1', call: '', sym: null, f: 1, u: 3, h: 9, status: 'einsatz', sectionId: 'ea1', task: '', note: '', lat: null, lng: null, time: now }]; });
     const nav = await p.$$eval('#tabs button', x => x.filter(e => e.offsetParent).map(e => e.textContent.trim()));
-    assert.deepStrictEqual(nav.slice(0, 5), ['Lagekarte', 'Einsatzraum', 'Kräfte', 'Führungsstruktur', 'Einsatztagebuch']); assert.ok(nav.includes('KRITIS') && !nav.includes('Meldungen') && !nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
+    assert.deepStrictEqual(nav.slice(0, 5), ['Lagekarte', 'Einsatzraum', 'Kräfte', 'Führungsstruktur', 'Einsatztagebuch']); assert.ok(nav.includes('KRITIS') && !nav.includes('Meldungen') && nav.includes('Problem erfassen') && !nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
     await p.keyboard.press('f'); await p.waitForTimeout(500);
     await p.click('.fsec[data-sid="ea1"]'.replace('.fsec[data-sid="ea1"]', '.fea:first-child .flab')); await p.fill('.dlg input', 'Kanal 12'); await p.keyboard.press('Enter'); await p.waitForTimeout(500);
     assert.strictEqual(await p.evaluate(() => window.__lage.state.sections[0].radio), 'Kanal 12');
@@ -275,6 +275,24 @@ async function seite(b, q, w, h) {
     const from = await p.locator('.walblock .wt').boundingBox(), to = await p.locator('.wblock[data-drop="sec:ea1"]').boundingBox();
     await p.mouse.move(from.x + 30, from.y + 30); await p.mouse.down(); await p.mouse.move(from.x + 60, from.y + 10, { steps: 4 }); await p.mouse.move(to.x + 60, to.y + 40, { steps: 8 }); await p.mouse.up(); await p.waitForTimeout(600);
     assert.strictEqual(await p.evaluate(() => window.__lage.state.units[0].sectionId), 'ea1', 'Ziehen in den Abschnitt'); await p.close();
+  });
+  await t('Kopfzeile: + EA, + Einsatzkräfte, + Objekt, Drucken; Kräfteübersicht teilt rot, weiß, blau auf', async () => {
+    const p = await seite(b, '', 1700, 1300); const labs = await p.$$eval('#app > header #mapActs .mb', x => x.map(e => e.textContent.trim())); assert.deepStrictEqual(labs, ['+ EA', '+ Einsatzkräfte', '+ Objekt']);
+    assert.deepStrictEqual(await p.$$eval('#mapBar .mb', x => x.map(e => e.textContent.trim())), ['Drucken'], 'Kartenleiste ohne Kräfte und Stab');
+    await p.evaluate(() => { const s = window.__lage.state, now = new Date().toISOString(); s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: [] }];
+      const U = (id, n, st) => ({ id, name: n, call: '', sym: null, f: 1, u: 2, h: 5, status: st, sectionId: 'A', task: '', note: '', lat: null, lng: null, time: now }); s.units = [U('1', 'HLF 20', 'einsatz'), U('2', 'RTW 3', 'einsatz'), U('3', 'GKW 1', 'anfahrt')]; });
+    await p.keyboard.press('u'); await p.waitForTimeout(600); const rows = await p.$$eval('.kt-t tr.grp', x => x.map(r => r.innerText.replace(/\s+/g, ' ').trim()));
+    assert.strictEqual(rows.length, 3, rows.join('|')); assert.ok(rows[0].includes('rot') && rows[0].endsWith('0 8 0') && rows[1].includes('weiß') && rows[1].endsWith('0 8 0') && rows[2].includes('blau') && rows[2].endsWith('8 0 0'), rows.join('|'));
+    assert.strictEqual(await p.$eval('.kt-note', e => e.placeholder), '', 'Anmerkung bleibt leer'); assert.ok(!(await p.textContent('body')).includes('weiße Einheiten'), 'kein Hinweis auf weiße Einheiten'); await p.close();
+  });
+  await t('Führungsstruktur: Bereitstellungsraum heißt BR, Sammellinie ohne Lücken', async () => {
+    const p = await seite(b, '', 1700, 1300); await p.evaluate(() => { const s = window.__lage.state; s.sections = [{ id: 'a', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: [] }, { id: 'b', kind: 'poly', typ: 'ea', name: 'Süd', color: '#16a34a', pts: [] }, { id: 'c', kind: 'poly', typ: 'br', name: 'Kaserne', color: '#d97706', pts: [] }]; s.units = []; });
+    await p.keyboard.press('f'); await p.waitForTimeout(600);
+    assert.ok((await p.textContent('.fsec[data-sid="c"] .ftag')).includes('BR') && !(await p.textContent('.fsec[data-sid="c"] .ftag')).includes('EA'), 'Kaserne ist BR');
+    assert.ok(!(await p.locator('.fsec[data-sid="c"] button', { hasText: '+ UEA' }).count()), 'BR hat kein + UEA'); assert.ok((await p.textContent('.fsec[data-sid="a"] .ftag')).includes('EA'));
+    const g = await p.$$eval('.feas > .fea', x => x.map(e => { const r = e.getBoundingClientRect(), cs = getComputedStyle(e, '::before'); return { l: r.left, r: r.right, bl: cs.left, br: cs.right, w: e.offsetWidth }; }));
+    for (let i = 1; i < g.length; i++) { const gap = g[i].l - g[i - 1].r; assert.ok(parseFloat(g[i].bl) <= -gap / 2 + 0.5 || g[i].bl.endsWith('%'), 'Linie links reicht bis zur Mitte der Lücke: ' + g[i].bl + ' bei Lücke ' + gap); if (i < g.length - 1) assert.ok(parseFloat(g[i].br) <= -gap / 2 + 0.5, 'Linie rechts reicht bis zur Mitte der Lücke: ' + g[i].br); }
+    await p.close();
   });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
