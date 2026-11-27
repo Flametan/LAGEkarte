@@ -924,6 +924,28 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
 .ovcol .ovunit:not(.wt) { flex-wrap: wrap; row-gap: 4px; } .ovcol .ovunit:not(.wt) > div:not(.st) { flex: 1 1 110px; min-width: 0; } .ovcol .ovunit:not(.wt) .st { margin-left: auto; }
 .ovcol .ovempty { margin: 0; }
 :root[data-theme="dark"] .ovcol > header { background: none; } :root[data-theme="dark"] .ovcol .ovunit:not(.wt) { background: #1b2a42; border-color: #3a4a63; }
+
+/* Einsatz einrichten und Lagebesprechungs-Fenster */
+.setupcard { width: min(600px, 94vw); max-height: 92vh; overflow: auto; }
+.setupcard .tabpane { display: block; padding: 0; }
+.sh { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; } .sh h2 { margin: 0; font-size: 20px; text-transform: none; letter-spacing: 0; border: 0; padding: 0; color: var(--ink); }
+.sic { width: 46px; height: 46px; border-radius: 12px; background: var(--red); color: #fff; display: grid; place-items: center; flex: none; }
+.scard { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; background: var(--panel, #fff); }
+.scard .srow { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin: 6px 0; } .scard input[type=text] { width: 100%; font-size: 16px; }
+.slb { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; } .srow .slb { margin: 0; min-width: 40px; }
+.seg2 { position: relative; display: inline-flex; border: 1px solid #94a3b8; border-radius: 9px; overflow: hidden; cursor: pointer; font-weight: 700; }
+.seg2 input { position: absolute; opacity: 0; width: 100%; height: 100%; inset: 0; cursor: pointer; }
+.seg2 span { padding: 7px 16px; color: var(--ink); } .seg2 input:not(:checked) ~ .s-off, .seg2 input:checked ~ .s-on { background: var(--red); color: #fff; }
+.seg2 input:focus-visible ~ span { outline: 2px solid var(--accent); outline-offset: -2px; }
+.sx { display: none; margin-top: 6px; border-top: 1px solid var(--line); padding-top: 8px; } .scard:has(#exActive:checked) .sx { display: block; }
+#mtPop { width: 320px; padding: 14px; gap: 10px; border-radius: 12px; border-top: 5px solid var(--red); }
+#mtPop .mt-h { display: flex; flex-direction: column; gap: 1px; } #mtPop .mt-h b { font-size: 15px; }
+#mtPop .mt-t { display: flex; gap: 8px; align-items: stretch; } #mtPop .mt-t input { flex: 1; min-width: 0; font-size: 26px; font-weight: 700; text-align: center; letter-spacing: .04em; border: 1px solid #94a3b8; border-radius: 8px; padding: 4px 6px; }
+#mtPop .mt-q { display: flex; gap: 6px; align-items: center; } #mtPop .mt-q .btn { flex: 1; justify-content: center; border-radius: 20px; }
+#mtPop .mt-a { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } #mtPop .mt-a .btn { justify-content: center; }
+#mtPop .mt-v { border: 0; background: none; color: var(--accent); font: 600 13px Inter, system-ui, sans-serif; text-align: left; padding: 4px 0 0; cursor: pointer; border-top: 1px solid var(--line); padding-top: 10px; }
+#mtPop .mt-v:hover { text-decoration: underline; }
+#hdrTitle { cursor: pointer; } #hdrTitle:hover { text-decoration: underline; text-underline-offset: 3px; }
 </style>
 </head>
 <body>
@@ -950,6 +972,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
     <button id="btnTheme" aria-label="Dunkelmodus" title="Hell oder dunkel umschalten"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.5 0-.9-.1-1.4A5.5 5.5 0 0 1 13.4 3.1C12.9 3 12.5 3 12 3z"/></svg></button>
     <div id="hdrMore"><button id="btnMore" aria-label="Menü" aria-haspopup="menu" aria-expanded="false" title="Weitere Funktionen"><i></i><i></i><i></i></button>
     <div id="hdrMenu" role="menu" aria-hidden="true">
+      <button id="btnSetup" title="Name und Uhr der Übung oder des Einsatzes einstellen">Einsatz einrichten</button>
       <button id="btnUnits" title="Alle Einheiten auf einen Blick, zum Beispiel für den Lagevortrag">Einheiten</button>
       <button id="btnFue" title="Führungsstruktur nach FwDV 100 mit Kommunikationsplan">Führungsstruktur</button>
       <button id="btnAddPoi" title="KRITIS-Objekt per Mausklick auf der Karte setzen">+ Objekt</button>
@@ -964,9 +987,9 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
 
   <aside id="panel">
     <nav id="tabs" role="tablist" aria-label="Bereiche">
-      <button role="tab" data-tab="einsatz" aria-selected="true"><span>Übersicht</span></button>
+      <button role="tab" data-tab="einsatz" class="navhid" aria-selected="false"><span>Übersicht</span></button>
       <button type="button" class="nav-act" data-act="map" title="Nur die Karte zeigen, Seitenleiste einklappen"><span>Lagekarte</span></button>
-      <button role="tab" data-tab="gebiet" aria-selected="false"><span>Gebiete</span></button>
+      <button role="tab" data-tab="gebiet" aria-selected="true"><span>Gebiete</span></button>
       <button type="button" class="nav-act" data-act="wand" title="Stabswand mit Kräfteübersicht (Taste U)"><span>Kräfte</span></button>
       <button type="button" class="nav-act" data-act="fue" title="Führungsstruktur und Kommunikationsplan (Taste F)"><span>Führungsstruktur</span></button>
       <button role="tab" data-tab="meldungen" class="navhid" aria-selected="false"><span>Meldungen</span></button>
@@ -986,16 +1009,20 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
       <div id="navSaved" class="nav-saved">Noch nicht gespeichert</div>
     </nav>
 
-    <section class="tabpane active" id="tab-einsatz">
-      <h2>Übung oder Einsatz</h2>
-      <div class="row"><input type="text" id="exName" placeholder="Bezeichnung der Übung oder des Einsatzes"></div>
-      <div class="row"><label><input type="checkbox" id="exActive"> Übungsuhr verwenden</label></div>
-      <div class="row"><label for="exStart">Beginn der Übung</label><input type="datetime-local" id="exStart" style="max-width:210px"><button class="btn" id="exApply">Uhr stellen</button></div>
-      <div class="row"><button class="btn" id="exPause">Pause</button><label for="exSpeed">Tempo</label>
-        <select id="exSpeed" style="min-width:150px"><option value="1">1-fach (Echtzeit)</option><option value="2">2-fach</option><option value="5">5-fach</option><option value="10">10-fach</option><option value="30">30-fach</option><option value="60">60-fach</option></select>
-        <button class="btn" id="exReal">Zurück auf Echtzeit</button></div>
-      <div class="hint" id="exInfo"></div>
-      <div class="notice">Mit Übungsuhr erhalten alle neuen Einträge, Meldungen und Statuswechsel die Zeit der Übung, nicht die der Uhr im Laptop. Bereits gespeicherte Zeiten bleiben unverändert.</div>
+    <section class="tabpane" id="tab-einsatz">
+      <div class="sh"><span class="sic"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="currentColor" d="M5 3h2v18H5zM8 4h11l-2.5 4.5L19 13H8z"/></svg></span><div><h2>Einsatz einrichten</h2><div class="hint">Name und Uhr, das stellen Sie nur einmal zu Beginn ein.</div></div></div>
+      <div class="scard"><label class="slb" for="exName">Bezeichnung</label><input type="text" id="exName" placeholder="z. B. Zugunglück Musterstadt oder Stabsübung 2026"></div>
+      <div class="scard">
+        <div class="srow"><span class="slb">Uhr</span><label class="seg2" title="Echtzeit oder Übungsuhr"><input type="checkbox" id="exActive"><span class="s-off">Echtzeit</span><span class="s-on">Übungsuhr</span></label></div>
+        <div class="sx">
+          <div class="srow"><label for="exStart">Beginn der Übung</label><input type="datetime-local" id="exStart" style="max-width:210px"><button class="btn" id="exApply">Uhr stellen</button></div>
+          <div class="srow"><label for="exSpeed">Tempo</label>
+            <select id="exSpeed" style="min-width:150px"><option value="1">1-fach (Echtzeit)</option><option value="2">2-fach</option><option value="5">5-fach</option><option value="10">10-fach</option><option value="30">30-fach</option><option value="60">60-fach</option></select>
+            <button class="btn" id="exPause">Pause</button><button class="btn" id="exReal">Zurück auf Echtzeit</button></div>
+          <div class="notice">Mit Übungsuhr erhalten alle neuen Einträge, Meldungen und Statuswechsel die Zeit der Übung, nicht die der Uhr im Laptop. Bereits gespeicherte Zeiten bleiben unverändert.</div>
+        </div>
+        <div class="hint" id="exInfo"></div>
+      </div>
       <div hidden>
       <h2>Lagebesprechung</h2>
       <div class="row"><label for="mtInt">Takt</label><input type="number" id="mtInt" min="1" step="1" style="max-width:80px"><span>Minuten</span><span class="hint">frei einstellbar, jederzeit änderbar</span></div>
@@ -1007,7 +1034,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
       </div>
     </section>
 
-    <section class="tabpane" id="tab-gebiet">
+    <section class="tabpane active" id="tab-gebiet">
       <h2>Adresse suchen</h2>
       <form class="row" id="addrForm" autocomplete="off">
         <input type="search" id="addrQ" placeholder="Straße, Hausnummer, Ort">
@@ -3286,6 +3313,16 @@ function updateMeetingChip() {
   if (document.activeElement !== $('#mtInt') && $('#tab-einsatz').classList.contains('active')) $('#mtInfo').textContent = meetingText();
 }
 /* Klick auf die Uhr: nächste Lagebesprechung festlegen */
+/* Einsatz einrichten: die Einstellungen liegen in einem Fenster, nicht mehr in einem Reiter */
+function openSetup() {
+  if ($('#setupDlg') || runtime.viewer) return;
+  const pane = $('#tab-einsatz'), home = pane.parentNode, next = pane.nextSibling;
+  const close = () => { home.insertBefore(pane, next); pane.classList.remove('active'); dlg.remove(); renderEinsatz(); };
+  const card = el('div', { class: 'rolecard setupcard' }), dlg = el('div', { id: 'setupDlg', class: 'dlg', role: 'dialog', 'aria-modal': 'true' }, card);
+  card.append(pane, el('div', { class: 'row' }, el('button', { class: 'btn primary', style: 'flex:1;justify-content:center', text: 'Fertig', onclick: close })));
+  pane.classList.add('active'); dlg.addEventListener('mousedown', e => { if (e.target === dlg) close(); }); dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
+  document.body.append(dlg); renderEinsatz(); setTimeout(() => $('#exName').focus(), 50);
+}
 function openMeetingPicker() {
   if (runtime.viewer || $('#mtPop')) return;
   const due = meetingDue(), base = due != null ? due : nowMs() + (state.meeting.intervalMin || 60) * 60000;
@@ -3294,12 +3331,12 @@ function openMeetingPicker() {
   const apply = () => { const m = /^(\d\d):(\d\d)$/.exec(t.value); if (!m) return; const d = new Date(nowMs()); d.setHours(+m[1], +m[2], 0, 0); let ms = d.getTime(); if (ms < nowMs() - 60000) ms += 86400000; set(ms); };
   const quick = min => el('button', { class: 'btn small', text: '+' + min + ' min', onclick: () => set(nowMs() + min * 60000) });
   const pop = el('div', { id: 'mtPop', role: 'dialog', 'aria-label': 'Nächste Lagebesprechung' },
-    el('b', { text: 'Nächste Lagebesprechung' }),
-    el('div', { class: 'row' }, t, el('button', { class: 'btn primary small', text: 'Übernehmen', onclick: apply })),
-    el('div', { class: 'row' }, quick(15), quick(30), quick(60)),
-    el('div', { class: 'row' }, el('button', { class: 'btn small', text: 'Takt (' + (state.meeting.intervalMin || 60) + ' min) verwenden', onclick: () => { state.meeting.nextIso = null; renderEinsatz(); save('Nächste Lagebesprechung nach Takt'); close(); } }),
-      el('button', { class: 'btn small', text: 'Jetzt führen', onclick: () => { close(); openGuidedMeeting(); } })),
-    el('div', { class: 'row' }, el('button', { class: 'btn small', text: 'Lagevortrag zeigen', title: 'Vortragsansicht mit großen Zahlen, Kräften und Gefahrstoff', onclick: () => { close(); startVortrag(); } })));
+    el('div', { class: 'mt-h' }, el('b', { text: 'Nächste Lagebesprechung' }), el('span', { class: 'hint', text: due != null ? 'geplant ' + fmtHM(due) + ' Uhr' : 'nach Takt, alle ' + (state.meeting.intervalMin || 60) + ' min' })),
+    el('div', { class: 'mt-t' }, t, el('button', { class: 'btn primary', text: 'Übernehmen', onclick: apply })),
+    el('div', { class: 'mt-q' }, el('span', { class: 'hint', text: 'in' }), quick(15), quick(30), quick(60)),
+    el('div', { class: 'mt-a' }, el('button', { class: 'btn primary', text: 'Jetzt führen', onclick: () => { close(); openGuidedMeeting(); } }),
+      el('button', { class: 'btn', text: 'Takt verwenden', title: 'Zeit nach dem eingestellten Takt (' + (state.meeting.intervalMin || 60) + ' min)', onclick: () => { state.meeting.nextIso = null; renderEinsatz(); save('Nächste Lagebesprechung nach Takt'); close(); } })),
+    el('button', { class: 'mt-v', text: 'Lagevortrag zeigen', title: 'Vortragsansicht mit großen Zahlen, Kräften und Gefahrstoff', onclick: () => { close(); startVortrag(); } }));
   const r = $('#clock').getBoundingClientRect(); pop.style.top = (r.bottom + 6) + 'px'; pop.style.left = Math.max(8, Math.min(r.left, innerWidth - 300)) + 'px';
   document.body.append(pop); t.focus();
   function close() { pop.remove(); document.removeEventListener('mousedown', out, true); document.removeEventListener('keydown', key, true); }
@@ -5099,7 +5136,7 @@ function applyRole() {
   $('#btnAddPoi').hidden = r !== 'S2' || runtime.viewer;
   $('#lvShow').hidden = false; $('#impOthers').hidden = r !== 'S2';
   $('#btnExport').hidden = runtime.viewer; $('#btnExport').title = r === 'S2' ? 'Eigene Daten und Gesamtstand als JSON-Datei' : 'Nur Ihre Daten als JSON-Datei speichern';
-  const sel = document.querySelector('#tabs button[aria-selected="true"]'); if (!sel || sel.hidden) openTab((tabs && tabs[0]) || 'einsatz');
+  const sel = document.querySelector('#tabs button[aria-selected="true"]'); if (!sel || sel.hidden) openTab((tabs && tabs[0]) || 'gebiet');
   renderUnitOverview(); renderFue();
 }
 function showLagevortrag() { startVortrag(); }
@@ -5315,9 +5352,11 @@ function maybeTour() {
   runTour();
 }
 function initRoles() {
-  $('#btnExport').onclick = () => exportRole(false); $('#btnHelp').onclick = showShortcuts; setTimeout(maybeTour, 1800);
+  $('#btnExport').onclick = () => exportRole(false); $('#btnHelp').onclick = showShortcuts; $('#btnSetup').onclick = openSetup; { const ht = $('#hdrTitle'); if (ht) { ht.onclick = openSetup; ht.title = 'Name und Uhr einstellen'; ht.style.cursor = 'pointer'; } }
+  setTimeout(() => { let seen = false; try { seen = !!localStorage.getItem('kritis-setup'); } catch (e) { /* egal */ } if (!seen && !runtime.viewer && !navigator.webdriver && !(state.exercise && state.exercise.name)) { try { localStorage.setItem('kritis-setup', '1'); } catch (e) { /* egal */ } openSetup(); } }, 700);
+  setTimeout(maybeTour, 1800);
   $('#mtGuided').onclick = openGuidedMeeting; $('#lvShow').onclick = showLagevortrag; $('#expMine').onclick = () => exportRole(false); $('#expAll').onclick = () => exportRole(true); $('#impOthers').onclick = importDlg;
-  runtime.role = 'S2'; applyRole(); if (!runtime.viewer && navigator.webdriver) openTab('einsatz');
+  runtime.role = 'S2'; applyRole(); if (!runtime.viewer && navigator.webdriver) openTab('gebiet');
 }
 /* Abschnitte-Reiter */
 function secTotals(sx) { const us = state.units.filter(u => u.sectionId === sx.id); return { us, f: us.reduce((a, u) => a + (u.f || 0), 0), u: us.reduce((a, u) => a + (u.u || 0), 0), h: us.reduce((a, u) => a + (u.h || 0), 0) }; }
