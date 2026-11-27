@@ -1812,6 +1812,15 @@ body.printing .clpanel, body.printing #clusterLines { display: none; }
   .ovunit.wt { width: calc(33.33% - 4px) !important; min-width: 92px; }
   .wal-r input { font-size: 16px; }
 }
+.rolecard label.hint > select { display: block; width: 100%; margin: 2px 0 8px; }
+
+/* Stabswand: Farbe des Abschnitts wie auf der Karte, nur als Akzent */
+.wblock[style*="--c"] { border-top: 5px solid var(--c); }
+.wblock[style*="--c"] .ea { border-color: color-mix(in srgb, var(--c) 55%, #555); }
+.wblock[style*="--c"] .ea .k { background: color-mix(in srgb, var(--c) 16%, #f1f1f1); border-right-color: color-mix(in srgb, var(--c) 55%, #888); }
+.wblock[style*="--c"] .ea .k b { color: var(--c); }
+.wblock[style*="--c"] .ovunit.wt { border-bottom: 3px solid var(--c); }
+.sdot { width: 10px; height: 10px; margin-right: 7px; border-radius: 50%; }
 </style>
 </head>
 <body>
@@ -3465,7 +3474,7 @@ function renderSections() {
     if (!sx.pts || sx.pts.length < 2) return;
     const c = safeColor(sx.color, '#e11d48');
     const lyr = secShape(sx);
-    lyr.bindTooltip(el('span', { text: sx.name }), { permanent: true, direction: 'center', className: 'seclabel' });
+    lyr.bindTooltip(el('span', { text: secLabel(sx) }), { permanent: true, direction: 'center', className: 'seclabel' });
     lyr._secId = sx.id; secLayers[sx.id] = lyr;
     lyr.on('contextmenu', e => ctxOpen(e, sectionItems(sx), e.latlng, (sx.kind === 'line' ? 'Linie: ' : 'Abschnitt: ') + sx.name));
     lyr.bindPopup(() => {
@@ -3504,7 +3513,7 @@ function renderSectionsKeepList() {   // während der Farbwahl nur die Karte neu
   state.sections.forEach(sx => {
     if (!sx.pts || sx.pts.length < 2) return;
     const lyr = secShape(sx);
-    lyr.bindTooltip(el('span', { text: sx.name }), { permanent: true, direction: 'center', className: 'seclabel' }); lyr.addTo(secLayer);
+    lyr.bindTooltip(el('span', { text: secLabel(sx) }), { permanent: true, direction: 'center', className: 'seclabel' }); lyr.addTo(secLayer);
   });
 }
 const SYM_ORD = { 1: 0, 3: 1, 4: 2, 2: 3, 5: 4 };   // Feuerwehr, Rettungsdienst, THW, dann Führung, dann Gefahren
@@ -5979,7 +5988,7 @@ function renderClusterPanel(cl) {
   [...cl.secs.entries()].map(([id, mem]) => { const sx = state.sections.find(x => x.id === id); return sx ? [sx, mem, clusterAnchor(sx, mem)] : null; }).filter(Boolean).sort((a, b) => a[2].y - b[2].y).forEach(([sx, mem, anc]) => {
     const us = mem.filter(m => m.k === 'u').map(m => m.ref).sort((a, b) => (a.name || '').localeCompare(b.name || '', 'de')), cs = mem.filter(m => m.k === 'c').map(m => m.ref);
     const card = el('div', { class: 'cl-card', 'data-sid': sx.id, style: '--c:' + safeColor(sx.color, '#2563eb') },
-      el('button', { class: 'cl-h', title: 'Zum Abschnitt zoomen', onclick: () => { if (sx.pts && sx.pts.length > 2) map.fitBounds(L.latLngBounds(sx.pts).pad(0.3)); } }, el('b', { text: sx.name }), el('span', { text: us.length + ' Einh.' + (cs.length ? ', ' + cs.reduce((a, c) => a + (c.n || 0), 0) + ' Pers.' : '') })),
+      el('button', { class: 'cl-h', title: 'Zum Abschnitt zoomen', onclick: () => { if (sx.pts && sx.pts.length > 2) map.fitBounds(L.latLngBounds(sx.pts).pad(0.3)); } }, el('b', { text: secLabel(sx) }), el('span', { text: us.length + ' Einh.' + (cs.length ? ', ' + cs.reduce((a, c) => a + (c.n || 0), 0) + ' Pers.' : '') })),
       ...us.map(u => el('div', { class: 'cl-u', role: 'button', tabindex: '0', title: (u.name || 'Einheit') + ' · ' + ustat(u.status).label + ' · auf die Karte ziehen, um sie zu verschieben', style: '--sc:' + safeColor(ustat(u.status).color), onpointerdown: e => clusterDrag(e, 'u', u, () => openUnitCard(u, can('logi') && !can('units'))) },
         el('img', { src: unitSym(u).url, alt: '', draggable: 'false' }), el('span', { class: 'cl-n', text: u.name || 'Einheit' }), el('small', { text: fmtStr(u) }))),
       ...cs.map(c => el('div', { class: 'cl-u cl-c', role: 'button', tabindex: '0', title: CAS[c.cat].label + ' · auf die Karte ziehen, um sie zu verschieben', style: '--sc:' + CAS[c.cat].color, onpointerdown: e => clusterDrag(e, 'c', c, () => map.setView([c.lat, c.lng], Math.max(map.getZoom(), 17))) },
@@ -5988,13 +5997,18 @@ function renderClusterPanel(cl) {
   });
   L1.hidden = !L1.children.length; R1.hidden = !R1.children.length; renderClusterLines();
 }
-function updateCluster() {
-  const cl = clusterCompute(), sig = [...cl.secs.entries()].map(([k, v]) => k + ':' + v.map(m => m.ref.id).sort().join(',')).sort().join('|');
-  if (sig !== clusterSig) { clusterSig = sig; renderUnitMarkers(); renderCas(); } else { clusterCur = cl; renderClusterLines(); }
+function clusterSigOf(cl) {   // welche Abschnitte, welche Einträge und auf welcher Seite des Bildes: ändert sich eines davon, wird neu aufgebaut
+  const w = map.getSize().x / 2;
+  return [...cl.secs.entries()].map(([k, v]) => { const sx = state.sections.find(x => x.id === k); return k + ':' + (sx && clusterAnchor(sx, v).x < w ? 'L' : 'R') + ':' + v.map(m => m.ref.id).sort().join(','); }).sort().join('|');
 }
-map.on('zoomend moveend', updateCluster); map.on('move', () => { if (clusterSig) requestAnimationFrame(renderClusterLines); });
+function updateCluster() {
+  const cl = clusterCompute(), sig = clusterSigOf(cl);
+  if (sig !== clusterSig) { const idsOld = clusterSig.replace(/:[LR]:/g, ':'), idsNew = sig.replace(/:[LR]:/g, ':'); clusterSig = sig; clusterCur = cl; if (idsOld !== idsNew) { renderUnitMarkers(); renderCas(); } else renderClusterPanel(cl); } else { clusterCur = cl; renderClusterLines(); }
+}
+let clusterFrame = 0;
+map.on('zoomend moveend', updateCluster); map.on('move zoom', () => { if (clusterFrame) return; clusterFrame = requestAnimationFrame(() => { clusterFrame = 0; if (clusterSig || clusterCur.secs.size) updateCluster(); }); });
 function renderUnitMarkers() {
-  unitLayer.clearLayers(); clusterCur = clusterCompute(); clusterSig = [...clusterCur.secs.entries()].map(([k, v]) => k + ':' + v.map(m => m.ref.id).sort().join(',')).sort().join('|');
+  unitLayer.clearLayers(); clusterCur = clusterCompute(); clusterSig = clusterSigOf(clusterCur);
   const hidden = clusterCur.hiddenU; renderClusterPanel(clusterCur);
   state.units.filter(u => u.lat != null && !hidden.has(u.id)).forEach(u => {
     const m = L.marker([u.lat, u.lng], { icon: unitMarkerIcon(u), draggable: true });
@@ -6059,6 +6073,10 @@ function refreshUnitsLight(u, card) {            // ohne Neuaufbau der Felder, d
 function setUnitStatus(u, id) {
   if (u.status === id) return; const was = ustat(u.status).label; u.status = id; u.time = nowIso();
   addJournal('Einheit ' + (u.name || '–') + ': Status ' + was + ' zu ' + ustat(id).label, true); renderUnits(); renderAbschnitte(); save('Status Einheit ' + u.name + ': ' + ustat(id).label);
+}
+function secLabel(sx) {   // EA, UEA oder BR vor dem Namen, außer er beginnt schon so
+  if (sx.kind === 'line') return sx.name; const pre = sx.parentId ? 'UEA' : sx.typ === 'br' ? 'BR' : sx.typ === 'el' ? 'EL' : 'EA', n = String(sx.name || '');
+  return new RegExp('^' + pre + '\\b', 'i').test(n.trim()) ? n : pre + ' ' + n;
 }
 function secInside(sx, lat, lng) {   // Punkt in Fläche (Strahlverfahren), pts = [lat, lng]
   const p = sx && sx.kind !== 'line' && sx.pts; if (!p || p.length < 3) return false; let in_ = false;
@@ -6276,7 +6294,7 @@ function wandBlock(sx, units) {
   const list = units.filter(u => sx ? ids.has(u.sectionId) : ((!u.sectionId || !state.sections.some(x => x.id === u.sectionId)) && u.status !== ST_ANF));
   const body = el('div', { class: 'wtiles' }, ...list.slice().sort((p, q) => (p.name || '').localeCompare(q.name || '', 'de')).map(wTile));
   if (!list.length) body.append(el('div', { class: 'ovempty', text: ro('units') ? 'leer' : 'Kacheln hierher ziehen' }));
-  return el('div', { class: 'ovcol wblock', 'data-drop': 'sec:' + (sx ? sx.id : '') }, sx ? wandCard(sx, sums) : el('div', { class: 'wnone' }, el('b', { text: 'Ohne Abschnitt' }), el('span', { text: 'nicht zugeordnete Einheiten' })), body);
+  return el('div', { class: 'ovcol wblock', 'data-drop': 'sec:' + (sx ? sx.id : ''), style: sx ? '--c:' + safeColor(sx.color, '#2563eb') : null }, sx ? wandCard(sx, sums) : el('div', { class: 'wnone' }, el('b', { text: 'Ohne Abschnitt' }), el('span', { text: 'nicht zugeordnete Einheiten' })), body);
 }
 function kcell(secId, key, val, computed) {
   const o = (state.kraefte.ovr[secId == null ? '_' : secId] || {})[key], has = o != null, vw = ro('kraefte');
@@ -6298,7 +6316,7 @@ function wandTable(secs) {
   const rows = secs.map(sx => ({ sx, id: sx.id, name: sx.name, sums: wandSums(sx.id) })).concat([{ sx: null, id: null, name: 'ohne Abschnitt', sums: wandSums(null) }]).filter(r => r.sx || r.sums.alle.n || r.sums.abg.n);
   const val = (r, k) => { const o = (state.kraefte.ovr[r.id == null ? '_' : r.id] || {})[k]; return o != null ? o : r.sums[k].m; };
   const tot = k => rows.reduce((a, r) => a + val(r, k), 0);
-  const tr = r => el('tr', {}, el('th', { scope: 'row', text: r.name }), ...['anf', 'vor', 'abg'].map(k => el('td', {}, kcell(r.id, k, val(r, k), r.sums[k].m), r.sums[k].n ? el('small', { text: r.sums[k].n + ' Einh.' }) : null, wandGroupChips(r.id, k))));
+  const tr = r => el('tr', {}, el('th', { scope: 'row' }, r.sx ? el('i', { class: 'gdot sdot', style: 'background:' + safeColor(r.sx.color, '#2563eb') }) : null, r.name), ...['anf', 'vor', 'abg'].map(k => el('td', {}, kcell(r.id, k, val(r, k), r.sums[k].m), r.sums[k].n ? el('small', { text: r.sums[k].n + ' Einh.' }) : null, wandGroupChips(r.id, k))));
   return el('div', { class: 'kt' }, el('div', { class: 'kt-h' }, el('span', { class: 'lbl', text: 'Kräfteübersicht (S1)' }), ),
     el('table', { class: 'kt-t' }, el('thead', {}, el('tr', {}, el('th', { text: 'EA' }), el('th', { text: 'alarmiert, auf Anfahrt' }), el('th', { text: 'vor Ort' }), el('th', { text: 'abgelöst' }))),
       el('tbody', {}, ...rows.map(tr), ...wandGroupRows(), el('tr', { class: 'sig' }, el('th', { text: 'Σ' }), el('td', { text: String(tot('anf')) }), el('td', { text: String(tot('vor')) }), el('td', { text: String(tot('abg')) })))),
@@ -6325,7 +6343,6 @@ function wandAlarm(units) {
   if (!list.length) tiles.append(el('div', { class: 'ovempty', text: ro('units') ? 'leer' : 'Kacheln hierher ziehen' }));
   const block = el('div', { class: 'ovcol wblock walblock', 'data-drop': 'alarm' }, ro('units') ? null : el('div', { class: 'wal-add' }, el('button', { class: 'btn small wedit primary', text: '+ Einheit', title: 'Alarmierte Einheit anlegen, sie steht auf Anfahrt und wird einem Abschnitt zugeteilt, wenn sie ankommt', onclick: () => addUnitDialog({ status: ST_ANF }) })), tiles);
   state.kraefte.alarmiert.forEach(a => box.append(el('div', { class: 'wal-r' }, el('input', { type: 'text', value: a.text, disabled: vw ? 'disabled' : null, 'aria-label': 'Alarmiert oder auf Marsch', onchange: e => { a.text = e.target.value.trim(); state.kraefte.standIso = nowIso(); save('Alarmiert: ' + a.text); } }), vw ? null : el('button', { class: 'btn small danger', text: '×', 'aria-label': 'Zeile entfernen', onclick: () => { state.kraefte.alarmiert = state.kraefte.alarmiert.filter(x => x !== a); renderUnitOverview(); save('Alarmiert entfernt'); } }))));
-  if (!vw) box.append(el('button', { class: 'btn small', text: '+ Zeile', onclick: () => { state.kraefte.alarmiert.push({ id: uid(), text: '' }); renderUnitOverview(); const i = $('#ovCols .wal-r:last-of-type input'); if (i) i.focus(); } }));
   return el('div', { class: 'wcol' }, el('span', { class: 'lbl', text: 'Alarmiert, auf Marsch' }), block, box);
 }
 /* Aufträge, Ergänzungen und Notizen der Stabswand */
@@ -7522,7 +7539,7 @@ placeMapActs(); initPlaceSearch(); initialView(); if (isPhone()) { setPanel(fals
 tickClock(); setInterval(tickClock, 1000);
 $('#panelToggle').innerHTML = panelGlyph(!$('#app').classList.contains('collapsed'));
 liveInit();
-window.__lage = { renderUnitMarkers, SYNC, TileCache, addUnit, assignUnit, unitMovedOnMap, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
+window.__lage = { renderSections, renderUnitMarkers, SYNC, TileCache, addUnit, assignUnit, unitMovedOnMap, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
 })();
 </script>
 </body>

@@ -299,6 +299,8 @@ async function seite(b, q, w, h) {
     const a = await st(); assert.deepStrictEqual(a.l, ['A'], 'West links: ' + JSON.stringify(a)); assert.deepStrictEqual(a.r, ['B'], 'Ost rechts'); assert.ok(a.rows.includes('SK I (rot), akut lebensbedrohlich') && a.rows.includes('RTW 3') && a.marker === 0, 'Einheiten und verletzte Personen im Fenster: ' + JSON.stringify(a));
     const row = await p.locator('#clusterPanelL .cl-u').first().boundingBox(); await p.mouse.move(row.x + 20, row.y + 8); await p.mouse.down(); await p.mouse.move(row.x + 80, row.y + 60, { steps: 4 }); await p.mouse.move(1100, 650, { steps: 6 }); await p.mouse.up(); await p.waitForTimeout(700);
     const u1 = await p.evaluate(() => window.__lage.state.units.find(u => u.id === '1')); assert.ok(Math.abs(u1.lat - 51.515) > 0.005 || Math.abs(u1.lng - 7.38) > 0.005, 'Einheit wurde herausgezogen: ' + JSON.stringify([u1.lat, u1.lng]));
+    await p.evaluate(() => window.__lage.map.setView([51.515, 7.5], 12, { animate: false })); await p.waitForTimeout(500); const sw = await st(); assert.ok(sw.r.length === 0 && sw.l.length >= 1, 'beide Abschnitte links im Bild: Fenster links ' + JSON.stringify(sw));
+    await p.evaluate(() => window.__lage.map.setView([51.515, 7.32], 12, { animate: false })); await p.waitForTimeout(500); const sw2 = await st(); assert.ok(sw2.l.length === 0 && sw2.r.length >= 1, 'Abschnitte rechts im Bild: Fenster wechseln sofort nach rechts ' + JSON.stringify(sw2));
     await p.evaluate(() => window.__lage.map.setView([48.0, 11.0], 12, { animate: false })); await p.waitForTimeout(700); const away = await st(); assert.ok(away.l.length === 0 && away.r.length === 0, 'Abschnitte nicht im Bild: keine Fenster ' + JSON.stringify(away));
     await p.evaluate(() => window.__lage.map.setView([51.515, 7.38], 18, { animate: false })); await p.waitForTimeout(700); const near = await st(); assert.ok(near.l.length === 0 && near.marker >= 3, 'weit hineingezoomt: einzelne Marker ' + JSON.stringify(near)); await p.close();
   });
@@ -317,6 +319,16 @@ async function seite(b, q, w, h) {
       await V.evaluate(() => { window.__lage.state.units[0].name = 'MANIPULIERT'; window.__lage.SYNC.schedulePush(); }); await V.waitForTimeout(1500); assert.deepStrictEqual(await A.evaluate(() => window.__lage.state.units.map(u => u.name)), ['LF Neu'], 'Zuschauer kann nichts ändern');
       assert.ok(!(await V.evaluate(() => { try { return !!localStorage.getItem('kritis-lage-v1'); } catch (e) { return false; } })), 'beim Zuschauer wird nichts gespeichert');
     } finally { srv.kill(); }
+  });
+  await t('Karte: EA und BR vor dem Namen; Abschnittsdialog mit Platz für Art; Alarmiert ohne + Zeile', async () => {
+    const p = await seite(b, '', 1700, 1300); await p.evaluate(() => { const L = window.__lage, s = L.state; const sq = (a, b) => [[a, b], [a, b + 0.01], [a + 0.01, b + 0.01], [a + 0.01, b]];
+      s.sections = [{ id: 'a', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: sq(51.5, 7.4) }, { id: 'b', kind: 'poly', typ: 'br', name: 'Kaserne', color: '#d97706', pts: sq(51.5, 7.42) }, { id: 'c', kind: 'poly', typ: 'ea', name: 'EA ICE', color: '#16a34a', pts: sq(51.5, 7.44) }, { id: 'd', kind: 'poly', typ: 'ea', name: 'Süd', parentId: 'a', color: '#dc2626', pts: sq(51.51, 7.4) }];
+      s.units = []; L.map.setView([51.505, 7.43], 13, { animate: false }); L.renderSections && L.renderSections(); });
+    await p.waitForTimeout(600); const labs = await p.$$eval('.seclabel', x => x.map(e => e.textContent.trim()).sort()); assert.deepStrictEqual(labs, ['BR Kaserne', 'EA ICE', 'EA Nord', 'UEA Süd'], labs.join('|'));
+    await p.keyboard.press('u'); await p.waitForTimeout(500); await p.evaluate(() => document.querySelector('#ovStat').dispatchEvent(new Event('change'))); await p.waitForTimeout(300);
+    assert.strictEqual(await p.locator('.wal button', { hasText: '+ Zeile' }).count(), 0, 'kein + Zeile bei Alarmiert');
+    await p.locator('.wcard button', { hasText: 'Bearbeiten' }).first().click(); await p.waitForTimeout(300); const sel = await p.locator('.dlg select[data-k="typ"]').boundingBox(), inp = await p.locator('.dlg input[data-k="befehl"]').boundingBox();
+    assert.ok(sel.width > 200 && sel.y + sel.height <= inp.y, 'Art-Auswahl hat eigene Zeile: ' + JSON.stringify([sel, inp])); await p.close();
   });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
