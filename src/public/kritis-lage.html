@@ -976,6 +976,7 @@ body.beamerwin #unitOv, body.beamerwin #fueOv { padding-top: 8px; }
 #app > header #hdrMenu button { background: none !important; border: 0 !important; border-radius: 0 !important; color: var(--ink) !important; box-shadow: none !important; }
 #app > header #hdrMenu button:hover:not(:disabled) { background: rgba(30, 64, 175, .12) !important; }
 #app > header #hdrMenu button:disabled { opacity: .45; }
+.advsrv { margin: 10px 0 0; font-size: 12.5px; color: var(--muted); } .advsrv summary { cursor: pointer; } .advsrv input { margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -3276,6 +3277,7 @@ function openBeamerDlg() {
 /* Verschlüsselung (HKDF, AES-GCM). Der Server sieht nur unlesbare Blöcke. Zusammengeführt wird je Feld */
 /* auf den Geräten: Die spätere Änderung gewinnt, gelöscht ist gelöscht.                               */
 /* ------------------------------------------------------------------ */
+const SYNC_SERVER = 'https://umbrel.taile733cb.ts.net:8443';   // Standard: eigener Sync-Server, muss nicht eingetragen werden
 const SYNC = (() => {
   const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', K = { code: 'lagekarte_sync_code', url: 'lagekarte_sync_url', pre: 'lagekarte_pre_sync' };
   const ENC = new TextEncoder(), DEC = new TextDecoder();
@@ -3453,24 +3455,25 @@ const SYNC = (() => {
     materialize(); rebuildAll(!resume); keep(); start(); if (local) schedulePush(); if (!resume) addJournal('Gemeinsamem Einsatz beigetreten', true); save();
   }
   function leave() { S.active = false; S.loopId++; try { S.ac && S.ac.abort(); } catch (e) { /* weg */ } ls.del(K.code); S.status = 'off'; updateChip(); addJournal('Gemeinsamen Einsatz verlassen', true); save(); }
-  async function resume() { const c = ls.get(K.code), u = ls.get(K.url); if (!c || !u || runtime.viewer || runtime.beamerView) return; try { await join(c, u, true); } catch (e) { S.code = norm(c); S.url = u; S.active = true; try { S.creds = await derive(c); } catch (x) { return; } setStatus('warn', e.message); S.loopId++; const id = S.loopId; (async () => { while (S.active && S.loopId === id) { await sleep(5000); try { await join(c, u, true); return; } catch (x) { setStatus(/verweigert|nicht/.test(x.message) ? 'denied' : 'warn', x.message); } } })(); } }
+  async function resume() { const c = ls.get(K.code), u = ls.get(K.url) || SYNC_SERVER; if (!c || runtime.viewer || runtime.beamerView) return; try { await join(c, u, true); } catch (e) { S.code = norm(c); S.url = u; S.active = true; try { S.creds = await derive(c); } catch (x) { return; } setStatus('warn', e.message); S.loopId++; const id = S.loopId; (async () => { while (S.active && S.loopId === id) { await sleep(5000); try { await join(c, u, true); return; } catch (x) { setStatus(/verweigert|nicht/.test(x.message) ? 'denied' : 'warn', x.message); } } })(); } }
   function downloadBackup() {
     const blob = new Blob([JSON.stringify({ gesichert: new Date().toISOString(), hinweis: 'Stand vor dem Beitritt zu einem gemeinsamen Einsatz', state: shareState() })], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'lagekarte-vor-beitritt-' + new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-') + '.json'; document.body.append(a); a.click(); setTimeout(() => { a.remove(); URL.revokeObjectURL(a.href); }, 500);
   }
-  return { S, K, ls, pretty, norm, valid, create, join, leave, resume, schedulePush, derive, flatten, get active() { return S.active; }, updateChip };
+  return { S, K, ls, DEFAULT: SYNC_SERVER, pretty, norm, valid, create, join, leave, resume, schedulePush, derive, flatten, get active() { return S.active; }, updateChip };
 })();
 
 function openSyncDlg(tab, pre) {
   if ($('#syncDlg') || runtime.viewer) return;
   let mode = SYNC.active && !tab ? 'teilen' : (tab || 'teilen'); const busy = { v: false };
-  const urlIn = el('input', { type: 'url', placeholder: 'https://ihr-server.example', value: (pre && pre.server) || SYNC.ls.get(SYNC.K.url) || '', 'aria-label': 'Adresse des Servers' });
+  const urlIn = el('input', { type: 'url', placeholder: 'https://ihr-server.example', value: (pre && pre.server) || SYNC.ls.get(SYNC.K.url) || SYNC.DEFAULT, 'aria-label': 'Adresse des Servers' });
+  const srvBox = () => el('details', { class: 'advsrv', open: urlIn.value !== SYNC.DEFAULT ? 'open' : null }, el('summary', { text: 'Server (voreingestellt)' }), urlIn);
   const codeIn = el('input', { type: 'text', class: 'synccode', placeholder: 'XXXX-XXXX-XXXX-XXXX-XXXX', value: (pre && pre.code) || '', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Code' });
   codeIn.addEventListener('input', () => { const p = SYNC.pretty(codeIn.value); codeIn.value = p; });
   const err = el('div', { class: 'notice', hidden: 'hidden' }), card = el('div', { class: 'rolecard synccard' }), dlg = el('div', { id: 'syncDlg', class: 'dlg', role: 'dialog', 'aria-modal': 'true' }, card);
   const fail = e => { err.textContent = e.message || String(e); err.hidden = false; };
   const close = () => dlg.remove();
-  const link = () => location.href.split('#')[0].split('?')[0] + '#einsatz=' + SYNC.norm(SYNC.S.code) + '&server=' + encodeURIComponent(SYNC.S.url);
+  const link = () => location.href.split('#')[0].split('?')[0] + '#einsatz=' + SYNC.norm(SYNC.S.code) + (SYNC.S.url !== SYNC.DEFAULT ? '&server=' + encodeURIComponent(SYNC.S.url) : '');
   const copy = async (t, what) => { try { await navigator.clipboard.writeText(t); say(what + ' kopiert.', 2500); } catch (e) { say('Kopieren nicht möglich. Bitte von Hand markieren.', 4000); } };
   const go = async (fn, ok) => { if (busy.v) return; busy.v = true; err.hidden = true; try { await fn(); render(); if (ok) say(ok, 3000); } catch (e) { fail(e); } busy.v = false; };
   const render = () => {
@@ -3485,11 +3488,11 @@ function openSyncDlg(tab, pre) {
         el('div', { class: 'warn', text: 'Wer den Code kennt, kann den Einsatz lesen und bearbeiten. Die Daten sind auf dem Gerät verschlüsselt, der Server sieht nur unlesbare Daten. Rückgängig ist im gemeinsamen Einsatz nicht verfügbar.' }), err,
         el('div', { class: 'line' }, el('button', { class: 'btn', style: 'color:#b71c1c', text: 'Einsatz verlassen', onclick: async () => { if (await askYesNo('Gemeinsamen Einsatz verlassen?', 'Sie behalten Ihre Kopie auf diesem Gerät. Änderungen der anderen kommen nicht mehr an.', 'Verlassen')) { SYNC.leave(); render(); } } }), el('button', { class: 'btn primary', text: 'Fertig', onclick: close })));
     } else if (mode === 'teilen') {
-      body = el('div', {}, el('div', { class: 'hint', text: 'Der aktuelle Einsatz wird verschlüsselt auf Ihren Server gelegt. Danach gibt es einen Code für alle, die mitarbeiten.' }), el('div', { class: 'slb2', text: 'Server' }), urlIn, err,
+      body = el('div', {}, el('div', { class: 'hint', text: 'Der aktuelle Einsatz wird verschlüsselt auf Ihren Server gelegt. Danach gibt es einen Code für alle, die mitarbeiten.' }), srvBox(), err,
         el('div', { class: 'line' }, el('button', { class: 'btn', text: 'Abbrechen', onclick: close }), el('button', { class: 'btn primary', text: 'Einsatz teilen', onclick: () => go(() => { if (!/^https?:\/\//.test(urlIn.value.trim())) throw new Error('Bitte die Adresse des Servers mit https:// eintragen.'); return SYNC.create(urlIn.value); }) })));
     } else {
       body = el('div', {}, el('div', { class: 'slb2', text: 'Code eingeben' }), codeIn,
-        el('div', { class: 'warn', text: 'Ihr aktueller Einsatz auf diesem Gerät wird durch den gemeinsamen Einsatz ersetzt. Vorher wird er automatisch als Datei gesichert.' }), el('div', { class: 'slb2', text: 'Server' }), urlIn, err,
+        el('div', { class: 'warn', text: 'Ihr aktueller Einsatz auf diesem Gerät wird durch den gemeinsamen Einsatz ersetzt. Vorher wird er automatisch als Datei gesichert.' }), srvBox(), err,
         el('div', { class: 'line' }, el('button', { class: 'btn', text: 'Abbrechen', onclick: close }), el('button', { class: 'btn primary', text: 'Beitreten', onclick: () => go(async () => { if (!/^https?:\/\//.test(urlIn.value.trim())) throw new Error('Bitte die Adresse des Servers mit https:// eintragen.'); await SYNC.join(codeIn.value, urlIn.value); mode = 'teilen'; }, 'Dem gemeinsamen Einsatz beigetreten.') })));
     }
     card.replaceChildren(el('h3', { text: 'Gemeinsamer Einsatz' }), el('div', { class: 'hint', text: 'Mehrere Personen bearbeiten denselben Einsatz.' }), tabs, body);
