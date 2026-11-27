@@ -1030,6 +1030,15 @@ body.viewer #mapActs, body.beamerwin #mapActs, body.vortrag #mapActs, body.print
 #app > header #hdrSub #mapActs { margin-left: auto; margin-right: 6px; }
 .kgrp { display: flex; gap: 8px; margin-top: 3px; font-size: 11.5px; color: var(--muted); font-weight: 600; } .kgrp .gdot { margin-right: 3px; }
 .vt th.bk { width: 54px; padding: 3px 4px; font-size: 11.5px; white-space: nowrap; }
+
+#clusterLines { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 850; pointer-events: none; }
+#clusterPanel { position: absolute; right: 10px; top: 130px; bottom: 36px; width: 200px; z-index: 860; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; } #clusterPanel[hidden] { display: none; }
+.cl-card { background: var(--panel, #fff); border: 1px solid var(--line); border-left: 6px solid var(--c); border-radius: 8px; box-shadow: 0 2px 8px rgba(15, 23, 42, .25); padding: 4px 6px 6px; flex: none; }
+.cl-h { display: flex; justify-content: space-between; align-items: baseline; width: 100%; border: 0; background: none; font: inherit; color: var(--ink); cursor: pointer; padding: 2px 2px 4px; text-align: left; } .cl-h b { font-size: 13px; } .cl-h span { font-size: 11px; color: var(--muted); }
+.cl-u { display: flex; align-items: center; gap: 6px; width: 100%; border: 0; border-top: 1px solid var(--line); background: none; padding: 3px 2px; font: inherit; color: var(--ink); cursor: pointer; text-align: left; border-left: 3px solid var(--sc, transparent); padding-left: 5px; } .cl-u:hover { background: rgba(30, 64, 175, .1); }
+.cl-u img { width: 30px; height: 24px; object-fit: contain; flex: none; } .cl-n { flex: 1; min-width: 0; font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .cl-u small { font-size: 10.5px; color: var(--muted); }
+body.printing #clusterPanel, body.printing #clusterLines { display: none; }
+@media (max-width: 700px) { #clusterPanel { width: 150px; top: 110px; bottom: 70px; } .cl-u small { display: none; } }
 </style>
 </head>
 <body>
@@ -4876,9 +4885,58 @@ function unitMarkerIcon(u) {
   const node = el('div', { class: 'umk ring' + (fl.out ? ' out' : fl.due ? ' due' : ''), style: '--sc:' + safeColor(st.color) }, img, fl.out ? el('span', { class: 'ustrike' }) : null, el('span', { class: 'usb', style: 'background:' + safeColor(st.color), text: st.short || (st.label || '?').charAt(0).toUpperCase() }), el('span', { class: 'ulb', text: u.name || 'Einheit' }));
   return L.divIcon({ className: '', html: node, iconSize: [Math.max(w, 60), 52], iconAnchor: [Math.max(w, 60) / 2, 22] });
 }
+/* Viele Einheiten übereinander: Aus dem Abschnitt geht ein Strich zum Kartenrand, dort stehen die Einheiten als Liste.
+   Das gilt nur, solange der Abschnitt im Bild ist und die Einheiten sich überdecken. */
+const CLUSTER_MIN = 3, CLUSTER_PX = 34;
+let clusterSig = '', clusterCur = new Map();
+function clusterSections() {
+  const out = new Map(), taken = new Set(); if (!map._loaded || !map.getSize().x) return out; const view = map.getBounds();
+  const secs = state.sections.filter(x => x.kind !== 'line' && x.pts && x.pts.length > 2).sort((a, b) => (a.parentId ? 1 : 0) - (b.parentId ? 1 : 0));
+  secs.forEach(sx => {
+    if (!view.intersects(L.latLngBounds(sx.pts))) return;
+    const ids = new Set([sx.id, ...state.sections.filter(c => c.parentId === sx.id).map(c => c.id)]);
+    const us = state.units.filter(u => u.lat != null && ids.has(u.sectionId) && !taken.has(u.id)); if (us.length < CLUSTER_MIN) return;
+    const pts = us.map(u => map.latLngToContainerPoint([u.lat, u.lng]));
+    const near = us.filter((u, i) => pts.some((p, j) => j !== i && Math.abs(p.x - pts[i].x) < CLUSTER_PX && Math.abs(p.y - pts[i].y) < CLUSTER_PX));
+    if (near.length >= CLUSTER_MIN) { out.set(sx.id, us); us.forEach(u => taken.add(u.id)); }
+  });
+  return out;
+}
+function clusterAnchor(sx) {
+  let c = L.latLngBounds(sx.pts).getCenter(); if (!secInside(sx, c.lat, c.lng)) { const m = L.latLng(sx.pts.reduce((a, q) => a + q[0], 0) / sx.pts.length, sx.pts.reduce((a, q) => a + q[1], 0) / sx.pts.length); if (secInside(sx, m.lat, m.lng)) c = m; }
+  const p = map.latLngToContainerPoint(c), sz = map.getSize(); return L.point(Math.min(Math.max(p.x, 10), sz.x - 10), Math.min(Math.max(p.y, 10), sz.y - 10));
+}
+function renderClusterLines() {
+  const panel = $('#clusterPanel'), svg = $('#clusterLines'); if (!panel || !svg) return; svg.replaceChildren(); if (panel.hidden) return;
+  const base = $('#mapWrap').getBoundingClientRect(), pr = panel.getBoundingClientRect(), NS = 'http://www.w3.org/2000/svg';
+  panel.querySelectorAll('.cl-card').forEach(card => {
+    const sx = state.sections.find(x => x.id === card.dataset.sid); if (!sx) return; const r = card.getBoundingClientRect(), a = clusterAnchor(sx);
+    const ey = Math.min(Math.max(r.top + 18, pr.top + 6), pr.bottom - 6) - base.top, ex = r.left - base.left, col = safeColor(sx.color, '#2563eb');
+    const line = document.createElementNS(NS, 'path'); line.setAttribute('d', 'M' + a.x + ' ' + a.y + ' L' + (ex - 14) + ' ' + ey + ' L' + ex + ' ' + ey); line.setAttribute('stroke', col); line.setAttribute('stroke-width', '3'); line.setAttribute('fill', 'none'); line.setAttribute('stroke-linejoin', 'round');
+    const dot = document.createElementNS(NS, 'circle'); dot.setAttribute('cx', a.x); dot.setAttribute('cy', a.y); dot.setAttribute('r', '6'); dot.setAttribute('fill', col); dot.setAttribute('stroke', '#fff'); dot.setAttribute('stroke-width', '2');
+    svg.append(line, dot);
+  });
+}
+function renderClusterPanel(cl) {
+  let panel = $('#clusterPanel'); if (!panel) { const w = $('#mapWrap'); panel = el('div', { id: 'clusterPanel', hidden: 'hidden' }); const sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.id = 'clusterLines'; w.append(sv, panel); panel.addEventListener('scroll', renderClusterLines); }
+  panel.replaceChildren(); panel.hidden = !cl.size; if (!cl.size) { renderClusterLines(); return; }
+  [...cl.entries()].map(([id, us]) => [state.sections.find(x => x.id === id), us]).filter(p => p[0]).sort((a, b) => clusterAnchor(a[0]).y - clusterAnchor(b[0]).y).forEach(([sx, us]) => {
+    panel.append(el('div', { class: 'cl-card', 'data-sid': sx.id, style: '--c:' + safeColor(sx.color, '#2563eb') },
+      el('button', { class: 'cl-h', title: 'Zum Abschnitt zoomen', onclick: () => map.fitBounds(L.latLngBounds(sx.pts).pad(0.3)) }, el('b', { text: sx.name }), el('span', { text: us.length + ' Einh.' })),
+      ...us.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', 'de')).map(u => el('button', { class: 'cl-u', title: (u.name || 'Einheit') + ' · ' + ustat(u.status).label, style: '--sc:' + safeColor(ustat(u.status).color), onclick: () => openUnitCard(u, can('logi') && !can('units')) },
+        el('img', { src: unitSym(u).url, alt: '' }), el('span', { class: 'cl-n', text: u.name || 'Einheit' }), el('small', { text: fmtStr(u) })))));
+  });
+  renderClusterLines();
+}
+function updateCluster() {
+  const cl = clusterSections(), sig = [...cl.keys()].sort().join('|') + '#' + [...cl.values()].map(u => u.length).join(',');
+  if (sig !== clusterSig) { clusterSig = sig; renderUnitMarkers(); } else renderClusterLines();
+}
+map.on('zoomend moveend', updateCluster); map.on('move', () => { if (clusterSig && clusterSig !== '#') requestAnimationFrame(renderClusterLines); });
 function renderUnitMarkers() {
-  unitLayer.clearLayers();
-  state.units.filter(u => u.lat != null).forEach(u => {
+  unitLayer.clearLayers(); clusterCur = clusterSections(); clusterSig = [...clusterCur.keys()].sort().join('|') + '#' + [...clusterCur.values()].map(u => u.length).join(',');
+  const hidden = new Set(); clusterCur.forEach(us => us.forEach(u => hidden.add(u.id))); renderClusterPanel(clusterCur);
+  state.units.filter(u => u.lat != null && !hidden.has(u.id)).forEach(u => {
     const m = L.marker([u.lat, u.lng], { icon: unitMarkerIcon(u), draggable: true });
     m.bindTooltip(el('span', { text: (u.name || 'Einheit') + ' · ' + fmtStr(u) + ' · ' + ustat(u.status).label + ' · ' + sectionName(u.sectionId) + (unitFlags(u).text ? ' · ' + unitFlags(u).text : '') }));
     m.on('dragend', () => { const ll = m.getLatLng(); unitMovedOnMap(u, ll.lat, ll.lng); });
@@ -6404,7 +6462,7 @@ placeMapActs(); initPlaceSearch(); initialView(); if (isPhone()) { setPanel(fals
 tickClock(); setInterval(tickClock, 1000);
 $('#panelToggle').innerHTML = panelGlyph(!$('#app').classList.contains('collapsed'));
 liveInit();
-window.__lage = { SYNC, TileCache, addUnit, assignUnit, unitMovedOnMap, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
+window.__lage = { renderUnitMarkers, SYNC, TileCache, addUnit, assignUnit, unitMovedOnMap, lageFacts, chemErg, chemSub, renderChem, runtime, pushLive, gaussPlume, effWind, get state() { return state; }, map, setArea, addArea, loadObjects, migrate, undo, redo, commit, get hist() { return hist; } };   // für Tests
 })();
 </script>
 </body>

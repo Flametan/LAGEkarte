@@ -289,6 +289,16 @@ async function seite(b, q, w, h) {
     for (let i = 1; i < g.length; i++) { const gap = g[i].l - g[i - 1].r; assert.ok(parseFloat(g[i].bl) <= -gap / 2 + 0.5 || g[i].bl.endsWith('%'), 'Linie links reicht bis zur Mitte der Lücke: ' + g[i].bl + ' bei Lücke ' + gap); if (i < g.length - 1) assert.ok(parseFloat(g[i].br) <= -gap / 2 + 0.5, 'Linie rechts reicht bis zur Mitte der Lücke: ' + g[i].br); }
     await p.close();
   });
+  await t('Viele Einheiten übereinander: Strich zum Kartenrand und Liste, nur solange der Abschnitt im Bild ist', async () => {
+    const p = await seite(b, '', 1500, 800); await p.evaluate(() => { const L = window.__lage, s = L.state, now = new Date().toISOString();
+      s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [[51.50, 7.40], [51.50, 7.43], [51.53, 7.43], [51.53, 7.40]] }];
+      const U = (id, n, lat, lng) => ({ id, name: n, call: '', sym: null, f: 1, u: 2, h: 5, status: 'einsatz', sectionId: 'A', task: '', note: '', lat, lng, time: now });
+      s.units = [U('1', 'HLF 20', 51.515, 7.415), U('2', 'LF 10', 51.5153, 7.4153), U('3', 'DLK 23', 51.5147, 7.4147), U('4', 'ELW 1', 51.5156, 7.4156)]; L.renderUnitMarkers && L.renderUnitMarkers(); });
+    const at = async (c, z) => { await p.evaluate(([c, z]) => window.__lage.map.setView(c, z, { animate: false }), [c, z]); await p.waitForTimeout(700); return p.evaluate(() => ({ panel: !!document.querySelector('#clusterPanel') && !document.querySelector('#clusterPanel').hidden, cards: document.querySelectorAll('.cl-card').length, units: [...document.querySelectorAll('.cl-u .cl-n')].map(x => x.textContent).sort(), marker: document.querySelectorAll('.leaflet-marker-icon').length, line: !!document.querySelector('#clusterLines path') })); };
+    const far = await at([51.515, 7.415], 12); assert.ok(far.panel && far.cards === 1 && far.units.join() === 'DLK 23,ELW 1,HLF 20,LF 10' && far.line && far.marker === 0, 'weit weg: Liste mit Strich ' + JSON.stringify(far));
+    const near = await at([51.515, 7.415], 18); assert.ok(!near.panel && near.marker === 4, 'nah: einzelne Marker ' + JSON.stringify(near));
+    const away = await at([48.0, 11.0], 12); assert.ok(!away.panel, 'Abschnitt nicht im Bild: keine Liste ' + JSON.stringify(away)); await p.close();
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));
