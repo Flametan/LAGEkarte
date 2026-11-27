@@ -171,6 +171,12 @@ async function seite(b, q, w, h) {
     const pl = await p.evaluate(() => { window.__lage.state.sections[1].pts = [[51.5, 7.4], [51.5, 7.5], [51.45, 7.5]]; const u = window.__lage.addUnit({ name: 'Neu', sectionId: 'ea1', f: 0, u: 1, h: 1 }); return [u.lat, u.lng]; });
     assert.ok(pl[0] > 51.4 && pl[0] < 51.6 && pl[1] > 7.3 && pl[1] < 7.6, 'Einheit liegt im Abschnitt'); await p.close();
   });
+  await t('Adresssuche unter Gebiete: Vorschläge, Anfliegen, Markierung', async () => {
+    const p = await seite(b, ''); await p.route('https://nominatim.openstreetmap.org/**', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify([{ lat: '51.5136', lon: '7.4653', display_name: 'Hansastraße 5, Dortmund, Nordrhein-Westfalen, Deutschland', boundingbox: ['51.5130', '51.5140', '7.4648', '7.4658'] }]) }));
+    await p.evaluate(() => document.querySelector('#tabs [data-tab=gebiet]').click()); await p.fill('#addrQ', 'Hansastraße 5 Dortmund'); await p.waitForSelector('.addr-opt'); await p.click('.addr-opt'); await p.waitForTimeout(2200);
+    const c = await p.evaluate(() => { const m = window.__lage.map.getCenter(); return [m.lat, m.lng, window.__lage.map.getZoom()]; });
+    assert.ok(Math.abs(c[0] - 51.5135) < 0.01 && Math.abs(c[1] - 7.4653) < 0.01 && c[2] >= 16, 'Karte zeigt die Adresse: ' + c); assert.ok(await p.locator('.leaflet-marker-icon').count() >= 1); await p.close();
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));

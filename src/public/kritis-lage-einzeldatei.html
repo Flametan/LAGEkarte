@@ -1578,6 +1578,7 @@ body { background: #f2f3f5; }
 #mapBar { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 1100; display: flex; align-items: center; gap: 8px; padding: 0 14px 0 24px; background: rgba(255,255,255,.96); border-bottom: 1px solid var(--line); box-shadow: 0 1px 5px rgba(0,0,0,.14); pointer-events: auto; }
 #mapBar .mb-t { font-size: 22px; font-weight: 600; color: #263340; margin-right: 6px; }
 #mapBar .sp { flex: 1; }
+.addr-opt { display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: inherit; padding: 8px 6px; font: inherit; cursor: pointer; } .addr-opt:hover { background: rgba(183,28,28,.08); }
 #secPop { position: absolute; top: 56px; right: 14px; z-index: 1200; width: 330px; background: #fff; color: #263340; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.25); padding: 12px; } #secPop[hidden] { display: none; } #secPop .row { margin: 8px 0; } :root[data-theme="dark"] #secPop { background: #17233a; color: var(--ink); } body.vortrag #secPop, body.printing #secPop { display: none; }
 #mapBar .mb { border: 1px solid #cdd4dc; background: #fff; color: #263340; border-radius: 5px; padding: 6px 12px; font-weight: 600; }
 #mapBar .mb:hover { border-color: var(--red); background: #fdecea; }
@@ -1713,7 +1714,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
       <h2>Adresse suchen</h2>
       <form class="row" id="addrForm" autocomplete="off">
         <input type="search" id="addrQ" placeholder="Straße, Hausnummer, Ort">
-        <button class="btn primary" type="submit">Zur Adresse</button>
+        <button class="btn primary" type="submit">Suchen</button>
       </form>
       <div id="addrRes"></div>
       <h2>Gebiet hinzufügen</h2>
@@ -6557,20 +6558,20 @@ function initPlaceSearch() {
   setPlaceMin(st ? st === 'min' : (state.areas.length > 0 || !!savedView()), true);
   $('#placeToggle').addEventListener('click', () => setPlaceMin(!$('#placeSearch').classList.contains('min')));
   $('#placeQ').addEventListener('keydown', ev => { if (ev.key === 'Escape') setPlaceMin(true); });
-  $('#addrForm').addEventListener('submit', async ev => {
-    ev.preventDefault(); const q = $('#addrQ').value.trim(), out = $('#addrRes'); if (!q) return; out.replaceChildren(el('div', { class: 'hint', text: 'Suche läuft…' }));
-    try {
-      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 12000);
-      const r = await fetch(NOMINATIM + '?format=jsonv2&limit=5&countrycodes=de&accept-language=de&addressdetails=0&q=' + encodeURIComponent(q), { signal: ctl.signal }); clearTimeout(to);
-      if (!r.ok) throw new Error('HTTP ' + r.status); const list = await r.json(); out.replaceChildren();
-      if (!list.length) { out.append(el('div', { class: 'hint', text: 'Nichts gefunden. Straße und Ort ausschreiben, zum Beispiel „Hansastraße 5, Dortmund“.' })); return; }
-      const go = x => { const ll = [+x.lat, +x.lon]; if (addrPin) addrPin.remove(); addrPin = L.marker(ll).addTo(map).bindTooltip(x.display_name, { permanent: false }); const b = x.boundingbox.map(Number); map.fitBounds([[b[0], b[2]], [b[1], b[3]]], { maxZoom: 18, padding: [40, 40] }); closeUnitOverview(); closeFue(); setPanel(true); };
-      go(list[0]);
-      out.append(el('div', { class: 'hint', text: list[0].display_name }), el('div', { class: 'row' }, el('button', { class: 'btn small', text: 'Markierung entfernen', onclick: () => { if (addrPin) { addrPin.remove(); addrPin = null; } } }),
-        el('a', { class: 'btn small', target: '_blank', rel: 'noopener', href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(list[0].lat + ',' + list[0].lon), text: 'In Google Maps öffnen' })));
-      list.slice(1).forEach(x => out.append(el('button', { type: 'button', class: 'btn small', style: 'display:block;margin:3px 0;text-align:left', text: x.display_name, onclick: () => go(x) })));
-    } catch (e) { out.replaceChildren(el('div', { class: 'hint', text: 'Suche nicht möglich (' + e.message + '). Ohne Internet gibt es keine Adresssuche.' })); }
-  });
+  { const out = $('#addrRes'), inp = $('#addrQ'); let tm = null, seq = 0, last = [];
+    const fly = x => { const ll = [+x.lat, +x.lon]; if (addrPin) addrPin.remove(); addrPin = L.marker(ll).addTo(map).bindTooltip(x.display_name.split(', ').slice(0, 3).join(', '), { permanent: true, direction: 'top', offset: [0, -30] }).openTooltip();
+      const bb = x.boundingbox.map(Number); closeUnitOverview(); closeFue(); map.invalidateSize(); map.flyToBounds([[bb[0], bb[2]], [bb[1], bb[3]]], { maxZoom: 18, padding: [60, 60], duration: 1.4 });
+      inp.value = x.display_name.split(', ').slice(0, 3).join(', '); out.replaceChildren(el('div', { class: 'hint', text: x.display_name }), el('button', { class: 'btn small', text: 'Markierung entfernen', onclick: () => { if (addrPin) { addrPin.remove(); addrPin = null; } out.replaceChildren(); } })); };
+    const show = list => { last = list; out.replaceChildren(...(list.length ? list.map(x => el('button', { type: 'button', class: 'addr-opt', text: x.display_name, onclick: () => fly(x) })) : [el('div', { class: 'hint', text: 'Nichts gefunden. Straße, Hausnummer und Ort eingeben, zum Beispiel „Hansastraße 5, Dortmund“.' })])); };
+    const find = async q => {
+      const my = ++seq; out.replaceChildren(el('div', { class: 'hint', text: 'Suche läuft…' }));
+      try { const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 12000);
+        const r = await fetch(NOMINATIM + '?format=jsonv2&limit=6&countrycodes=de&accept-language=de&q=' + encodeURIComponent(q), { signal: ctl.signal }); clearTimeout(to);
+        if (!r.ok) throw new Error('HTTP ' + r.status); const list = await r.json(); if (my === seq) show(list);
+      } catch (e) { if (my === seq) out.replaceChildren(el('div', { class: 'hint', text: 'Suche nicht möglich (' + e.message + '). Ohne Internet gibt es keine Adresssuche.' })); } };
+    inp.addEventListener('input', () => { clearTimeout(tm); const q = inp.value.trim(); if (q.length < 4) { out.replaceChildren(); return; } tm = setTimeout(() => find(q), 700); });
+    $('#addrForm').addEventListener('submit', async ev => { ev.preventDefault(); clearTimeout(tm); const q = inp.value.trim(); if (!q) return; await find(q); if (last.length) fly(last[0]); });
+  }
   $('#placeSearch').addEventListener('submit', async ev => {
     ev.preventDefault(); const q = $('#placeQ').value.trim(); if (!q) return;
     box.replaceChildren(el('div', { class: 'none', text: 'Suche läuft…' }));
