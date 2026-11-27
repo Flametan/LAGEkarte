@@ -289,15 +289,18 @@ async function seite(b, q, w, h) {
     for (let i = 1; i < g.length; i++) { const gap = g[i].l - g[i - 1].r; assert.ok(parseFloat(g[i].bl) <= -gap / 2 + 0.5 || g[i].bl.endsWith('%'), 'Linie links reicht bis zur Mitte der Lücke: ' + g[i].bl + ' bei Lücke ' + gap); if (i < g.length - 1) assert.ok(parseFloat(g[i].br) <= -gap / 2 + 0.5, 'Linie rechts reicht bis zur Mitte der Lücke: ' + g[i].br); }
     await p.close();
   });
-  await t('Viele Einheiten übereinander: Strich zum Kartenrand und Liste, nur solange der Abschnitt im Bild ist', async () => {
+  await t('Überlappende Zeichen: Fenster links und rechts je nach Abschnitt, auch verletzte Personen, Herausziehen, nur solange der Abschnitt im Bild ist', async () => {
     const p = await seite(b, '', 1500, 800); await p.evaluate(() => { const L = window.__lage, s = L.state, now = new Date().toISOString();
-      s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [[51.50, 7.40], [51.50, 7.43], [51.53, 7.43], [51.53, 7.40]] }];
-      const U = (id, n, lat, lng) => ({ id, name: n, call: '', sym: null, f: 1, u: 2, h: 5, status: 'einsatz', sectionId: 'A', task: '', note: '', lat, lng, time: now });
-      s.units = [U('1', 'HLF 20', 51.515, 7.415), U('2', 'LF 10', 51.5153, 7.4153), U('3', 'DLK 23', 51.5147, 7.4147), U('4', 'ELW 1', 51.5156, 7.4156)]; L.renderUnitMarkers && L.renderUnitMarkers(); });
-    const at = async (c, z) => { await p.evaluate(([c, z]) => window.__lage.map.setView(c, z, { animate: false }), [c, z]); await p.waitForTimeout(700); return p.evaluate(() => ({ panel: !!document.querySelector('#clusterPanel') && !document.querySelector('#clusterPanel').hidden, cards: document.querySelectorAll('.cl-card').length, units: [...document.querySelectorAll('.cl-u .cl-n')].map(x => x.textContent).sort(), marker: document.querySelectorAll('.leaflet-marker-icon').length, line: !!document.querySelector('#clusterLines path') })); };
-    const far = await at([51.515, 7.415], 12); assert.ok(far.panel && far.cards === 1 && far.units.join() === 'DLK 23,ELW 1,HLF 20,LF 10' && far.line && far.marker === 0, 'weit weg: Liste mit Strich ' + JSON.stringify(far));
-    const near = await at([51.515, 7.415], 18); assert.ok(!near.panel && near.marker === 4, 'nah: einzelne Marker ' + JSON.stringify(near));
-    const away = await at([48.0, 11.0], 12); assert.ok(!away.panel, 'Abschnitt nicht im Bild: keine Liste ' + JSON.stringify(away)); await p.close();
+      s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'EA West', color: '#2563eb', pts: [[51.50, 7.36], [51.50, 7.40], [51.53, 7.40], [51.53, 7.36]] }, { id: 'B', kind: 'poly', typ: 'ea', name: 'EA Ost', color: '#16a34a', pts: [[51.50, 7.41], [51.50, 7.45], [51.53, 7.45], [51.53, 7.41]] }];
+      const U = (id, n, sec, lat, lng) => ({ id, name: n, call: '', sym: null, f: 1, u: 2, h: 5, status: 'einsatz', sectionId: sec, task: '', note: '', lat, lng, time: now });
+      s.units = [U('1', 'HLF 20', 'A', 51.515, 7.38), U('2', 'LF 10', 'A', 51.5151, 7.3801), U('3', 'ELW 1', 'B', 51.515, 7.43), U('4', 'RTW 3', 'B', 51.5151, 7.4301), U('5', 'DLK', 'B', 51.52, 7.44)];
+      s.casualties = [{ id: 'c1', cat: 'sk1', n: 3, note: '', time: now, lat: 51.51502, lng: 7.38001 }]; L.map.setView([51.515, 7.405], 12, { animate: false }); L.renderUnitMarkers(); });
+    await p.waitForTimeout(800); const st = () => p.evaluate(() => ({ l: [...document.querySelectorAll('#clusterPanelL .cl-card')].map(c => c.dataset.sid), r: [...document.querySelectorAll('#clusterPanelR .cl-card')].map(c => c.dataset.sid), rows: [...document.querySelectorAll('.cl-u .cl-n')].map(x => x.textContent).sort(), marker: document.querySelectorAll('.leaflet-marker-icon').length }));
+    const a = await st(); assert.deepStrictEqual(a.l, ['A'], 'West links: ' + JSON.stringify(a)); assert.deepStrictEqual(a.r, ['B'], 'Ost rechts'); assert.ok(a.rows.includes('SK I (rot), akut lebensbedrohlich') && a.rows.includes('RTW 3') && a.marker === 0, 'Einheiten und verletzte Personen im Fenster: ' + JSON.stringify(a));
+    const row = await p.locator('#clusterPanelL .cl-u').first().boundingBox(); await p.mouse.move(row.x + 20, row.y + 8); await p.mouse.down(); await p.mouse.move(row.x + 80, row.y + 60, { steps: 4 }); await p.mouse.move(1100, 650, { steps: 6 }); await p.mouse.up(); await p.waitForTimeout(700);
+    const u1 = await p.evaluate(() => window.__lage.state.units.find(u => u.id === '1')); assert.ok(Math.abs(u1.lat - 51.515) > 0.005 || Math.abs(u1.lng - 7.38) > 0.005, 'Einheit wurde herausgezogen: ' + JSON.stringify([u1.lat, u1.lng]));
+    await p.evaluate(() => window.__lage.map.setView([48.0, 11.0], 12, { animate: false })); await p.waitForTimeout(700); const away = await st(); assert.ok(away.l.length === 0 && away.r.length === 0, 'Abschnitte nicht im Bild: keine Fenster ' + JSON.stringify(away));
+    await p.evaluate(() => window.__lage.map.setView([51.515, 7.38], 18, { animate: false })); await p.waitForTimeout(700); const near = await st(); assert.ok(near.l.length === 0 && near.marker >= 3, 'weit hineingezoomt: einzelne Marker ' + JSON.stringify(near)); await p.close();
   });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
