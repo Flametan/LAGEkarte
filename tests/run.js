@@ -154,6 +154,20 @@ async function seite(b, q, w, h) {
     await p.click('.wcol:has(.vt) button:has-text("Stand festhalten")'); await p.waitForTimeout(300);
     assert.strictEqual(await p.evaluate(() => window.__lage.state.kraefte.rows[0].sk1), 4); await p.close();
   });
+  await t('Führungsstruktur: Funkgruppe auf der Linie, Ziehen, Einheiten ausblenden; Navigation', async () => {
+    const p = await seite(b, '', 1600, 950); await p.evaluate(() => { const s = window.__lage.state, now = new Date().toISOString();
+      s.sections = [{ id: 'ea1', kind: 'poly', typ: 'ea', name: 'EA Nord', color: '#2563eb', pts: [] }, { id: 'ea2', kind: 'poly', typ: 'ea', name: 'EA Süd', color: '#16a34a', pts: [] }];
+      s.units = [{ id: 'a', name: 'LF 1', call: '', sym: null, f: 1, u: 3, h: 9, status: 'einsatz', sectionId: 'ea1', task: '', note: '', lat: null, lng: null, time: now }]; });
+    const nav = await p.$$eval('#tabs button', x => x.filter(e => e.offsetParent).map(e => e.textContent.trim()));
+    assert.deepStrictEqual(nav.slice(0, 4), ['Übersicht', 'Lagekarte', 'Kräfte', 'Führungsstruktur']); assert.ok(!nav.includes('Probleme') && !nav.includes('Lagestände') && !nav.includes('Einheiten (Liste)'));
+    await p.keyboard.press('f'); await p.waitForTimeout(500);
+    await p.click('.fsec[data-sid="ea1"]'.replace('.fsec[data-sid="ea1"]', '.fea:first-child .flab')); await p.fill('.dlg input', 'Kanal 12'); await p.keyboard.press('Enter'); await p.waitForTimeout(500);
+    assert.strictEqual(await p.evaluate(() => window.__lage.state.sections[0].radio), 'Kanal 12');
+    await p.click('.fsec[data-sid="ea1"] .fold'); await p.waitForTimeout(200); assert.strictEqual(await p.locator('.fsec[data-sid="ea1"] .fu').count(), 0);
+    const g = await p.locator('.ftag[data-grip="ea2"]').boundingBox(), r = await p.locator('.fsec[data-sid="ea1"]').boundingBox();
+    await p.mouse.move(g.x + 8, g.y + 8); await p.mouse.down(); await p.mouse.move(g.x - 30, g.y, { steps: 3 }); await p.mouse.move(r.x + 6, r.y + 60, { steps: 8 }); await p.mouse.up(); await p.waitForTimeout(400);
+    assert.deepStrictEqual(await p.evaluate(() => window.__lage.state.sections.map(s => s.name)), ['EA Süd', 'EA Nord']); await p.close();
+  });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
     await p.click('#btnMore'); await p.waitForTimeout(450); await p.click('#btnLook'); await p.waitForTimeout(200); assert.ok(await p.evaluate(() => document.body.classList.contains('wandlook')));

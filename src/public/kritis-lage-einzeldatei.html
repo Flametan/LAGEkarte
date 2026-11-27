@@ -1344,7 +1344,19 @@ div.fbox { cursor: default; }
 .fbox .funk { display: inline-block; margin-top: 3px; font-size: 10.5px; background: #e0e7ff; color: #1e3a8a; border-radius: 3px; padding: 0 5px; }
 .fstab { border: 2px solid #1e40af; border-radius: 8px; background: rgba(30, 64, 175, .04); padding: 8px 10px; max-width: 520px; }
 .fgrid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.feas { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; align-items: flex-start; }
+.feas { display: flex; flex-wrap: nowrap; justify-content: center; gap: 14px; align-items: flex-start; }
+.fea { position: relative; display: flex; flex-direction: column; align-items: center; }
+.fea::before { content: ''; position: absolute; top: 0; left: -7px; right: -7px; border-top: 2px solid #94a3b8; }
+.fea:first-child::before { left: 50%; } .fea:last-child::before { right: 50%; } .fea:only-child::before { display: none; }
+.fline { position: relative; width: 2px; height: 44px; background: #94a3b8; flex: none; }
+.fuc .fline { height: 34px; margin: 0 auto; } .fuc { display: flex; flex-direction: column; align-items: stretch; }
+.flab { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); white-space: nowrap; font: inherit; font-size: 11px; font-weight: 700; background: #e0e7ff; color: #1e3a8a; border: 1px solid #a5b4fc; border-radius: 10px; padding: 1px 8px; cursor: pointer; }
+.flab.empty { background: var(--panel, #fff); color: var(--muted); border: 1px dashed #94a3b8; font-weight: 500; } .flab:hover { border-color: var(--red); }
+span.flab { cursor: default; } span.flab.empty { display: none; }
+.ftag.grip { cursor: grab; touch-action: none; user-select: none; } .fsec.fsrc { opacity: .35; }
+.fghost { position: fixed; z-index: 3000; pointer-events: none; opacity: .85; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+.fsec.fdrop.fi { outline: 3px dashed var(--red); } .fsec.fdrop.fb { box-shadow: -6px 0 0 var(--red); } .fsec.fdrop.fa { box-shadow: 6px 0 0 var(--red); }
+.fsum { display: flex; align-items: center; gap: 8px; } .fsum .fold { margin-left: auto; padding: 0 8px; }
 .fsec { border: 1px solid var(--line); border-left: 6px solid var(--c); border-radius: 6px; background: var(--panel, #fff); padding: 8px; min-width: 210px; max-width: 280px; }
 .fsec.uea { margin-top: 8px; background: rgba(100, 116, 139, .07); }
 .ftag { display: inline-block; font-size: 10.5px; font-weight: 700; color: #fff; background: var(--c); border-radius: 3px; padding: 0 6px; margin-bottom: 4px; }
@@ -1561,6 +1573,7 @@ body { background: #f2f3f5; }
 #mapBar { position: absolute; top: 0; left: 0; right: 0; height: 52px; z-index: 1100; display: flex; align-items: center; gap: 8px; padding: 0 14px 0 24px; background: rgba(255,255,255,.96); border-bottom: 1px solid var(--line); box-shadow: 0 1px 5px rgba(0,0,0,.14); pointer-events: auto; }
 #mapBar .mb-t { font-size: 22px; font-weight: 600; color: #263340; margin-right: 6px; }
 #mapBar .sp { flex: 1; }
+#secPop { position: absolute; top: 56px; right: 14px; z-index: 1200; width: 330px; background: #fff; color: #263340; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.25); padding: 12px; } #secPop[hidden] { display: none; } #secPop .row { margin: 8px 0; } :root[data-theme="dark"] #secPop { background: #17233a; color: var(--ink); } body.vortrag #secPop, body.printing #secPop { display: none; }
 #mapBar .mb { border: 1px solid #cdd4dc; background: #fff; color: #263340; border-radius: 5px; padding: 6px 12px; font-weight: 600; }
 #mapBar .mb:hover { border-color: var(--red); background: #fdecea; }
 :root[data-theme="dark"] #mapBar { background: rgba(17,26,43,.96); } :root[data-theme="dark"] #mapBar .mb-t { color: var(--ink); } :root[data-theme="dark"] #mapBar .mb { background: #17233a; color: var(--ink); border-color: #3a4a63; }
@@ -1607,6 +1620,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
 #tabs [data-tab='lage']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 5l6-2 6 2 6-2v16l-6 2-6-2-6 2zm6-.5v13l6 2v-13z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M3 5l6-2 6 2 6-2v16l-6 2-6-2-6 2zm6-.5v13l6 2v-13z'/%3E%3C/svg%3E"); }
 #tabs [data-tab='staende']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 5h-2v6l5 3 1-1.700-4-2.300z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 5h-2v6l5 3 1-1.700-4-2.300z'/%3E%3C/svg%3E"); }
 #tabs [data-tab='daten']::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5 3h11l5 5v13H5zm3 0v6h7V3zm1 11v7h6v-7z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5 3h11l5 5v13H5zm3 0v6h7V3zm1 11v7h6v-7z'/%3E%3C/svg%3E"); }
+.navhid { display: none !important; }
 </style>
 </head>
 <body>
@@ -1649,22 +1663,22 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
     <nav id="tabs" role="tablist" aria-label="Bereiche">
       <button role="tab" data-tab="einsatz" aria-selected="true"><span>Übersicht</span></button>
       <button type="button" class="nav-act" data-act="map" title="Nur die Karte zeigen, Seitenleiste einklappen"><span>Lagekarte</span></button>
+      <button type="button" class="nav-act" data-act="wand" title="Stabswand mit Kräfteübersicht (Taste U)"><span>Kräfte</span></button>
+      <button type="button" class="nav-act" data-act="fue" title="Führungsstruktur und Kommunikationsplan (Taste F)"><span>Führungsstruktur</span></button>
       <button role="tab" data-tab="tagebuch" aria-selected="false"><span>Einsatztagebuch</span></button>
       <button role="tab" data-tab="meldungen" aria-selected="false"><span>Meldungen</span></button>
-      <button type="button" class="nav-act" data-act="wand" title="Stabswand mit Kräfteübersicht (Taste U)"><span>Kräfte</span></button>
-      <button type="button" class="nav-act" data-act="fue" title="Führungsstruktur und Kommunikationsplan (Taste F)"><span>Stab &amp; Kontakte</span></button>
       <div class="nav-grp">Weitere Bereiche</div>
       <button role="tab" data-tab="gebiet" aria-selected="false"><span>Gebiete</span></button>
       <button role="tab" data-tab="ebenen" aria-selected="false"><span>Ebenen</span></button>
       <button role="tab" data-tab="objekte" aria-selected="false"><span>Objekte</span></button>
-      <button role="tab" data-tab="kraefte" aria-selected="false"><span>Einheiten (Liste)</span></button>
-      <button role="tab" data-tab="probleme" aria-selected="false"><span>Probleme</span></button>
+      <button role="tab" data-tab="kraefte" class="navhid" aria-selected="false"><span>Einheiten (Liste)</span></button>
+      <button role="tab" data-tab="probleme" class="navhid" aria-selected="false"><span>Probleme</span></button>
       <button role="tab" data-tab="zahlen" aria-selected="false"><span>Zahlen</span></button>
       <button role="tab" data-tab="bhp" aria-selected="false" title="Behandlungsplatz: Sichtungskategorien, Transport, Kliniken"><span>Behandlungsplatz</span></button>
       <button role="tab" data-tab="keule" aria-selected="false" title="Wetter, Wind und Keule"><span>Wetter und Keule</span></button>
       <button role="tab" data-tab="chem" aria-selected="false" title="Gefahrstoffe: Datenblatt, Absperrzonen, Betroffene, Keule"><span>Gefahrstoff</span></button>
       <button role="tab" data-tab="lage" aria-selected="false"><span>Lage</span></button>
-      <button role="tab" data-tab="staende" aria-selected="false"><span>Lagestände</span></button>
+      <button role="tab" data-tab="staende" class="navhid" aria-selected="false"><span>Lagestände</span></button>
       <button role="tab" data-tab="daten" aria-selected="false"><span>Daten</span></button>
       <div id="navSaved" class="nav-saved">Noch nicht gespeichert</div>
     </nav>
@@ -1679,6 +1693,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
         <button class="btn" id="exReal">Zurück auf Echtzeit</button></div>
       <div class="hint" id="exInfo"></div>
       <div class="notice">Mit Übungsuhr erhalten alle neuen Einträge, Meldungen und Statuswechsel die Zeit der Übung, nicht die der Uhr im Laptop. Bereits gespeicherte Zeiten bleiben unverändert.</div>
+      <div hidden>
       <h2>Lagebesprechung</h2>
       <div class="row"><label for="mtInt">Takt</label><input type="number" id="mtInt" min="1" step="1" style="max-width:80px"><span>Minuten</span><span class="hint">frei einstellbar, jederzeit änderbar</span></div>
       <div class="hint" id="mtInfo"></div>
@@ -1686,6 +1701,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
       <h2 class="editonly">Sachgebiete und Rollen</h2>
       <div id="roleEdit" class="editonly"></div>
       <div class="row editonly"><button class="btn small" id="roleAdd">Rolle hinzufügen</button></div>
+      </div>
     </section>
 
     <section class="tabpane" id="tab-gebiet">
@@ -1921,16 +1937,6 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
       <div class="hint" id="symHint">Zeichen wählen, dann auf die Karte klicken. Esc bricht ab.</div>
       <div id="symGrid"></div>
 
-      <h2>Einsatzabschnitte und Linien</h2>
-      <div class="row">
-        <input type="text" id="secName" placeholder="Bezeichnung, z. B. Abschnitt Nord">
-        <input type="color" id="secColor" value="#e11d48" title="Farbe">
-      </div>
-      <div class="row">
-        <button class="btn" id="btnSecPoly">Fläche zeichnen</button>
-        <button class="btn" id="btnSecLine">Linie zeichnen</button>
-      </div>
-
       <h2>Abhängigkeiten</h2>
       <div class="hint">Anlegen im Objekt-Popup: „Versorgt…“ und danach das abhängige Objekt anklicken. Fällt ein Objekt aus, werden die abhängigen Objekte markiert. Die Verknüpfungen sind manuell erfasst, nicht berechnet.</div>
       <div id="depList"></div>
@@ -2092,13 +2098,16 @@ SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
   </aside>
 
   <div id="mapWrap">
-    <div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button><button type="button" class="mb" data-mb="units" title="Einheiten und Stabswand (U)">Kräfte</button><button type="button" class="mb" data-mb="fue" title="Führungsstruktur (F)">Stab</button><button type="button" class="mb" data-mb="print" title="Karte drucken oder als PDF speichern">Drucken</button></div>
+    <div id="secPop" hidden role="dialog" aria-label="Einsatzabschnitt zeichnen"><b>Einsatzabschnitt auf der Karte</b>
+      <div class="row"><input type="text" id="secName" placeholder="Bezeichnung, z. B. Abschnitt Nord"><input type="color" id="secColor" value="#e11d48" title="Farbe"></div>
+      <div class="row"><button class="btn" id="btnSecPoly">Fläche zeichnen</button><button class="btn" id="btnSecLine">Linie zeichnen</button></div>
+      <div class="hint">Zeichnen, dann Doppelklick zum Beenden. Abschnitte ohne Karte legt man in der Führungsstruktur oder auf der Stabswand an.</div></div><div id="mapBar"><span class="mb-t">Lagekarte</span><span class="sp"></span><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button><button type="button" class="mb" data-mb="units" title="Einheiten und Stabswand (U)">Kräfte</button><button type="button" class="mb" data-mb="fue" title="Führungsstruktur (F)">Stab</button><button type="button" class="mb" data-mb="sec" title="Einsatzabschnitt oder Linie auf der Karte zeichnen">Abschnitt</button><button type="button" class="mb" data-mb="print" title="Karte drucken oder als PDF speichern">Drucken</button></div>
     <div id="map"></div>
     <form id="placeSearch" role="search" autocomplete="off"><button type="button" id="placeToggle" aria-label="Ortssuche ein- oder ausklappen" aria-expanded="true" title="Ortssuche ein- oder ausklappen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 21 21"/></svg></button><input type="search" id="placeQ" placeholder="Ort suchen und hinzoomen" aria-label="Ort suchen"><button type="submit" aria-label="Suchen">Suchen</button><div id="placeRes" role="listbox"></div></form>
     <div id="editBar" role="toolbar" aria-label="Eckpunkte bearbeiten"><span id="editTxt">Eckpunkte bearbeiten</span><button id="editOk">Übernehmen (Enter)</button><button id="editCancel">Verwerfen (Esc)</button></div>
     <section id="chemBand" aria-label="Gefahrstoff" hidden></section>
     <section id="fueOv" aria-label="Führungsstruktur" hidden>
-      <div class="fuehd"><h2>Führungsstruktur nach FwDV 100</h2><div class="ovtools"><button class="btn primary" id="fueAddEA">+ EA</button><button class="btn" id="fueClose">Schließen</button></div></div>
+      <div class="fuehd"><h2>Führungsstruktur nach FwDV 100</h2><div class="ovtools"><button class="btn primary" id="fueAddEA">+ EA</button><button class="btn" id="fueFold" title="Einheiten in allen Abschnitten aus- oder einblenden">Einheiten ausblenden</button><button class="btn" id="fueClose">Schließen</button></div></div>
       <div id="fueBody"></div>
       <div id="fueFunk"></div>
     </section>
@@ -5819,18 +5828,55 @@ function fueUnit(u) { const st = ustat(u.status); return el('div', { class: 'fu'
 function fueSecBox(sx, level) {
   const ch = state.sections.filter(x => x.parentId === sx.id && x.kind !== 'line'), us = state.units.filter(u => u.sectionId === sx.id), vw = ro('sections');
   const tot = us.reduce((a, u) => a + uTotal(u), 0);
-  const box = el('div', { class: 'fsec' + (level ? ' uea' : ''), style: '--c:' + safeColor(sx.color, '#2563eb') },
-    el('div', { class: 'ftag', text: level ? 'UEA' : 'EA' }),
-    fBox({ title: sx.name, sub: 'Leiter' + (sx.deputy ? ', Stv.: ' + sx.deputy : ''), name: sx.leader, call: sx.radio, color: sx.color, dom: 'sections', sym: level ? 'tz/Führungsstellen/UEAL' : 'tz/Führungsstellen/EAL', onclick: () => fueEditSection(sx) }),
+  const box = el('div', { class: 'fsec' + (level ? ' uea' : ''), 'data-sid': sx.id, style: '--c:' + safeColor(sx.color, '#2563eb') },
+    el('div', { class: 'ftag' + (vw ? '' : ' grip'), 'data-grip': vw ? null : sx.id, title: vw ? null : 'Ziehen: verschieben oder unter einen anderen EA hängen', text: (vw ? '' : '⠿ ') + (level ? 'UEA' : 'EA') }),
+    fBox({ title: sx.name, sub: 'Leiter' + (sx.deputy ? ', Stv.: ' + sx.deputy : ''), name: sx.leader, color: sx.color, dom: 'sections', sym: level ? 'tz/Führungsstellen/UEAL' : 'tz/Führungsstellen/EAL', onclick: () => fueEditSection(sx) }),
     sx.task ? el('div', { class: 'ftask', text: sx.task }) : null,
-    el('div', { class: 'fsum', text: us.length + ' Einheiten, Stärke ' + tot }),
-    ...us.map(fueUnit),
+    el('div', { class: 'fsum' }, el('span', { text: us.length + ' Einheiten, Stärke ' + tot }), us.length ? el('button', { class: 'btn small fold', text: sx.hideU ? 'einblenden' : 'ausblenden', title: 'Einheiten dieses Abschnitts ' + (sx.hideU ? 'einblenden' : 'ausblenden'), onclick: () => { sx.hideU = !sx.hideU; renderFue(); save('Führungsstruktur: Einheiten ' + (sx.hideU ? 'ausgeblendet' : 'eingeblendet')); } }) : null),
+    ...(sx.hideU ? [] : us.map(fueUnit)),
     vw ? null : el('div', { class: 'fact' }, level ? null : el('button', { class: 'btn small', text: '+ UEA', onclick: () => fueAddSection(sx) }), el('button', { class: 'btn small', text: '+ Einheit', onclick: () => addUnitDialog({ sectionId: sx.id }) }), el('button', { class: 'btn small danger', text: 'Entfernen', onclick: () => fueRemoveSection(sx) })),
-    ch.length ? el('div', { class: 'fuea' }, ...ch.map(c => fueSecBox(c, 1))) : null);
+    ch.length ? el('div', { class: 'fuea' }, ...ch.map(c => el('div', { class: 'fuc' }, fueLine(c), fueSecBox(c, 1)))) : null);
   return box;
 }
+
+function fueLine(sx) {
+  const vw = ro('sections'), t = sx.radio || '';
+  return el('div', { class: 'fline' }, el(vw ? 'span' : 'button', { class: 'flab' + (t ? '' : ' empty'), title: vw ? null : 'Funkgruppe oder Kanal für diese Verbindung eintragen', text: t || (vw ? '' : '+ Funk'),
+    onclick: vw ? null : async () => { const v = await askText('Funkgruppe auf der Verbindung zu ' + sx.name, sx.radio || ''); if (v == null) return; sx.radio = v.trim(); renderFue(); save('Funkgruppe: ' + sx.name); } }));
+}
+function fueDropApply(id, tid, mode) {
+  const d = state.sections.find(x => x.id === id), t = state.sections.find(x => x.id === tid); if (!d || !t || d === t) return false;
+  const hasKids = state.sections.some(x => x.parentId === d.id);
+  if (mode === 'into') { if (t.parentId || hasKids) return false; d.parentId = t.id; }
+  else { if (t.parentId && hasKids) return false; d.parentId = t.parentId || null; state.sections = state.sections.filter(x => x !== d); const i = state.sections.indexOf(t); state.sections.splice(mode === 'after' ? i + 1 : i, 0, d); }
+  return true;
+}
+function fueDragInit() {
+  const body = $('#fueBody'); if (!body || body.dataset.dnd) return; body.dataset.dnd = '1';
+  body.addEventListener('pointerdown', e => {
+    const g = e.target.closest('[data-grip]'); if (!g || e.button > 0) return; e.preventDefault();
+    const id = g.dataset.grip, src = body.querySelector('.fsec[data-sid="' + id + '"]'); let ghost = null, tgt = null, mode = null; const x0 = e.clientX, y0 = e.clientY;
+    const clear = () => body.querySelectorAll('.fdrop').forEach(n => n.classList.remove('fdrop', 'fb', 'fa', 'fi'));
+    const mv = ev => {
+      if (!ghost) { if (Math.hypot(ev.clientX - x0, ev.clientY - y0) < 6) return; ghost = src.cloneNode(true); ghost.classList.add('fghost'); ghost.style.width = src.offsetWidth + 'px'; document.body.append(ghost); src.classList.add('fsrc'); }
+      ghost.style.left = ev.clientX - 20 + 'px'; ghost.style.top = ev.clientY - 14 + 'px'; clear(); tgt = null; mode = null;
+      ghost.style.display = 'none'; const hit = document.elementFromPoint(ev.clientX, ev.clientY); ghost.style.display = '';
+      const f = hit && hit.closest('.fsec'); if (!f || !body.contains(f) || f === src || src.contains(f)) return;
+      const r = f.getBoundingClientRect(), t = state.sections.find(x => x.id === f.dataset.sid), dd = state.sections.find(x => x.id === id), kids = state.sections.some(x => x.parentId === id);
+      if (!t.parentId) { const rx = (ev.clientX - r.left) / r.width; mode = rx < .22 ? 'before' : rx > .78 ? 'after' : 'into'; if (mode === 'into' && kids) mode = rx < .5 ? 'before' : 'after'; }
+      else { if (kids) return; mode = (ev.clientY - r.top) < r.height / 2 ? 'before' : 'after'; }
+      tgt = t.id; f.classList.add('fdrop', mode === 'before' ? 'fb' : mode === 'after' ? 'fa' : 'fi');
+    };
+    const up = () => {
+      document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
+      if (ghost) { ghost.remove(); src.classList.remove('fsrc'); clear(); if (tgt && fueDropApply(id, tgt, mode)) { const n = state.sections.find(x => x.id === id).name; addJournal('Führungsstruktur geändert: ' + n + (mode === 'into' ? ' als UEA unter ' + sectionName(tgt) : ' verschoben'), true); renderSections(); renderUnits(); renderAbschnitte(); renderFue(); save('Führungsstruktur: ' + n + ' verschoben'); } }
+    };
+    document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
+  });
+  $('#fueFold').onclick = () => { const secs = state.sections.filter(x => x.kind !== 'line' && state.units.some(u => u.sectionId === x.id)), allH = secs.length && secs.every(x => x.hideU); secs.forEach(x => { x.hideU = !allH; }); renderFue(); save('Führungsstruktur: Einheiten ' + (allH ? 'eingeblendet' : 'ausgeblendet')); };
+}
 function renderFue() {
-  const ov = $('#fueOv'); if (!ov || ov.hidden) return; const body = $('#fueBody'), vw = ro('sections'), vwFb = ro('fb'); $('#fueAddEA').hidden = vw;
+  const ov = $('#fueOv'); if (!ov || ov.hidden) return; fueDragInit(); const body = $('#fueBody'), vw = ro('sections'), vwFb = ro('fb'); $('#fueAddEA').hidden = vw; { const sc = state.sections.filter(x => x.kind !== 'line' && state.units.some(u => u.sectionId === x.id)); $('#fueFold').textContent = sc.length && sc.every(x => x.hideU) ? 'Einheiten einblenden' : 'Einheiten ausblenden'; }
   const act = document.activeElement; if (act && body.contains(act) && /^(INPUT|TEXTAREA|SELECT)$/.test(act.tagName)) return;
   body.replaceChildren();
   const roles = state.roles.filter(r => r.id !== 'SL'), sl = state.roles.find(r => r.id === 'SL');
@@ -5856,7 +5902,7 @@ function renderFue() {
       el('div', { class: 'fr' }, fBox({ title: 'Leitstelle', sub: 'Verbindung zur Leitstelle', name: ls.name, call: ls.call, color: '#475569', sym: 'tz/Einrichtungen/Leitstelle', onclick: () => fueEditPerson('LS', 'Leitstelle') }))),
     el('div', { class: 'fv' }),
     el('div', { class: 'fhd', text: 'Einsatzabschnitte (EA) und Untereinsatzabschnitte (UEA)' }),
-    el('div', { class: 'feas' }, ...roots.map(r => el('div', { class: 'fea' }, fueSecBox(r, 0))),
+    el('div', { class: 'feas' }, ...roots.map(r => el('div', { class: 'fea' }, fueLine(r), fueSecBox(r, 0))),
       free.length ? el('div', { class: 'fea' }, el('div', { class: 'fsec', style: '--c:#94a3b8' }, el('div', { class: 'ftag', text: 'nicht zugeteilt' }), ...free.map(fueUnit))) : null,
       !roots.length && !vw ? el('div', { class: 'hint', text: 'Noch kein Einsatzabschnitt. Mit „+ EA“ anlegen.' }) : null)));
   renderFunk(); if (vw) lockViewer(body);
@@ -6079,7 +6125,7 @@ function showShortcuts() {
     el('div', { class: 'row' }, el('button', { class: 'btn', text: 'Einweisung starten', onclick: () => { document.querySelectorAll('.dlg').forEach(d => d.remove()); setTimeout(runTour, 450); } })));
 }
 function goTab(name) {
-  const b = document.querySelector('#tabs [data-tab="' + name + '"]'); if (!b || b.offsetParent === null) { say('Der Reiter gehört nicht zu Ihrer Funktion.', 2500); return; }
+  const b = document.querySelector('#tabs [data-tab="' + name + '"]'); if (!b || (b.offsetParent === null && !b.classList.contains('navhid'))) { say('Der Reiter gehört nicht zu Ihrer Funktion.', 2500); return; }
   setPanel(true); openTab(name);
 }
 document.addEventListener('keydown', e => {
@@ -6349,7 +6395,7 @@ function initNavActs() {
     else if (a === 'fue') { if (!$('#fueOv').hidden) closeFue(); else openFue(); }
     syncNav();
   }));
-  document.querySelectorAll('#mapBar [data-mb]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mb; if (k === 'poi') $('#btnAddPoi').click(); else if (k === 'units') $('#btnUnits').click(); else if (k === 'fue') $('#btnFue').click(); else if (k === 'print') $('#btnPrint').click(); syncNav(); }));
+  document.querySelectorAll('#mapBar [data-mb]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mb; if (k === 'poi') $('#btnAddPoi').click(); else if (k === 'units') $('#btnUnits').click(); else if (k === 'fue') $('#btnFue').click(); else if (k === 'sec') { const p = $('#secPop'); p.hidden = !p.hidden; if (!p.hidden) $('#secName').focus(); } else if (k === 'print') $('#btnPrint').click(); syncNav(); }));
   syncNav();
 }
 function initLook() {
@@ -6615,8 +6661,8 @@ $('#btnPoly').onclick = e => startDraw('polygon', 'area', e.currentTarget);
 $('#btnRect').onclick = e => startDraw('rectangle', 'area', e.currentTarget);
 $('#btnCircle').onclick = startCircleMode;
 $('#btnLoad').onclick = () => { Object.keys(runtime.sector).forEach(k => { if (runtime.sector[k].s === 'error') queryAreas().forEach(a => LAYERS.filter(l => l.sector === k).forEach(l => { if (state.loaded[a.id]) delete state.loaded[a.id][l.id]; })); }); loadObjects(); };
-$('#btnSecPoly').onclick = e => startDraw('polygon', 'section', e.currentTarget);
-$('#btnSecLine').onclick = e => startDraw('polyline', 'section', e.currentTarget);
+$('#btnSecPoly').onclick = e => { $('#secPop').hidden = true; startDraw('polygon', 'section', e.currentTarget); };
+$('#btnSecLine').onclick = e => { $('#secPop').hidden = true; startDraw('polyline', 'section', e.currentTarget); };
 $('#btnJ').onclick = () => { const t = $('#jText').value.trim(); if (t) { addJournal(t); $('#jText').value = ''; } };
 $('#jBy').addEventListener('change', e => { state.author = e.target.value; persist(); }); $('#jFlt').addEventListener('input', renderJournal); $('#jAuto').addEventListener('change', renderJournal);
 $('#jText').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnJ').click(); });
