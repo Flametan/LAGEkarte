@@ -921,7 +921,7 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
 .ovcol .ovbody { padding: 8px; display: flex; flex-direction: column; gap: 8px; }
 .ovcol .ovunit:not(.wt) { margin: 0; border: 1px solid var(--line); border-left: 5px solid var(--c); border-radius: 8px; background: var(--panel, #fff); box-shadow: 0 1px 2px rgba(15, 23, 42, .06); padding: 8px 10px; transition: box-shadow .15s, border-color .15s; }
 .ovcol .ovunit:not(.wt):hover { box-shadow: 0 3px 10px rgba(15, 23, 42, .15); }
-.ovcol .ovunit:not(.wt) .st { background: color-mix(in srgb, var(--c) 12%, transparent); border-radius: 14px; padding: 2px 4px 2px 8px; }
+.ovcol .ovunit:not(.wt) .st { background: var(--cs, rgba(100, 116, 139, .12)); border-radius: 14px; padding: 2px 4px 2px 8px; }
 .ovcol .ovunit:not(.wt) { flex-wrap: wrap; row-gap: 4px; } .ovcol .ovunit:not(.wt) > div:not(.st) { flex: 1 1 110px; min-width: 0; } .ovcol .ovunit:not(.wt) .st { margin-left: auto; }
 .ovcol .ovempty { margin: 0; }
 :root[data-theme="dark"] .ovcol > header { background: none; } :root[data-theme="dark"] .ovcol .ovunit:not(.wt) { background: #1b2a42; border-color: #3a4a63; }
@@ -954,9 +954,25 @@ body.viewer #mapBar .mb[data-mb="poi"] { display: none; }
 #app > header h1 .logo svg { width: 46px; height: 46px; display: block; }
 
 /* Beamer-Fenster */
-.bmcard { width: min(560px, 94vw); } .bmcard h3 { margin-top: 0; }
-.bmrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; }
-.bmrow .bmn { flex: 1 1 160px; display: flex; flex-direction: column; } .bmst { font-size: 12px; color: var(--muted); } .bmst.on { color: #15803d; font-weight: 700; }
+
+/* Beamer-Pult */
+.mb-bm { background: #0f172a !important; border-color: #0f172a !important; color: #fff !important; display: inline-flex; align-items: center; } #app > header #mapActs .mb-bm { background: #0f172a !important; border-color: #0f172a !important; }
+.bmled { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #64748b; margin-right: 6px; } .mb-bm.live .bmled { background: #22c55e; box-shadow: 0 0 7px #22c55e; } .mb-bm.hold .bmled { background: #f59e0b; box-shadow: 0 0 7px #f59e0b; }
+#bmPult { position: fixed; z-index: 3700; width: min(700px, 96vw); background: #0b0e13; border: 1px solid #232b38; border-radius: 8px; padding: 8px; color: #e5e7eb; box-shadow: 0 14px 36px rgba(0, 0, 0, .5); } #bmPult[hidden] { display: none; }
+.bp-t { display: flex; justify-content: space-between; font: 700 10px 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .14em; color: #7b8a9d; margin: 2px 4px 8px; }
+.bp-grid, .bp-ctl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .bp-ctl { margin-top: 6px; } .bp-ctl > div { display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 3px; }
+.bp-tile { position: relative; background: #05080c; border: 3px solid #263142; border-radius: 4px; overflow: hidden; aspect-ratio: 16 / 9; } .bp-tile.live { border-color: #22c55e; box-shadow: 0 0 14px #22c55e66; } .bp-tile.hold { border-color: #f59e0b; box-shadow: 0 0 14px #f59e0b66; }
+.bp-tile img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; } .bp-tile.hold img { filter: grayscale(.65) brightness(.75); } .bp-tile img[hidden] { display: none; }
+.bp-bars { position: absolute; inset: 0 0 40% 0; background: linear-gradient(90deg, #c0c0c0 0 14.2%, #c0c000 0 28.4%, #00c0c0 0 42.6%, #00c000 0 56.8%, #c000c0 0 71%, #c00000 0 85.2%, #0000c0 0); } .bp-nos { position: absolute; inset: 60% 0 0 0; display: grid; place-items: center; text-decoration: none; color: #94a3b8; font: 700 11px ui-monospace, monospace; letter-spacing: .2em; }
+.bp-tile:not(.off) .bp-bars, .bp-tile:not(.off) .bp-nos { display: none; } .bp-tl { position: absolute; left: 5px; top: 5px; font: 800 9px ui-monospace, monospace; padding: 1px 6px; border-radius: 2px; color: #000; background: #22c55e; } .bp-tile.hold .bp-tl { background: #f59e0b; } .bp-tile.off .bp-tl { display: none; }
+.bp-frz { position: absolute; inset: 0; display: none; place-items: center; font: 800 15px ui-monospace, monospace; color: #fbbf24; letter-spacing: .2em; text-shadow: 0 0 8px #000; } .bp-tile.hold .bp-frz { display: grid; }
+.bp-umd { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(5, 8, 12, .82); font: 700 11px ui-monospace, monospace; letter-spacing: .08em; padding: 3px 6px; display: flex; justify-content: space-between; }
+.bp-ctl button { padding: 7px 0; text-align: center; font: 700 10px ui-monospace, monospace; background: #1c2430; border: 1px solid #334155; border-radius: 3px; color: #cbd5e1; cursor: pointer; } .bp-ctl button:hover:not(:disabled) { border-color: #7dd3fc; } .bp-ctl button.on { background: #f59e0b; color: #1b1303; border-color: #fbbf24; } .bp-ctl button:disabled { opacity: .35; cursor: default; }
+.bp-h { font-size: 11px; color: #7b8a9d; margin: 8px 4px 2px; line-height: 1.4; }
+@media (max-width: 700px) { .bp-grid { grid-template-columns: 1fr; } .bp-ctl { grid-template-columns: 1fr; } }
+body.beamerwin .leaflet-control-zoom, body.beamerwin .leaflet-control-layers { display: none !important; }
+#bmZoom .bmz-a.on { background: rgba(34, 197, 94, .55); border-color: #86efac; } #bmZoom .bmz-a { font-size: 12px; min-width: 52px; }
+
 #bmFrozen { position: fixed; right: 10px; bottom: 8px; z-index: 5000; font-size: 11px; color: rgba(100, 116, 139, .75); background: rgba(255, 255, 255, .6); border-radius: 4px; padding: 1px 6px; pointer-events: none; }
 body.viewer #app > header #btnMore, body.viewer #app > header #btnUndo { }
 body.beamerwin #unitOv .ovtools, body.beamerwin #fueOv .ovtools, body.beamerwin #app > header #btnMore, body.beamerwin #app > header #btnTheme, body.beamerwin #app > header #btnVortrag, body.beamerwin #app > header .qb, body.beamerwin #mapBar, body.beamerwin #placeSearch, body.beamerwin #panelToggle, body.beamerwin #reviewSlider { display: none !important; }
@@ -1073,8 +1089,8 @@ body.printing .clpanel, body.printing #clusterLines { display: none; }
 
 /* Stabswand: Farbe des Abschnitts wie auf der Karte, nur als Akzent */
 .wblock[style*="--c"] { border-top: 5px solid var(--c); }
-.wblock[style*="--c"] .ea { border-color: color-mix(in srgb, var(--c) 55%, #555); }
-.wblock[style*="--c"] .ea .k { background: color-mix(in srgb, var(--c) 16%, #f1f1f1); border-right-color: color-mix(in srgb, var(--c) 55%, #888); }
+.wblock[style*="--c"] .ea { border-color: var(--c1, #555); }
+.wblock[style*="--c"] .ea .k { background: var(--c2, #e6e6e6); border-right-color: var(--c3, #888); }
 .wblock[style*="--c"] .ea .k b { color: var(--c); }
 .wblock[style*="--c"] .ovunit.wt { border-bottom: 3px solid var(--c); }
 .sdot { width: 10px; height: 10px; margin-right: 7px; border-radius: 50%; }
@@ -1097,7 +1113,7 @@ body.printing .clpanel, body.printing #clusterLines { display: none; }
     <span id="hdrArea"></span>
     <div id="mtLine" hidden></div>
     <span class="sp"></span>
-    <span id="mapActs"><button type="button" class="mb mb-ea" data-mb="sec" title="Neuen Einsatzabschnitt (EA) anlegen: Name und Farbe wählen, Fläche oder Linie auf der Karte zeichnen">+ EA</button><button type="button" class="mb mb-ek" data-mb="ek" title="Einsatzkräfte anlegen und direkt auf der Karte setzen">+ Einsatzkräfte</button><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button></span><span id="clock" role="button" tabindex="0" title="Klicken: nächste Lagebesprechung festlegen"></span>
+    <span id="mapActs"><button type="button" class="mb mb-ea" data-mb="sec" title="Neuen Einsatzabschnitt (EA) anlegen: Name und Farbe wählen, Fläche oder Linie auf der Karte zeichnen">+ EA</button><button type="button" class="mb mb-ek" data-mb="ek" title="Einsatzkräfte anlegen und direkt auf der Karte setzen">+ Einsatzkräfte</button><button type="button" class="mb" data-mb="poi" title="KRITIS-Objekt per Mausklick setzen">+ Objekt</button><button type="button" class="mb mb-bm" data-mb="beamer" aria-haspopup="dialog" title="Beamer-Fenster öffnen, festhalten und aktualisieren"><i class="bmled"></i>Beamer</button></span><span id="clock" role="button" tabindex="0" title="Klicken: nächste Lagebesprechung festlegen"></span>
     <span id="tacTime" class="chip" role="button" tabindex="0" title="Taktische Zeit (TTHHMM). Klicken: nächste Lagebesprechung festlegen" aria-label="Taktische Zeit"></span>
     <button id="fristChip" class="chip" hidden title="Fristen: Probleme mit Frist und Nachforderungen mit Lieferzeit"></button>
     <span id="storeChip" class="chip due" hidden></span>
@@ -1608,6 +1624,7 @@ SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/togeojson/0.16.0/togeojson.min.js" integrity="sha384-Pf8wWv2U7DX+774Kza+7w2RiYwz6YWNTckaDjwxZbjFj7Bsnh5XPFH465NiVHU8y" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js" integrity="sha384-0d+Gr7vM4Drod8E3hXKgciWJSWbjD/opKLLygI9ktiWbuvlDwQLzU46wJ9s5gsp7" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" integrity="sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!-- Taktische Zeichen aus dem Repository. Datei muss in src/public liegen, sonst fehlt nur die Zeichenpalette. -->
 <script src="images/symbols/symbols.js" onerror="window.symbolsMissing=true"></script>
 <script src="images/symbols-tz/symbols-tz.js"></script>
@@ -1736,6 +1753,10 @@ if (runtime.viewer) document.body.classList.add('viewer');
 if (runtime.beamer) document.body.classList.add('beamer');
 if (runtime.beamerView) document.body.classList.add('beamerwin');
 const PAL = ['#2563eb', '#dc2626', '#16a34a', '#d97706', '#7c3aed', '#0891b2', '#db2777', '#475569'];
+const mixHex = (a, b, t) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); const x = p(a), y = p(b); return '#' + x.map((v, i) => Math.round(v * t + y[i] * (1 - t)).toString(16).padStart(2, '0')).join(''); };   // Farbmischung ohne color-mix, damit auch Bildaufnahmen der Seite funktionieren
+const hexA = (h, a) => 'rgba(' + [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)).join(',') + ',' + a + ')';
+/* Leere Einträge (null, undefined, false) werden beim Anhängen übersprungen, sonst schreibt der Browser das Wort "null" in die Seite */
+['append', 'prepend', 'replaceChildren'].forEach(m => { const orig = Element.prototype[m]; Element.prototype[m] = function (...a) { return orig.apply(this, a.filter(x => x != null && x !== false)); }; });
 const safeColor = (c, d) => /^#[0-9a-f]{6}$/i.test(c || '') ? c : (d || PAL[0]);
 
 const PRIO_OLD = { hoch: 1, mittel: 2, niedrig: 3 };
@@ -3332,39 +3353,68 @@ function beamerApply(m) {
   if (bv === 'fue' && $('#fueOv').hidden) openFue();
   if (bv === 'karte' && m.view) map.fitBounds(L.latLngBounds(m.view), { animate: false });
   if (bv === 'fue') renderFue(); if (bv === 'wand') renderUnitOverview();
-  runtime.beamerStand = Date.now();
+  runtime.beamerStand = Date.now(); if (runtime.beamerFit) setTimeout(runtime.beamerFit, 120); if (runtime.thumbSoon) runtime.thumbSoon();
 }
 function beamerShowFrozen() {
   let b = $('#bmFrozen'); if (!runtime.beamerFrozen) { if (b) b.remove(); return; }
   if (!b) { b = el('div', { id: 'bmFrozen' }); document.body.append(b); }
   b.textContent = 'Stand festgehalten ' + fmtHM(runtime.beamerStand || Date.now());
 }
-function beamerZoomInit() {   // Strg und Minus, Plus, Null und Strg mit Mausrad gelten nur für dieses Fenster, nicht für die anderen
-  const KEY = 'kritis-bmzoom'; let z = 1; try { z = parseFloat(sessionStorage.getItem(KEY)) || 1; } catch (e) { /* ohne Speicher */ }
-  const apply = () => { z = Math.min(3, Math.max(0.3, Math.round(z * 100) / 100)); document.documentElement.style.zoom = z === 1 ? '' : String(z); const pv = $('.bmz-v'); if (pv) pv.textContent = Math.round(z * 100) + ' %'; try { sessionStorage.setItem(KEY, String(z)); } catch (e) { /* egal */ } setTimeout(() => { try { map.invalidateSize(); renderClusterLines(); } catch (e) { /* Karte noch nicht bereit */ } }, 60); };
-  const pct = el('button', { type: 'button', class: 'bmz-v', title: 'Zurück auf 100 %', onclick: () => step(0) });
-  const bar = el('div', { id: 'bmZoom', role: 'group', 'aria-label': 'Größe dieses Fensters' }, el('button', { type: 'button', 'data-z': '-', title: 'Kleiner (Strg und Minus)', text: '−', onclick: () => step(-0.1) }), pct, el('button', { type: 'button', 'data-z': '+', title: 'Größer (Strg und Plus)', text: '+', onclick: () => step(0.1) }));
-  let hideT = 0; const wake = () => { bar.classList.add('on'); clearTimeout(hideT); hideT = setTimeout(() => bar.classList.remove('on'), 3500); };
+function beamerZoomInit() {   // Größe nur für dieses Fenster: Strg und Minus, Plus, Null, Strg mit Mausrad, Knöpfe. "Auto" passt alles auf den Schirm, ohne Scrollen
+  const KEY = 'kritis-bmzoom', KEYA = 'kritis-bmauto', bv = runtime.beamerView; let z = 1, auto = bv !== 'karte';
+  try { z = parseFloat(sessionStorage.getItem(KEY)) || 1; const a = sessionStorage.getItem(KEYA); if (a !== null) auto = a === '1' && bv !== 'karte'; } catch (e) { /* ohne Speicher */ }
+  const label = () => { const pv = $('.bmz-v'); if (pv) pv.textContent = Math.round(z * 100) + ' %'; const ab = $('#bmZoom [data-z="auto"]'); if (ab) ab.classList.toggle('on', auto); };
+  const apply = () => { z = Math.min(3, Math.max(0.3, Math.round(z * 100) / 100)); document.documentElement.style.zoom = z === 1 ? '' : String(z); label(); try { sessionStorage.setItem(KEY, String(z)); sessionStorage.setItem(KEYA, auto ? '1' : '0'); } catch (e) { /* egal */ } setTimeout(() => { try { map.invalidateSize(); renderClusterLines(); } catch (e) { /* Karte noch nicht bereit */ } }, 60); };
+  const fit = () => {       // größte Größe bis 100 %, bei der die ganze Ansicht ohne Scrollen sichtbar ist
+    if (!auto) return; const ov = bv === 'wand' ? $('#unitOv') : bv === 'fue' ? $('#fueOv') : null; if (!ov || ov.hidden) return; let best = 0.3;
+    for (let t = 1; t >= 0.3; t = Math.round((t - 0.05) * 100) / 100) { document.documentElement.style.zoom = t === 1 ? '' : String(t); if (ov.scrollHeight <= ov.clientHeight + 1 && ov.scrollWidth <= ov.clientWidth + 1) { best = t; break; } }
+    z = best; apply();
+  };
+  runtime.beamerFit = fit;
+  const step = d => { auto = false; z = d === 0 ? 1 : z + d; apply(); wake(); };
+  const setAuto = () => { auto = !auto; if (auto) fit(); else { z = 1; apply(); } wake(); };
+  const bar = el('div', { id: 'bmZoom', role: 'group', 'aria-label': 'Größe dieses Fensters' }, el('button', { type: 'button', 'data-z': '-', title: 'Kleiner (Strg und Minus)', text: '−', onclick: () => step(-0.1) }), el('button', { type: 'button', class: 'bmz-v', title: 'Zurück auf 100 %', onclick: () => step(0) }), el('button', { type: 'button', 'data-z': '+', title: 'Größer (Strg und Plus)', text: '+', onclick: () => step(0.1) }),
+    bv === 'karte' ? null : el('button', { type: 'button', 'data-z': 'auto', class: 'bmz-a', title: 'Automatisch einpassen: alles ist ohne Scrollen sichtbar', text: 'Auto', onclick: setAuto }));
+  let hideT = 0; function wake() { bar.classList.add('on'); clearTimeout(hideT); hideT = setTimeout(() => bar.classList.remove('on'), 3500); }
   document.addEventListener('mousemove', wake); document.addEventListener('touchstart', wake, { passive: true }); document.body.append(bar);
-  const step = d => { z = d === 0 ? 1 : z + d; apply(); wake(); };
   document.addEventListener('keydown', e => { if (!(e.ctrlKey || e.metaKey) || e.altKey) return; const k = e.key; if (k === '-' || k === '_') step(-0.1); else if (k === '+' || k === '=' || k === '>') step(0.1); else if (k === '0') step(0); else return; e.preventDefault(); e.stopPropagation(); }, true);
   document.addEventListener('wheel', e => { if (!e.ctrlKey && !e.metaKey) return; e.preventDefault(); step(e.deltaY > 0 ? -0.1 : 0.1); }, { passive: false, capture: true });
-  apply(); window.__beamerZoom = () => z;
+  window.addEventListener('resize', () => { if (auto) fit(); });
+  apply(); window.__beamerZoom = () => z; window.__beamerAuto = () => auto;
+}
+async function beamerThumb(force) {      // kleine Aufnahme dieses Fensters für das Pult im Hauptfenster
+  if (typeof html2canvas !== 'function' || runtime.thumbBusy || (runtime.beamerFrozen && !force)) return; runtime.thumbBusy = true; const bv = runtime.beamerView;
+  try {
+    const W = innerWidth, H = innerHeight, TW = 440, SC = TW / W, TH = Math.max(1, Math.round(H * SC)), out = document.createElement('canvas'); out.width = TW; out.height = TH; const g = out.getContext('2d');
+    g.fillStyle = bv === 'karte' ? '#e5e3df' : '#f4f6fa'; g.fillRect(0, 0, TW, TH);
+    const mw = $('#mapWrap').getBoundingClientRect(), zf = mw.width / Math.max(1, map.getSize().x);
+    if (bv === 'karte') {                 // Kacheln und Flächen selbst zeichnen, die Bibliothek bildet sie nicht zuverlässig ab
+      document.querySelectorAll('.leaflet-tile-pane img.leaflet-tile').forEach(im => { try { const r = im.getBoundingClientRect(); g.drawImage(im, r.left * SC, r.top * SC, r.width * SC, r.height * SC); } catch (e) { /* Kachel nicht lesbar */ } });
+      state.sections.forEach(sx => { if (!sx.pts || sx.pts.length < 2) return; const col = safeColor(sx.color, '#2563eb'); g.beginPath(); sx.pts.forEach((q, i) => { const p = map.latLngToContainerPoint(q), x = (mw.left + p.x * zf) * SC, y = (mw.top + p.y * zf) * SC; if (i) g.lineTo(x, y); else g.moveTo(x, y); });
+        if (sx.kind !== 'line') { g.closePath(); g.fillStyle = hexA(col, .2); g.fill(); } g.lineWidth = Math.max(1, 3 * SC * zf); g.strokeStyle = col; g.stroke(); });
+    }
+    const top = await html2canvas(document.body, { useCORS: true, scale: SC, logging: false, backgroundColor: null,
+      ignoreElements: e => (bv === 'karte' && e.classList && (e.classList.contains('leaflet-tile-pane') || e.classList.contains('leaflet-overlay-pane'))) || (bv !== 'karte' && e.id === 'map') || e.id === 'bmZoom',
+      onclone: d => { if (bv === 'karte') d.querySelectorAll('.leaflet-container, #mapWrap, #map, body, html').forEach(e => e.style.setProperty('background', 'transparent', 'important')); } });
+    g.drawImage(top, 0, 0);   // nur der sichtbare Teil oben links: bei verkleinertem Fenster ist die Aufnahme größer als der Schirm
+    runtime.lastThumb = { img: out.toDataURL('image/jpeg', 0.72), time: Date.now() }; bcast.send({ t: 'thumb', view: bv, img: runtime.lastThumb.img, time: runtime.lastThumb.time });
+  } catch (e) { /* Miniatur ist nur eine Hilfe */ } finally { runtime.thumbBusy = false; }
 }
 function beamerStart() {
   const bv = runtime.beamerView; beamerZoomInit(); document.title = 'Beamer: ' + BEAMER_VIEWS.find(x => x[0] === bv)[1];
-  runtime.beamerFrozen = false; runtime.beamerPending = null;
+  runtime.beamerFrozen = false; runtime.beamerPending = null; let thT = 0; runtime.thumbSoon = (ms) => { clearTimeout(thT); thT = setTimeout(() => beamerThumb(), ms || 2200); };
   bcast.on(m => {
     if (m.t === 'state') { if (runtime.beamerFrozen) runtime.beamerPending = m; else beamerApply(m); }
     else if (m.t === 'ctl' && (m.target === bv || m.target === '*')) {
-      if (m.freeze === true) { runtime.beamerFrozen = true; runtime.beamerStand = runtime.beamerStand || Date.now(); }
+      if (m.freeze === true) { runtime.beamerStand = runtime.beamerStand || Date.now(); beamerThumb(true).then(() => { runtime.beamerFrozen = true; }); runtime.beamerFrozen = true; }
       else if (m.freeze === false) { runtime.beamerFrozen = false; if (runtime.beamerPending) { beamerApply(runtime.beamerPending); runtime.beamerPending = null; } }
       if (m.refresh) { if (runtime.beamerPending) { beamerApply(runtime.beamerPending); runtime.beamerPending = null; } else bcast.send({ t: 'hello', view: bv }); }
+      if (m.thumb) { if (runtime.beamerFrozen && runtime.lastThumb) bcast.send({ t: 'thumb', view: bv, img: runtime.lastThumb.img, time: runtime.lastThumb.time }); else beamerThumb(); }
       beamerShowFrozen();
     }
   });
-  const beat = () => bcast.send({ t: 'beat', view: bv, frozen: !!runtime.beamerFrozen, pending: !!runtime.beamerPending });
-  bcast.send({ t: 'hello', view: bv }); setInterval(beat, 2000); beat();
+  const beat = () => bcast.send({ t: 'beat', view: bv, frozen: !!runtime.beamerFrozen, pending: !!runtime.beamerPending, stand: runtime.beamerStand || null, zoom: window.__beamerZoom ? window.__beamerZoom() : 1, auto: window.__beamerAuto ? window.__beamerAuto() : false });
+  bcast.send({ t: 'hello', view: bv }); setInterval(beat, 2000); beat(); setInterval(() => { if (!runtime.beamerFrozen) beamerThumb(); }, 12000); runtime.thumbSoon(3500);
   if (!bcast.ok) say('Dieser Browser kann keine Beamer-Fenster abgleichen.', 8000);
   else say('Warte auf das Hauptfenster… (muss im selben Browser offen sein)', 4000);
 }
@@ -3372,33 +3422,47 @@ function beamerMainStart() {
   runtime.beamers = {};
   bcast.on(m => {
     if (m.t === 'hello') bcSendState();
-    else if (m.t === 'beat') { runtime.beamers[m.view] = { time: Date.now(), frozen: m.frozen, pending: m.pending }; if ($('#bmDlg')) renderBeamerDlg(); }
+    else if (m.t === 'beat') { const o = runtime.beamers[m.view] || {}; runtime.beamers[m.view] = Object.assign(o, { time: Date.now(), frozen: m.frozen, pending: m.pending, stand: m.stand, zoom: m.zoom, auto: m.auto }); updateBeamerPult(); }
+    else if (m.t === 'thumb') { const o = runtime.beamers[m.view] || (runtime.beamers[m.view] = { time: 0 }); o.thumb = m.img; o.thumbTime = m.time; updateBeamerPult(); }
   });
   map.on('moveend', () => { clearTimeout(runtime.bcView); runtime.bcView = setTimeout(() => { if (!runtime.viewer) bcast.send({ t: 'view', view: viewBox() }); }, 250); });
-  setInterval(() => { if ($('#bmDlg')) renderBeamerDlg(); }, 2500);
+  setInterval(updateBeamerPult, 2500);
 }
-const beamerAlive = v => runtime.beamers && runtime.beamers[v] && Date.now() - runtime.beamers[v].time < 6000;
-function beamerCtl(target, o) { bcast.send(Object.assign({ t: 'ctl', target }, o)); if (target !== '*' && runtime.beamers[target]) { if (o.freeze !== undefined) runtime.beamers[target].frozen = o.freeze; } renderBeamerDlg(); }
-function beamerToggleKarte() { const v = 'karte'; if (!beamerAlive(v)) { say('Der Karten-Beamer ist nicht geöffnet. Menü, Beamer.', 4000); return; } const fr = !runtime.beamers[v].frozen; beamerCtl(v, { freeze: fr }); say('Karten-Beamer ' + (fr ? 'festgehalten: Ausschnitt und Inhalte bleiben stehen.' : 'freigegeben: folgt wieder dem Hauptfenster.'), 4000); }
-function renderBeamerDlg() {
-  const box = $('#bmRows'); if (!box) return; box.replaceChildren();
-  BEAMER_VIEWS.forEach(([v, name]) => {
-    const st = runtime.beamers[v], alive = beamerAlive(v);
-    box.append(el('div', { class: 'bmrow' }, el('div', { class: 'bmn' }, el('b', { text: name }), el('span', { class: 'bmst' + (alive ? ' on' : ''), text: alive ? (st.frozen ? 'verbunden, festgehalten' : 'verbunden, live') : 'nicht geöffnet' })),
-      el('button', { class: 'btn small', text: alive ? 'Fenster nach vorn' : 'Fenster öffnen', onclick: () => { const u = location.href.split('#')[0].split('?')[0] + '?beamer=' + v; const w = window.open(u, 'lage-beamer-' + v); if (!w) say('Der Browser hat das Fenster blockiert. Pop-ups für diese Seite erlauben.', 5000); else w.focus(); } }),
-      el('button', { class: 'btn small' + (alive && st.frozen ? ' primary' : ''), text: alive && st.frozen ? 'Freigeben' : 'Festhalten', disabled: alive ? null : 'disabled', title: 'Festgehalten: Ausschnitt und Inhalte bleiben auf dem Beamer stehen', onclick: () => beamerCtl(v, { freeze: !st.frozen }) }),
-      el('button', { class: 'btn small', text: 'Jetzt aktualisieren', disabled: alive && st.frozen ? null : 'disabled', title: 'Nur bei festgehaltenem Beamer: einmal den aktuellen Stand zeigen', onclick: () => beamerCtl(v, { refresh: true }) })));
+const beamerAlive = v => runtime.beamers && runtime.beamers[v] && Date.now() - (runtime.beamers[v].time || 0) < 6000;
+function beamerCtl(target, o) { bcast.send(Object.assign({ t: 'ctl', target }, o)); if (target !== '*' && runtime.beamers[target]) { if (o.freeze !== undefined) runtime.beamers[target].frozen = o.freeze; } updateBeamerPult(); }
+function beamerToggleKarte() { const v = 'karte'; if (!beamerAlive(v)) { say('Der Karten-Beamer ist nicht geöffnet. Knopf „Beamer“ oben rechts.', 4000); return; } const fr = !runtime.beamers[v].frozen; beamerCtl(v, { freeze: fr }); say('Karten-Beamer ' + (fr ? 'festgehalten: Ausschnitt und Inhalte bleiben stehen.' : 'freigegeben: folgt wieder dem Hauptfenster.'), 4000); }
+/* Beamer-Pult: drei Kacheln mit Miniatur, Öffnen, Festhalten und Aktualisieren */
+function beamerOpen(v) { const u = location.href.split('#')[0].split('?')[0] + '?beamer=' + v, w = window.open(u, 'lage-beamer-' + v); if (!w) say('Der Browser hat das Fenster blockiert. Pop-ups für diese Seite erlauben.', 5000); else { try { w.focus(); } catch (e) { /* egal */ } } setTimeout(() => bcast.send({ t: 'ctl', target: '*', thumb: true }), 2500); }
+function buildBeamerPult() {
+  const tiles = BEAMER_VIEWS.map(([v, name], i) => el('div', { class: 'bp-tile off', 'data-v': v }, el('img', { alt: 'Vorschau ' + name, hidden: 'hidden' }), el('div', { class: 'bp-bars' }), el('s', { class: 'bp-nos', text: 'NO SIGNAL' }), el('span', { class: 'bp-tl' }), el('div', { class: 'bp-frz', text: 'FREEZE' }), el('div', { class: 'bp-umd' }, el('span', { text: name.toUpperCase() }), el('span', { text: 'CH ' + (i + 1) }))));
+  const ctl = BEAMER_VIEWS.map(([v, name]) => el('div', { 'data-v': v }, el('button', { type: 'button', 'data-a': 'open', title: name + ' in einem eigenen Fenster öffnen oder nach vorn holen', text: 'ÖFFNEN', onclick: () => beamerOpen(v) }),
+    el('button', { type: 'button', 'data-a': 'freeze', 'aria-pressed': 'false', title: 'Festhalten: Ausschnitt und Inhalte bleiben auf dem Beamer stehen, während Sie weiterarbeiten', text: 'FESTHALTEN', onclick: () => { const st = runtime.beamers[v]; if (beamerAlive(v)) beamerCtl(v, { freeze: !st.frozen }); } }),
+    el('button', { type: 'button', 'data-a': 'refresh', title: 'Jetzt aktualisieren: den aktuellen Stand einmal auf den Beamer bringen', text: 'AKTUAL.', onclick: () => { if (beamerAlive(v)) { beamerCtl(v, { refresh: true }); setTimeout(() => bcast.send({ t: 'ctl', target: v, thumb: true }), 1500); } } })));
+  return el('div', { id: 'bmPult', role: 'dialog', 'aria-label': 'Beamer', hidden: 'hidden' }, el('div', { class: 'bp-t' }, el('span', { text: 'BEAMER · MULTIVIEWER' }), el('span', { id: 'bpInfo' })), el('div', { class: 'bp-grid' }, ...tiles), el('div', { class: 'bp-ctl' }, ...ctl),
+    el('div', { class: 'bp-h', text: 'Jedes Fenster auf seinen Beamer ziehen, dort F11 für Vollbild. Grün: folgt dem Hauptfenster. Orange: festgehalten. Alle Fenster müssen in diesem Browser laufen. Taste H schaltet den Karten-Beamer um.' }));
+}
+function updateBeamerPult() {
+  const alive = BEAMER_VIEWS.filter(([v]) => beamerAlive(v)), frozen = alive.some(([v]) => runtime.beamers[v].frozen), btn = $('.mb-bm');
+  if (btn) { btn.classList.toggle('live', alive.length > 0 && !frozen); btn.classList.toggle('hold', frozen); btn.title = alive.length ? 'Beamer: ' + alive.length + ' von 3 Fenstern verbunden' + (frozen ? ', mindestens eins festgehalten' : '') : 'Beamer-Fenster öffnen, festhalten und aktualisieren'; }
+  const p = $('#bmPult'); if (!p || p.hidden) return;
+  $('#bpInfo').textContent = alive.length + ' / 3 VERBUNDEN · ' + fmtHM(nowMs());
+  BEAMER_VIEWS.forEach(([v]) => {
+    const st = runtime.beamers[v] || {}, on = beamerAlive(v), fr = on && st.frozen, tile = p.querySelector('.bp-tile[data-v="' + v + '"]'), c = p.querySelector('.bp-ctl [data-v="' + v + '"]');
+    tile.className = 'bp-tile ' + (!on ? 'off' : fr ? 'hold' : 'live'); const img = tile.querySelector('img'); if (on && st.thumb) { if (img.getAttribute('src') !== st.thumb) img.src = st.thumb; img.hidden = false; } else img.hidden = true;
+    tile.querySelector('.bp-tl').textContent = !on ? '' : fr ? 'FEST ' + fmtHM(st.stand || nowMs()) : 'LIVE';
+    const fb = c.querySelector('[data-a=freeze]'); fb.textContent = fr ? 'FREIGEBEN' : 'FESTHALTEN'; fb.classList.toggle('on', !!fr); fb.setAttribute('aria-pressed', String(!!fr)); fb.disabled = !on;
+    c.querySelector('[data-a=refresh]').disabled = !on; c.querySelector('[data-a=open]').textContent = 'ÖFFNEN';
   });
 }
-function openBeamerDlg() {
-  if ($('#bmDlg')) return;
-  const dlg = el('div', { id: 'bmDlg', class: 'dlg', role: 'dialog', 'aria-modal': 'true' }, el('div', { class: 'bmcard' },
-    el('h3', { text: 'Beamer-Fenster' }), el('div', { class: 'hint', text: 'Jedes Fenster zeigt immer seine Ansicht und folgt diesem Hauptfenster. Fenster auf den jeweiligen Beamer ziehen und dort F11 für Vollbild drücken. Strg und Minus, Plus oder Null ändern die Größe nur im jeweiligen Beamer-Fenster. Hatten Sie vorher den Browser-Zoom verstellt, einmal Strg+0 im Hauptfenster drücken. Alle Fenster müssen in diesem Browser laufen.' }),
-    el('div', { id: 'bmRows' }), el('div', { class: 'hint', text: 'Festhalten friert Ausschnitt und Inhalte auf dem Beamer ein, während Sie hier weiterarbeiten. Taste H schaltet den Karten-Beamer um.' }),
-    el('div', { class: 'row' }, el('button', { class: 'btn primary', style: 'flex:1;justify-content:center', text: 'Schließen', onclick: () => dlg.remove() }))));
-  dlg.addEventListener('mousedown', e => { if (e.target === dlg) dlg.remove(); }); dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); dlg.remove(); } });
-  document.body.append(dlg); renderBeamerDlg(); bcSendState();
+function positionBeamerPult() { const p = $('#bmPult'), b = $('.mb-bm'); if (!p || !b) return; const r = b.getBoundingClientRect(), w = p.offsetWidth || 700; p.style.top = Math.round(r.bottom + 8) + 'px'; p.style.left = Math.round(Math.max(8, Math.min(r.right - w, innerWidth - w - 8))) + 'px'; }
+function toggleBeamerPult(force) {
+  let p = $('#bmPult'); if (!p) { p = buildBeamerPult(); document.body.append(p); }
+  const open = force !== undefined ? force : p.hidden; p.hidden = !open; if (!open) { document.removeEventListener('mousedown', runtime.bpOut, true); document.removeEventListener('keydown', runtime.bpKey, true); return; }
+  positionBeamerPult(); updateBeamerPult(); bcSendState(); bcast.send({ t: 'ctl', target: '*', thumb: true });
+  runtime.bpOut = e => { if (!p.contains(e.target) && !e.target.closest('.mb-bm, #hdrMenu')) toggleBeamerPult(false); }; runtime.bpKey = e => { if (e.key === 'Escape') { e.stopPropagation(); toggleBeamerPult(false); } };
+  document.addEventListener('mousedown', runtime.bpOut, true); document.addEventListener('keydown', runtime.bpKey, true);
 }
+function openBeamerDlg() { toggleBeamerPult(true); }
 /* ------------------------------------------------------------------ */
 /* Gemeinsamer Einsatz: Abgleich über den eigenen Sync-Server          */
 /* Ein Code (20 Zeichen) ersetzt das Konto. Daraus entstehen im Browser Kennung, Zugriffsschlüssel und */
@@ -3801,12 +3865,16 @@ function meetingText() {
   const d = due - nowMs(); return d >= 0 ? 'Nächste Lagebesprechung um ' + new Date(due).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' (in ' + fmtDur(d) + ').' : 'Lagebesprechung überfällig seit ' + fmtDur(-d) + '.';
 }
 const fmtDur = ms => { const t = Math.round(ms / 1000), h = Math.floor(t / 3600), mi = Math.floor(t % 3600 / 60), se = t % 60; return (h ? h + ' h ' : '') + pad2(mi) + ':' + pad2(se) + (h ? '' : ' min'); };
+function chipDur(ms) {   // Kopfzeile: unter einer Stunde mm:ss min, sonst h und min, immer mit Leerzeichen vor min
+  const t = Math.round(ms / 1000), h = Math.floor(t / 3600), mi = Math.floor(t % 3600 / 60), se = t % 60;
+  return h ? h + ' h ' + mi + ' min' : pad2(mi) + ':' + pad2(se) + ' min';
+}
 function updateMeetingChip() {
   const c = $('#mtLine'); if (!c) return; const due = meetingDue();
   if (due == null) { c.hidden = true; } else {
     const d = due - nowMs(); c.hidden = false; c.classList.toggle('due', d < 0); c.classList.toggle('soon', d >= 0 && d < 5 * 60000);
     const dd = fmtDur(Math.abs(d)), mins = / min$/.test(dd);
-    c.replaceChildren(el('span', { class: 'mtl', text: 'Nächste Lagebesprechung ' }), el('span', { class: 'mts', text: 'Besprechung ' }), fmtHM(due), el('span', { class: 'mtu', text: ' Uhr' }), ' · ', el('span', { class: 'mti', text: d >= 0 ? 'in ' : 'überfällig ' }), mins ? dd.replace(/ min$/, '') : dd, mins ? el('span', { class: 'mtu', text: ' min' }) : null); c.title = 'Nächste Lagebesprechung um ' + fmtHM(due) + ' Uhr. Klick auf die Uhr ändert den Termin.';
+    c.replaceChildren(el('span', { class: 'mtl', text: 'Nächste Lagebesprechung ' }), el('span', { class: 'mts', text: 'Besprechung ' }), fmtHM(due), el('span', { class: 'mtu', text: ' Uhr' }), ' · ', el('span', { class: 'mti', text: d >= 0 ? 'in ' : 'überfällig ' }), chipDur(Math.abs(d))); c.title = 'Nächste Lagebesprechung um ' + fmtHM(due) + ' Uhr. Klick auf die Uhr ändert den Termin.';
   }
   if (document.activeElement !== $('#mtInt') && $('#tab-einsatz').classList.contains('active')) $('#mtInfo').textContent = meetingText();
 }
@@ -5360,7 +5428,7 @@ function wandBlock(sx, units) {
   const list = units.filter(u => sx ? ids.has(u.sectionId) : ((!u.sectionId || !state.sections.some(x => x.id === u.sectionId)) && u.status !== ST_ANF));
   const body = el('div', { class: 'wtiles' }, ...list.slice().sort((p, q) => (p.name || '').localeCompare(q.name || '', 'de')).map(wTile));
   if (!list.length) body.append(el('div', { class: 'ovempty', text: ro('units') ? 'leer' : 'Kacheln hierher ziehen' }));
-  return el('div', { class: 'ovcol wblock', 'data-drop': 'sec:' + (sx ? sx.id : ''), style: sx ? '--c:' + safeColor(sx.color, '#2563eb') : null }, sx ? wandCard(sx, sums) : el('div', { class: 'wnone' }, el('b', { text: 'Ohne Abschnitt' }), el('span', { text: 'nicht zugeordnete Einheiten' })), body);
+  return el('div', { class: 'ovcol wblock', 'data-drop': 'sec:' + (sx ? sx.id : ''), style: sx ? (() => { const c = safeColor(sx.color, '#2563eb'); return '--c:' + c + ';--c1:' + mixHex(c, '#555555', .55) + ';--c2:' + mixHex(c, '#f1f1f1', .16) + ';--c3:' + mixHex(c, '#888888', .55); })() : null }, sx ? wandCard(sx, sums) : el('div', { class: 'wnone' }, el('b', { text: 'Ohne Abschnitt' }), el('span', { text: 'nicht zugeordnete Einheiten' })), body);
 }
 function kcell(secId, key, val, computed) {
   const o = (state.kraefte.ovr[secId == null ? '_' : secId] || {})[key], has = o != null, vw = ro('kraefte');
@@ -5481,7 +5549,7 @@ function renderWand(cols, units) {
 function ovTile(u, mode) {
   const st = ustat(u.status), kids = state.units.filter(x => x.parentId === u.id), par = u.parentId ? state.units.find(x => x.id === u.parentId) : null, vw = ro('units');
   const stBtn = vw ? el('span', {}, el('i'), st.label) : el('button', { class: 'ovst', title: 'Status ändern', onclick: ev => { const r = ev.currentTarget.getBoundingClientRect(); showMenu(r.left, r.bottom + 2, state.unitStatus.map(x => ({ label: x.label, swatch: x.color, check: x.id === u.status, onclick: () => setUnitStatus(u, x.id) }))); } }, el('i'), st.label);
-  const t = el('div', { class: 'ovunit', style: '--c:' + safeColor(st.color), 'data-uid': u.id, tabindex: vw ? null : '0' },
+  const t = el('div', { class: 'ovunit', style: '--c:' + safeColor(st.color) + ';--cs:' + hexA(safeColor(st.color), .12), 'data-uid': u.id, tabindex: vw ? null : '0' },
     vw ? null : el('span', { class: 'grip', title: 'Ziehen, um die Einheit zu verschieben', 'aria-hidden': 'true', text: '⋮⋮' }),
     el('img', { src: unitSym(u).url, alt: '' }),
     el('div', {}, el('div', { class: 'nm', text: u.name || 'Einheit' }), el('div', { class: 'meta', text: [u.call, 'Stärke ' + fmtStr(u)].filter(Boolean).join(' · ') }),
@@ -6193,7 +6261,7 @@ function initNavActs() {
     else if (a === 'fue') { if (!$('#fueOv').hidden) closeFue(); else openFue(); }
     syncNav();
   }));
-  document.querySelectorAll('#mapActs [data-mb]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mb; if (k === 'poi') $('#btnAddPoi').click(); else if (k === 'units') $('#btnUnits').click(); else if (k === 'fue') $('#btnFue').click(); else if (k === 'ek') openUnitWizard({}); else if (k === 'sec') { const p = $('#secPop'); p.hidden = !p.hidden; if (!p.hidden) $('#secName').focus(); } else if (k === 'print') $('#btnPrint').click(); syncNav(); }));
+  document.querySelectorAll('#mapActs [data-mb]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mb; if (k === 'poi') $('#btnAddPoi').click(); else if (k === 'units') $('#btnUnits').click(); else if (k === 'fue') $('#btnFue').click(); else if (k === 'ek') openUnitWizard({}); else if (k === 'beamer') toggleBeamerPult(); else if (k === 'sec') { const p = $('#secPop'); p.hidden = !p.hidden; if (!p.hidden) $('#secName').focus(); } else if (k === 'print') $('#btnPrint').click(); syncNav(); }));
   syncNav();
 }
 function initLook() {

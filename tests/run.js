@@ -207,14 +207,14 @@ async function seite(b, q, w, h) {
     const karte = await mk('karte'), wand = await mk('wand'), fue = await mk('fue');
     assert.ok(await wand.evaluate(() => document.body.innerText.includes('LF Eins')), 'Wand zeigt die Einheit'); assert.ok(await fue.evaluate(() => !document.querySelector('#fueOv').hidden));
     assert.ok(await wand.evaluate(() => !document.querySelector('#unitOv .ovtools').offsetParent), 'keine Bedienelemente im Beamer');
-    await main.evaluate(() => { const L = window.__lage; L.state.units[0].name = 'LF Zwei'; L.assignUnit(L.state.units[0], 'A'); L.state.units[0].name = 'LF Zwei'; L.map.setView([52.0, 8.0], 12); window.__lage.state.units[0].time = new Date().toISOString(); }); await main.evaluate(() => document.querySelector('#btnBeamer').click()); await main.waitForTimeout(2800);
+    await main.evaluate(() => { const L = window.__lage; L.state.units[0].name = 'LF Zwei'; L.assignUnit(L.state.units[0], 'A'); L.state.units[0].name = 'LF Zwei'; L.map.setView([52.0, 8.0], 12); window.__lage.state.units[0].time = new Date().toISOString(); }); await main.click('.mb-bm'); await main.waitForTimeout(2800);
     const cen = await karte.evaluate(() => { const c = window.__lage.map.getCenter(); return [c.lat, c.lng]; }); assert.ok(Math.abs(cen[0] - 52.0) < 0.3, 'Karten-Beamer folgt dem Ausschnitt: ' + cen);
-    await main.evaluate(() => document.querySelectorAll('#bmRows .bmrow')[2].querySelectorAll('button')[1].click()); await main.waitForTimeout(400);
+    await main.click('#bmPult .bp-ctl [data-v="karte"] [data-a="freeze"]'); await main.waitForTimeout(400);
     await main.evaluate(() => { const L = window.__lage; L.map.setView([48.0, 11.0], 12); L.state.units[0].name = 'LF Drei'; L.assignUnit(L.state.units[0], null); }); await main.waitForTimeout(1000);
     const cen2 = await karte.evaluate(() => { const c = window.__lage.map.getCenter(); return c.lat; }); assert.ok(Math.abs(cen2 - 52.0) < 0.3, 'Karte festgehalten: ' + cen2);
-    await main.evaluate(() => document.querySelectorAll('#bmRows .bmrow')[2].querySelectorAll('button')[1].click()); await main.waitForTimeout(1000);
+    await main.click('#bmPult .bp-ctl [data-v="karte"] [data-a="freeze"]'); await main.waitForTimeout(1000);
     const cen3 = await karte.evaluate(() => window.__lage.map.getCenter().lat); assert.ok(Math.abs(cen3 - 48.0) < 0.3, 'nach Freigabe wieder live: ' + cen3);
-    await wand.keyboard.press('Control+-'); await wand.keyboard.press('Control+-'); await wand.waitForTimeout(300);
+    await wand.keyboard.press('Control+0'); await wand.waitForTimeout(200); await wand.keyboard.press('Control+-'); await wand.keyboard.press('Control+-'); await wand.waitForTimeout(300);
     assert.strictEqual(await wand.evaluate(() => document.documentElement.style.zoom), '0.8', 'Zoom nur im Beamer-Fenster'); assert.strictEqual(await fue.evaluate(() => document.documentElement.style.zoom), '', 'anderes Beamer-Fenster bleibt'); assert.strictEqual(await main.evaluate(() => document.documentElement.style.zoom), '', 'Hauptfenster bleibt');
     await wand.keyboard.press('Control+0'); await wand.waitForTimeout(200); assert.strictEqual(await wand.evaluate(() => document.documentElement.style.zoom), '', 'Strg+0 setzt zurück');
     await wand.mouse.move(300, 300); await wand.waitForTimeout(300); await wand.click('#bmZoom button[data-z="+"]'); await wand.waitForTimeout(200); assert.strictEqual(await wand.evaluate(() => document.documentElement.style.zoom), '1.1', 'Plus-Knopf im Beamer-Fenster'); assert.strictEqual(await fue.evaluate(() => document.documentElement.style.zoom), '', 'anderes Fenster bleibt'); await wand.click('#bmZoom button[data-z="-"]'); await wand.waitForTimeout(200); assert.strictEqual(await wand.evaluate(() => document.documentElement.style.zoom), '', 'Minus-Knopf');
@@ -276,7 +276,7 @@ async function seite(b, q, w, h) {
     assert.strictEqual(await p.evaluate(() => window.__lage.state.units[0].sectionId), 'ea1', 'Ziehen in den Abschnitt'); await p.close();
   });
   await t('Kopfzeile: + EA, + Einsatzkräfte, + Objekt, Drucken; Kräfteübersicht teilt rot, weiß, blau auf', async () => {
-    const p = await seite(b, '', 1700, 1300); const labs = await p.$$eval('#app > header #mapActs .mb', x => x.map(e => e.textContent.trim())); assert.deepStrictEqual(labs, ['+ EA', '+ Einsatzkräfte', '+ Objekt']);
+    const p = await seite(b, '', 1700, 1300); const labs = await p.$$eval('#app > header #mapActs .mb', x => x.map(e => e.textContent.trim())); assert.deepStrictEqual(labs, ['+ EA', '+ Einsatzkräfte', '+ Objekt', 'Beamer']);
     assert.strictEqual(await p.locator('#mapBar .mb').count(), 0, 'Kartenleiste ohne Kräfte, Stab und Drucken'); assert.ok(await p.$eval('#mapActs', e => e.parentElement.id === 'hdrSub'), 'Knöpfe in der unteren Zeile der Kopfzeile'); assert.ok(await p.locator('#btnPrint').count() === 1, 'Drucken im Menü');
     await p.evaluate(() => { const s = window.__lage.state, now = new Date().toISOString(); s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: [] }];
       const U = (id, n, st) => ({ id, name: n, call: '', sym: null, f: 1, u: 2, h: 5, status: st, sectionId: 'A', task: '', note: '', lat: null, lng: null, time: now }); s.units = [U('1', 'HLF 20', 'einsatz'), U('2', 'RTW 3', 'einsatz'), U('3', 'GKW 1', 'anfahrt')]; });
@@ -363,6 +363,27 @@ async function seite(b, q, w, h) {
       assert.ok(!(await A.evaluate(() => document.querySelector('#btnRedo').disabled)), 'Wiederholen verfügbar');
       await A.evaluate(() => { window.__lage.redo(); }); await A.waitForTimeout(2500); assert.strictEqual(await B.evaluate(() => window.__lage.state.units[0].note), 'von A', 'Wiederholen kommt bei B an');
     } finally { srv.kill(); }
+  });
+  await t('Beamer-Pult: Öffnen statt Holen, Miniaturen, Auto-Einpassen, kein null', async () => {
+    const ctx = await b.newContext({ viewport: { width: 1500, height: 800 } }); const url = 'file://' + require('path').resolve(__dirname, '../src/public/kritis-lage-einzeldatei.html');
+    const main = await ctx.newPage(); await main.goto(url); await main.waitForTimeout(1200);
+    await main.evaluate(() => { const L = window.__lage, s = L.state, now = new Date().toISOString(); const sq = (a, b2, d) => [[a, b2], [a, b2 + d], [a + d * 0.7, b2 + d], [a + d * 0.7, b2]];
+      s.sections = [{ id: 'A', kind: 'poly', typ: 'ea', name: 'Nord', color: '#2563eb', pts: sq(50.10, 8.62, 0.025) }, { id: 'B', kind: 'poly', typ: 'ea', name: 'Süd', color: '#dc2626', pts: sq(50.09, 8.66, 0.02) }, { id: 'C', kind: 'poly', typ: 'br', name: 'Kaserne', color: '#d97706', pts: sq(50.085, 8.70, 0.012) }];
+      const U = (id, n, sec, lat, lng, st) => ({ id, name: n, call: '', sym: null, f: 1, u: 2, h: 5, status: st || 'einsatz', sectionId: sec, task: '', note: '', lat, lng, time: now }); s.units = [U('1', 'ELW 1', 'A', 50.108, 8.632), U('2', 'HLF 20', 'A', 50.112, 8.636), U('3', 'LF 10', 'B', 50.098, 8.67), U('4', 'RTW 3', 'B', 50.1, 8.672), U('5', 'GKW 1', 'C', 50.089, 8.704, 'anfahrt')]; L.map.setView([50.098, 8.668], 14, { animate: false }); L.renderUnitMarkers(); });
+    const mk = async v => { const p = await ctx.newPage(); await p.setViewportSize({ width: 1920, height: 1080 }); await p.goto(url + '?beamer=' + v); return p; }; const wand = await mk('wand'), fue = await mk('fue'), karte = await mk('karte'); await main.bringToFront(); await main.waitForTimeout(7000);
+    await main.click('.mb-bm'); await main.waitForTimeout(4500);
+    assert.strictEqual(await main.$$eval('#bmPult .bp-ctl [data-a="open"]', x => x.map(e => e.textContent.trim()).join()), 'ÖFFNEN,ÖFFNEN,ÖFFNEN', 'Öffnen statt Holen');
+    for (const v of ['wand', 'fue', 'karte']) assert.ok(await main.$eval('#bmPult .bp-tile[data-v="' + v + '"] img', e => !e.hidden && e.src.startsWith('data:image')), 'Miniatur ' + v);
+    assert.ok(await main.$eval('.mb-bm', e => e.classList.contains('live')), 'Statuslicht grün');
+    const fits = await wand.evaluate(() => { const o = document.querySelector('#unitOv'); return [window.__beamerAuto(), window.__beamerZoom(), o.scrollHeight <= o.clientHeight + 1 && o.scrollWidth <= o.clientWidth + 1]; }); assert.ok(fits[0] && fits[1] <= 1 && fits[2], 'Einsatzübersicht passt auf den Schirm: ' + fits);
+    assert.ok(!(await fue.textContent('#fueOv')).includes('null'), 'kein null in der Führungsstruktur');
+    assert.ok(!(await karte.locator('.leaflet-control-zoom').isVisible()), 'keine Zoomknöpfe im Karten-Beamer');
+    await main.click('#bmPult .bp-ctl [data-v="fue"] [data-a="freeze"]'); await main.waitForTimeout(1200); assert.ok(await main.$eval('#bmPult .bp-tile[data-v="fue"]', e => e.classList.contains('hold')), 'festgehalten: orange'); assert.ok(await main.$eval('.mb-bm', e => e.classList.contains('hold')), 'Statuslicht orange');
+    await ctx.close();
+  });
+  await t('Lagebesprechung in der Kopfzeile: Stunden und min mit Leerzeichen, kein null', async () => {
+    const p = await seite(b, '', 1700, 900); await p.evaluate(() => { window.__lage.state.meeting.nextIso = new Date(Date.now() + (104 * 60 + 44) * 1000).toISOString(); }); await p.waitForTimeout(1500);
+    const tx = await p.$eval('#mtLine', e => e.textContent); assert.ok(/in 1 h 4[34] min$/.test(tx) && !tx.includes('null'), tx); await p.close();
   });
   await t('Wandoptik schaltbar und gemerkt', async () => {
     const p = await seite(b, ''); assert.ok(!(await p.evaluate(() => document.body.classList.contains('wandlook'))));
